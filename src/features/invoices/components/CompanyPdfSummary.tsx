@@ -18,10 +18,10 @@ export function CompanyPdfSummary({ company }: CompanyPdfSummaryProps) {
   const { t } = useTranslation(["common", "invoice"]);
 
   const allRows: { key: keyof InvoicePdfVisibility; label: string; value?: string }[] = [
-    { key: "showCompanyEmail", label: t("invoice:visibility.showCompanyEmail"), value: company.email },
-    { key: "showCompanyPhone", label: t("invoice:visibility.showCompanyPhone"), value: company.phone },
-    { key: "showCompanyVatId", label: t("invoice:visibility.showCompanyVatId"), value: company.vatId },
-    { key: "showCompanyTaxNumber", label: t("invoice:visibility.showCompanyTaxNumber"), value: company.taxNumber }
+    { key: "showCompanyEmail", label: t("invoice:form.visibility.showCompanyEmail"), value: company.email },
+    { key: "showCompanyPhone", label: t("invoice:form.visibility.showCompanyPhone"), value: company.phone },
+    { key: "showCompanyVatId", label: t("invoice:form.visibility.showCompanyVatId"), value: company.vatId },
+    { key: "showCompanyTaxNumber", label: t("invoice:form.visibility.showCompanyTaxNumber"), value: company.taxNumber }
   ];
   const rows = allRows.filter((row) => row.value);
 

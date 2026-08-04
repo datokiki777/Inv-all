@@ -31,6 +31,8 @@ const paymentDetailsSchema = z.object({
 });
 
 const pdfVisibilitySchema = z.object({
+  showServiceDate: z.boolean(),
+  showDueDate: z.boolean(),
   showCompanyEmail: z.boolean(),
   showCompanyPhone: z.boolean(),
   showCompanyVatId: z.boolean(),
@@ -116,8 +118,8 @@ export const invoiceItemFormSchema = z.object({
 export const invoiceFormSchema = z.object({
   invoiceNumber: z.string().min(1, "invoiceNumberRequired"),
   createdDate: z.string().min(1, "dateRequired"),
-  serviceDate: z.string().min(1, "dateRequired"),
-  dueDate: z.string().min(1, "dateRequired"),
+  serviceDate: z.string().optional(),
+  dueDate: z.string().optional(),
   clientId: z.string().min(1, "clientRequired"),
   items: z.array(invoiceItemFormSchema).min(1, "atLeastOneItemRequired"),
   taxMode: z.enum(["standard", "reverseCharge", "taxFree", "custom"]),

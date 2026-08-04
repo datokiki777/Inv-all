@@ -2,6 +2,8 @@ import type { InvoicePdfVisibility } from "@/types";
 
 /** Everything visible by default — matches how the app behaved before these toggles existed. */
 export const defaultPdfVisibility: InvoicePdfVisibility = {
+  showServiceDate: true,
+  showDueDate: true,
   showCompanyEmail: true,
   showCompanyPhone: true,
   showCompanyVatId: true,

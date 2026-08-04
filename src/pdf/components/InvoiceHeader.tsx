@@ -61,12 +61,16 @@ export function InvoiceHeader({ invoice, labels, accentColor }: Props) {
         <Text style={styles.metaLine}>
           {labels.createdDate}: {invoice.createdDate}
         </Text>
-        <Text style={styles.metaLine}>
-          {labels.serviceDate}: {invoice.serviceDate}
-        </Text>
-        <Text style={styles.metaLine}>
-          {labels.dueDate}: {invoice.dueDate}
-        </Text>
+        {visibility.showServiceDate && invoice.serviceDate ? (
+          <Text style={styles.metaLine}>
+            {labels.serviceDate}: {invoice.serviceDate}
+          </Text>
+        ) : null}
+        {visibility.showDueDate && invoice.dueDate ? (
+          <Text style={styles.metaLine}>
+            {labels.dueDate}: {invoice.dueDate}
+          </Text>
+        ) : null}
       </View>
     </View>
   );

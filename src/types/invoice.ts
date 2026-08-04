@@ -45,6 +45,8 @@ export type InvoiceLanguage = "de" | "en";
  * before.
  */
 export interface InvoicePdfVisibility {
+  showServiceDate: boolean;
+  showDueDate: boolean;
   showCompanyEmail: boolean;
   showCompanyPhone: boolean;
   showCompanyVatId: boolean;

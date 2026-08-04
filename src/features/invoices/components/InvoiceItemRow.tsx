@@ -63,61 +63,60 @@ export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: Inv
       <Input placeholder={t("invoice:form.itemDescription")} {...register(`items.${index}.description`)} />
 
       <div className="grid grid-cols-3 gap-2">
-        <Input
-          type="number"
-          step="0.01"
-          min="0"
-          inputMode="decimal"
-          aria-label={t("invoice:fields.quantity", { ns: "invoice" })}
-          invalid={!!rowErrors?.quantity}
-          {...register(`items.${index}.quantity`)}
-        />
-        <Select aria-label={t("invoice:fields.unit", { ns: "invoice" })} {...register(`items.${index}.unit`)}>
-          {UNITS.map((unit) => (
-            <option key={unit} value={unit}>
-              {t(`products.units.${unit}`)}
-            </option>
-          ))}
-        </Select>
-        <Input
-          type="number"
-          step="0.01"
-          min="0"
-          inputMode="decimal"
-          aria-label={t("invoice:fields.unitPrice", { ns: "invoice" })}
-          invalid={!!rowErrors?.unitPrice}
-          {...register(`items.${index}.unitPrice`)}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        <Select aria-label={t("invoice:form.itemDiscount")} {...register(`items.${index}.discountType`)}>
-          <option value="none">{t("invoice:form.discountNone")}</option>
-          <option value="percent">{t("invoice:form.discountPercent")}</option>
-          <option value="fixed">{t("invoice:form.discountFixed")}</option>
-        </Select>
-        {discountType !== "none" ? (
+        <div>
+          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.quantity", { ns: "invoice" })}</p>
           <Input
             type="number"
             step="0.01"
             min="0"
             inputMode="decimal"
-            aria-label={t("invoice:form.discountValue")}
-            placeholder={t("invoice:form.discountValue")}
-            {...register(`items.${index}.discountValue`)}
+            invalid={!!rowErrors?.quantity}
+            {...register(`items.${index}.quantity`)}
           />
-        ) : null}
-        {showVatColumn ? (
+        </div>
+        <div>
+          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+          <Select {...register(`items.${index}.unit`)}>
+            {UNITS.map((unit) => (
+              <option key={unit} value={unit}>
+                {t(`products.units.${unit}`)}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unitPrice", { ns: "invoice" })}</p>
           <Input
             type="number"
-            step="0.1"
+            step="0.01"
             min="0"
-            max="100"
             inputMode="decimal"
-            aria-label={t("invoice:fields.vat", { ns: "invoice" })}
-            placeholder={`${t("invoice:fields.vat", { ns: "invoice" })} %`}
-            {...register(`items.${index}.vatPercent`)}
+            invalid={!!rowErrors?.unitPrice}
+            {...register(`items.${index}.unitPrice`)}
           />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.discount", { ns: "invoice" })}</p>
+          <Select {...register(`items.${index}.discountType`)}>
+            <option value="none">{t("invoice:form.discountNone")}</option>
+            <option value="percent">{t("invoice:form.discountPercent")}</option>
+            <option value="fixed">{t("invoice:form.discountFixed")}</option>
+          </Select>
+        </div>
+        {discountType !== "none" ? (
+          <div>
+            <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:form.discountValue")}</p>
+            <Input type="number" step="0.01" min="0" inputMode="decimal" {...register(`items.${index}.discountValue`)} />
+          </div>
+        ) : null}
+        {showVatColumn ? (
+          <div>
+            <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.vat", { ns: "invoice" })} %</p>
+            <Input type="number" step="0.1" min="0" max="100" inputMode="decimal" {...register(`items.${index}.vatPercent`)} />
+          </div>
         ) : null}
       </div>
 

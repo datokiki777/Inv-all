@@ -19,7 +19,9 @@ export interface DashboardMetrics {
 const OUTSTANDING_STATUSES = new Set<Invoice["status"]>(["sent", "partiallyPaid", "overdue"]);
 
 function isPastDue(invoice: Invoice, todayDateOnly: string): boolean {
-  return invoice.status !== "paid" && invoice.status !== "cancelled" && invoice.dueDate < todayDateOnly;
+  return (
+    invoice.status !== "paid" && invoice.status !== "cancelled" && !!invoice.dueDate && invoice.dueDate < todayDateOnly
+  );
 }
 
 function groupByCurrency(invoices: Invoice[]): CurrencyAmount[] {

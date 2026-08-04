@@ -21,7 +21,7 @@ export function TaxSettingsEditor() {
     <div className="space-y-3 rounded-lg border border-line p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
-        {hasVatRate ? <PdfVisibilitySwitch visKey="showVatSummaryTable" label={t("invoice:visibility.showVatSummaryTable")} /> : null}
+        {hasVatRate ? <PdfVisibilitySwitch visKey="showVatSummaryTable" /> : null}
       </div>
 
       <FormField label={t("invoice:form.taxMode")} htmlFor="taxMode">

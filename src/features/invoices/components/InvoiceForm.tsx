@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { todayDateOnly, addDays, formatDate } from "@/utils/date";
+import { todayDateOnly, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
 import { defaultPdfVisibility } from "@/utils/invoicePdfVisibility";
 import { useInvoiceDraftAutosave, loadInvoiceDraft, clearInvoiceDraft, type InvoiceDraftSnapshot } from "@/features/invoices/hooks/useInvoiceDraft";
@@ -22,7 +22,6 @@ import { ClientPdfSummary } from "./ClientPdfSummary";
 import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import { InvoiceTotalsPreview } from "./InvoiceTotalsPreview";
 
-const STATUSES = ["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"] as const;
 const TEMPLATES = ["classic", "modern", "compact", "minimal"] as const;
 const PAYMENT_METHODS = ["bankTransfer", "cash", "paypal", "other"] as const;
 
@@ -46,8 +45,8 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
   return {
     invoiceNumber: suggestedInvoiceNumber ?? "",
     createdDate: today,
-    serviceDate: today,
-    dueDate: addDays(today, 14),
+    serviceDate: "",
+    dueDate: "",
     clientId: "",
     items: [blankInvoiceFormItem(19)],
     taxMode: "standard",
@@ -146,17 +145,27 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
           <Input id="invoiceNumber" invalid={!!errors.invoiceNumber} {...register("invoiceNumber")} />
         </FormField>
 
-        <div className="grid grid-cols-3 gap-2">
-          <FormField label={t("invoice:fields.createdDate", { ns: "invoice" })} htmlFor="createdDate" error={err("createdDate")}>
-            <Input id="createdDate" type="date" {...register("createdDate")} />
-          </FormField>
-          <FormField label={t("invoice:fields.serviceDate", { ns: "invoice" })} htmlFor="serviceDate" error={err("serviceDate")}>
-            <Input id="serviceDate" type="date" {...register("serviceDate")} />
-          </FormField>
-          <FormField label={t("invoice:fields.dueDate", { ns: "invoice" })} htmlFor="dueDate" error={err("dueDate")}>
-            <Input id="dueDate" type="date" {...register("dueDate")} />
-          </FormField>
-        </div>
+        <FormField label={t("invoice:fields.createdDate", { ns: "invoice" })} htmlFor="createdDate" error={err("createdDate")}>
+          <Input id="createdDate" type="date" {...register("createdDate")} />
+        </FormField>
+
+        <FormField
+          label={t("invoice:fields.serviceDate", { ns: "invoice" })}
+          htmlFor="serviceDate"
+          error={err("serviceDate")}
+          headerRight={<PdfVisibilitySwitch visKey="showServiceDate" />}
+        >
+          <Input id="serviceDate" type="date" {...register("serviceDate")} />
+        </FormField>
+
+        <FormField
+          label={t("invoice:fields.dueDate", { ns: "invoice" })}
+          htmlFor="dueDate"
+          error={err("dueDate")}
+          headerRight={<PdfVisibilitySwitch visKey="showDueDate" />}
+        >
+          <Input id="dueDate" type="date" {...register("dueDate")} />
+        </FormField>
 
         <CompanyPdfSummary company={company} />
 
@@ -187,7 +196,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         <div className="space-y-3 rounded-lg border border-line p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
-            {company.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" label={t("invoice:visibility.showBankDetails")} /> : null}
+            {company.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" /> : null}
           </div>
           <FormField label={t("invoice:form.paymentMethod")} htmlFor="paymentMethod">
             <Select id="paymentMethod" {...register("paymentMethod")}>
@@ -206,7 +215,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         <FormField
           label={t("invoice:form.note")}
           htmlFor="note"
-          headerRight={<PdfVisibilitySwitch visKey="showNotes" label={t("invoice:visibility.showNotes")} />}
+          headerRight={<PdfVisibilitySwitch visKey="showNotes" />}
         >
           <Textarea id="note" {...register("note")} />
         </FormField>
@@ -228,16 +237,6 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
             </Select>
           </FormField>
         </div>
-
-        <FormField label={t("invoice:form.status")} htmlFor="status">
-          <Select id="status" {...register("status")}>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {t(`invoice:status.${status}`)}
-              </option>
-            ))}
-          </Select>
-        </FormField>
 
         <InvoiceTotalsPreview />
 

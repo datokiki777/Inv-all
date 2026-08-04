@@ -12,10 +12,10 @@ export function ClientPdfSummary({ client }: ClientPdfSummaryProps) {
   if (!client) return null;
 
   const allRows: { key: keyof InvoicePdfVisibility; label: string; value?: string }[] = [
-    { key: "showClientEmail", label: t("invoice:visibility.showClientEmail"), value: client.email },
-    { key: "showClientPhone", label: t("invoice:visibility.showClientPhone"), value: client.phone },
-    { key: "showClientVatId", label: t("invoice:visibility.showClientVatId"), value: client.vatId },
-    { key: "showClientTaxNumber", label: t("invoice:visibility.showClientTaxNumber"), value: client.taxNumber }
+    { key: "showClientEmail", label: t("invoice:form.visibility.showClientEmail"), value: client.email },
+    { key: "showClientPhone", label: t("invoice:form.visibility.showClientPhone"), value: client.phone },
+    { key: "showClientVatId", label: t("invoice:form.visibility.showClientVatId"), value: client.vatId },
+    { key: "showClientTaxNumber", label: t("invoice:form.visibility.showClientTaxNumber"), value: client.taxNumber }
   ];
   const rows = allRows.filter((row) => row.value);
 
