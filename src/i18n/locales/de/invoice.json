@@ -1,0 +1,23 @@
+{
+  "status": {
+    "draft": "Entwurf",
+    "sent": "Versendet",
+    "paid": "Bezahlt",
+    "partiallyPaid": "Teilweise bezahlt",
+    "overdue": "Überfällig",
+    "cancelled": "Storniert"
+  },
+  "fields": {
+    "invoiceNumber": "Rechnungsnummer",
+    "createdDate": "Rechnungsdatum",
+    "serviceDate": "Leistungsdatum",
+    "dueDate": "Fälligkeitsdatum",
+    "subtotal": "Zwischensumme",
+    "discount": "Rabatt",
+    "vat": "MwSt.",
+    "total": "Gesamtbetrag",
+    "paid": "Bezahlt",
+    "remaining": "Offener Betrag"
+  },
+  "reverseChargeNote": "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge)."
+}

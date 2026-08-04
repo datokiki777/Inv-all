@@ -1,0 +1,23 @@
+{
+  "status": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "paid": "Paid",
+    "partiallyPaid": "Partially paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled"
+  },
+  "fields": {
+    "invoiceNumber": "Invoice number",
+    "createdDate": "Invoice date",
+    "serviceDate": "Service date",
+    "dueDate": "Due date",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "vat": "VAT",
+    "total": "Total",
+    "paid": "Paid",
+    "remaining": "Remaining"
+  },
+  "reverseChargeNote": "Reverse charge: VAT liability is transferred to the recipient."
+}
