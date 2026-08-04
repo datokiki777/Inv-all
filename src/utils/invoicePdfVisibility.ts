@@ -15,7 +15,6 @@ export const defaultPdfVisibility: InvoicePdfVisibility = {
   showNotes: true,
   showBankDetails: true,
   showItemUnitColumn: true,
-  showItemDiscount: true,
   showVatSummaryTable: true
 };
 

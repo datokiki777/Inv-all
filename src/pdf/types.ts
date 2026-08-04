@@ -1,4 +1,5 @@
 import type { Invoice, Unit } from "@/types";
+import type { PaymentMethod } from "@/types/paymentDetails";
 
 /**
  * Contract every PDF template must implement. Templates receive only the
@@ -25,11 +26,15 @@ export interface InvoicePdfLabels {
   lineTotal: string;
   subtotal: string;
   discount: string;
+  discountFixedLabel: string;
   vatTotal: string;
   total: string;
   paid: string;
   remaining: string;
   paymentDetails: string;
+  paymentMethod: string;
+  paymentMethods: Record<PaymentMethod, string>;
+  paymentTerms: string;
   bankName: string;
   accountHolder: string;
   notes: string;

@@ -58,7 +58,6 @@ export interface InvoicePdfVisibility {
   showNotes: boolean;
   showBankDetails: boolean;
   showItemUnitColumn: boolean;
-  showItemDiscount: boolean;
   showVatSummaryTable: boolean;
 }
 

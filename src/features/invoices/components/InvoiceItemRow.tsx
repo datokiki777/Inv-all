@@ -1,4 +1,4 @@
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
@@ -12,32 +12,29 @@ const UNITS: Unit[] = ["hour", "day", "piece", "kg", "unit", "flatRate"];
 interface InvoiceItemRowProps {
   index: number;
   products: ProductOrService[];
-  /** Show the "Show in PDF" switches for Discount/Unit on this row — these are
-   *  whole-table settings, not per-item, so only the first row renders them. */
+  /** Show the "Show in PDF" switch for Unit on this row — it's a whole-table
+   *  setting, not per-item, so only the first row renders it. */
   showVisibilityToggles: boolean;
   onRemove: () => void;
 }
 
 /**
  * One line-item's fields, as its own component (not inlined in a .map)
- * so each row can call useWatch for its own discountType — conditionally
- * rendering hooks inside a .map callback would break React's rules of
- * hooks the moment rows are added/removed.
+ * so hooks stay valid as rows are added/removed.
  *
  * VAT is set once for the whole invoice (see TaxSettingsEditor's "VAT
- * rate") rather than per item — InvoiceItemsEditor keeps every row's
- * vatPercent in sync with that single rate, so there's no VAT input here.
+ * rate") rather than per item. Discount is also invoice-level only (see
+ * DiscountEditor) — there is no per-item discount anymore, to keep a
+ * single, unambiguous discount that's clearly explained on the PDF.
  */
 export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemove }: InvoiceItemRowProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const {
-    control,
     register,
     setValue,
     formState: { errors }
   } = useFormContext<InvoiceFormValues>();
 
-  const discountType = useWatch({ control, name: `items.${index}.discountType` });
   const rowErrors = errors.items?.[index];
 
   function applyProduct(productId: string) {
@@ -68,7 +65,7 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
 
       <Input placeholder={t("invoice:form.itemDescription")} {...register(`items.${index}.description`)} />
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <div>
           <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.quantity", { ns: "invoice" })}</p>
           <Input
@@ -91,28 +88,7 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
             {...register(`items.${index}.unitPrice`)}
           />
         </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
         <div>
-          <div className="mb-1 flex items-center gap-2">
-            <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.discount", { ns: "invoice" })}</p>
-            {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemDiscount" /> : null}
-          </div>
-          <Select {...register(`items.${index}.discountType`)}>
-            <option value="none">{t("invoice:form.discountNone")}</option>
-            <option value="percent">{t("invoice:form.discountPercent")}</option>
-            <option value="fixed">{t("invoice:form.discountFixed")}</option>
-          </Select>
-        </div>
-        {discountType !== "none" ? (
-          <div>
-            <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:form.discountValue")}</p>
-            <Input type="number" step="0.01" min="0" inputMode="decimal" {...register(`items.${index}.discountValue`)} />
-          </div>
-        ) : null}
-        {/* col-start-3 pins Unit to the rightmost slot regardless of whether Discount Value (the middle slot) is rendered. */}
-        <div className="col-start-3">
           <div className="mb-1 flex items-center gap-2">
             <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
             {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "@react-pdf/renderer";
-import type { Invoice, InvoiceItem } from "@/types";
+import type { Invoice } from "@/types";
 import type { InvoicePdfLabels } from "../types";
 import { itemTotal, formatMoney } from "@/utils/money";
 import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
@@ -20,30 +20,24 @@ const styles = StyleSheet.create({
   colQty: { flex: 0.8, fontSize: 9, textAlign: "right" },
   colUnit: { flex: 1, fontSize: 9, textAlign: "right" },
   colPrice: { flex: 1.4, fontSize: 9, textAlign: "right" },
-  colDiscount: { flex: 1, fontSize: 9, textAlign: "right" },
   colVat: { flex: 1, fontSize: 9, textAlign: "right" },
   colTotal: { flex: 1.4, fontSize: 9, textAlign: "right" },
   headerText: { fontSize: 8, color: "#888", textTransform: "uppercase" }
 });
 
-function formatItemDiscount(item: InvoiceItem, currency: string, locale: string): string {
-  if (!item.discount || item.discount.value <= 0) return "—";
-  if (item.discount.type === "percent") return `-${item.discount.value}%`;
-  return `-${formatMoney(item.discount.value, currency, locale)}`;
-}
-
 /**
  * Line-items table. `fixed` + `wrap` (react-pdf defaults for View rows) let
  * @react-pdf/renderer break the table across pages and repeat this header
- * automatically — no manual pagination logic lives here. "Unit" and
- * "Discount" columns are each independently optional
- * (pdfVisibility.showItemUnitColumn / showItemDiscount) — flex-based
- * widths mean the remaining columns simply reflow when one is hidden.
+ * automatically — no manual pagination logic lives here. The "Unit" column
+ * is optional (pdfVisibility.showItemUnitColumn) — flex-based widths mean
+ * the remaining columns simply reflow when it's hidden. There is no
+ * per-item discount column — discounts are invoice-level only (see
+ * InvoiceTotals), so there's exactly one discount to explain, not one
+ * per line.
  */
 export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Props) {
   const visibility = resolvePdfVisibility(invoice.pdfVisibility);
   const showUnit = visibility.showItemUnitColumn;
-  const showDiscount = visibility.showItemDiscount;
 
   return (
     <View>
@@ -52,7 +46,6 @@ export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Prop
         <Text style={[styles.colQty, styles.headerText]}>{labels.quantity}</Text>
         {showUnit ? <Text style={[styles.colUnit, styles.headerText]}>{labels.unit}</Text> : null}
         <Text style={[styles.colPrice, styles.headerText]}>{labels.unitPrice}</Text>
-        {showDiscount ? <Text style={[styles.colDiscount, styles.headerText]}>{labels.discount}</Text> : null}
         <Text style={[styles.colVat, styles.headerText]}>{labels.vat}</Text>
         <Text style={[styles.colTotal, styles.headerText, { color: accentColor }]}>{labels.lineTotal}</Text>
       </View>
@@ -65,7 +58,6 @@ export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Prop
           <Text style={styles.colQty}>{item.quantity}</Text>
           {showUnit ? <Text style={styles.colUnit}>{labels.units[item.unit]}</Text> : null}
           <Text style={styles.colPrice}>{formatMoney(item.unitPriceCents, invoice.currency, locale)}</Text>
-          {showDiscount ? <Text style={styles.colDiscount}>{formatItemDiscount(item, invoice.currency, locale)}</Text> : null}
           <Text style={styles.colVat}>{item.vatPercent}%</Text>
           <Text style={styles.colTotal}>{formatMoney(itemTotal(item), invoice.currency, locale)}</Text>
         </View>

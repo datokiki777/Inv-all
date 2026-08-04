@@ -28,10 +28,17 @@ export function InvoiceTotalsPreview() {
   const locale = localeForLanguage(values.pdfLanguage as "de" | "en" | undefined);
   const fmt = (cents: number) => formatMoney(cents, currency, locale);
 
+  const discountLabel =
+    discount?.type === "percent"
+      ? `${t("invoice:fields.discount", { ns: "invoice" })} (${discount.value}%)`
+      : discount?.type === "fixed"
+        ? `${t("invoice:fields.discount", { ns: "invoice" })} (${t("invoice:form.discountFixed")})`
+        : t("invoice:fields.discount", { ns: "invoice" });
+
   return (
     <div className="space-y-1.5 rounded-lg border border-line bg-surface-raised p-4 text-sm">
       <Row label={t("invoice:fields.subtotal", { ns: "invoice" })} value={fmt(totals.subtotalCents)} />
-      {totals.discountCents > 0 ? <Row label={t("invoice:fields.discount", { ns: "invoice" })} value={`-${fmt(totals.discountCents)}`} /> : null}
+      {totals.discountCents > 0 ? <Row label={discountLabel} value={`-${fmt(totals.discountCents)}`} /> : null}
       {taxSettings.mode !== "reverseCharge" && taxSettings.mode !== "taxFree" ? (
         <Row label={t("invoice:fields.vat", { ns: "invoice" })} value={fmt(totals.vatCents)} />
       ) : null}

@@ -44,7 +44,6 @@ export const pdfVisibilitySchema = z.object({
   showNotes: z.boolean(),
   showBankDetails: z.boolean(),
   showItemUnitColumn: z.boolean(),
-  showItemDiscount: z.boolean(),
   showVatSummaryTable: z.boolean()
 });
 

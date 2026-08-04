@@ -20,6 +20,15 @@ const styles = StyleSheet.create({
 export function InvoiceTotals({ invoice, labels, accentColor, locale }: Props) {
   const fmt = (cents: number) => formatMoney(cents, invoice.currency, locale);
 
+  // Spells out what kind of discount this is — a flat "Discount" line
+  // with just a number doesn't say whether it's e.g. 10% or a flat €50
+  // off, which matters for anyone checking the math.
+  const discountExplanation = invoice.discount
+    ? invoice.discount.type === "percent"
+      ? `${labels.discount} (${invoice.discount.value}%)`
+      : `${labels.discount} (${labels.discountFixedLabel})`
+    : labels.discount;
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.line}>
@@ -28,7 +37,7 @@ export function InvoiceTotals({ invoice, labels, accentColor, locale }: Props) {
       </View>
       {invoice.discountCents > 0 ? (
         <View style={styles.line}>
-          <Text>{labels.discount}</Text>
+          <Text>{discountExplanation}</Text>
           <Text>-{fmt(invoice.discountCents)}</Text>
         </View>
       ) : null}

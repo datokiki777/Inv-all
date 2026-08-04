@@ -23,25 +23,39 @@ const styles = StyleSheet.create({
  */
 export function InvoiceFooter({ invoice, labels }: Props) {
   const visibility = resolvePdfVisibility(invoice.pdfVisibility);
+  const hasPaymentTerms = !!invoice.paymentDetails.paymentTermsText;
+  const hasBankBlock = visibility.showBankDetails && invoice.paymentDetails.bankDetails;
 
   return (
     <>
       <View>
-        {visibility.showBankDetails && invoice.paymentDetails.bankDetails ? (
+        {hasBankBlock || hasPaymentTerms ? (
           <View style={styles.payment}>
             <Text>{labels.paymentDetails}</Text>
-            {invoice.paymentDetails.bankDetails.bankName ? (
+            <Text>
+              {labels.paymentMethod}: {labels.paymentMethods[invoice.paymentDetails.method]}
+            </Text>
+            {hasBankBlock ? (
+              <>
+                {invoice.paymentDetails.bankDetails!.bankName ? (
+                  <Text>
+                    {labels.bankName}: {invoice.paymentDetails.bankDetails!.bankName}
+                  </Text>
+                ) : null}
+                {invoice.paymentDetails.bankDetails!.accountHolder ? (
+                  <Text>
+                    {labels.accountHolder}: {invoice.paymentDetails.bankDetails!.accountHolder}
+                  </Text>
+                ) : null}
+                {invoice.paymentDetails.bankDetails!.iban ? <Text>IBAN: {invoice.paymentDetails.bankDetails!.iban}</Text> : null}
+                {invoice.paymentDetails.bankDetails!.bic ? <Text>BIC: {invoice.paymentDetails.bankDetails!.bic}</Text> : null}
+              </>
+            ) : null}
+            {hasPaymentTerms ? (
               <Text>
-                {labels.bankName}: {invoice.paymentDetails.bankDetails.bankName}
+                {labels.paymentTerms}: {invoice.paymentDetails.paymentTermsText}
               </Text>
             ) : null}
-            {invoice.paymentDetails.bankDetails.accountHolder ? (
-              <Text>
-                {labels.accountHolder}: {invoice.paymentDetails.bankDetails.accountHolder}
-              </Text>
-            ) : null}
-            {invoice.paymentDetails.bankDetails.iban ? <Text>IBAN: {invoice.paymentDetails.bankDetails.iban}</Text> : null}
-            {invoice.paymentDetails.bankDetails.bic ? <Text>BIC: {invoice.paymentDetails.bankDetails.bic}</Text> : null}
           </View>
         ) : null}
         {visibility.showNotes && invoice.note ? (
