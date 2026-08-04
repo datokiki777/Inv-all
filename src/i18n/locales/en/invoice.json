@@ -32,6 +32,7 @@
     "pickProduct": "Pick a saved product…",
     "addItem": "Add item",
     "removeItem": "Remove",
+    "itemDiscount": "Item discount",
     "taxSettings": "Tax",
     "taxMode": "Tax mode",
     "taxModes": {

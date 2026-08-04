@@ -32,6 +32,7 @@
     "pickProduct": "Gespeichertes Produkt wählen…",
     "addItem": "Position hinzufügen",
     "removeItem": "Entfernen",
+    "itemDiscount": "Positionsrabatt",
     "taxSettings": "Steuer",
     "taxMode": "Steuermodus",
     "taxModes": {

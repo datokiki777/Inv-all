@@ -28,9 +28,29 @@ export default {
         danger: "#c9634f"
       },
       fontFamily: {
-        display: ["'Fraunces'", "serif"],
-        sans: ["'Inter'", "system-ui", "sans-serif"],
-        mono: ["'IBM Plex Mono'", "monospace"]
+        // These reference *system* fonts only, deliberately — the app must
+        // render correctly with zero network access, so no @font-face /
+        // Google Fonts dependency is used. On Android, "sans" resolves to
+        // Roboto (the OS's own UI font) with no download needed. "display"
+        // prefers each platform's built-in serif for headings; "mono" is
+        // used for a handful of monospaced figures (e.g. IBAN display).
+        display: ["Georgia", "'Noto Serif'", "'Times New Roman'", "serif"],
+        sans: [
+          "-apple-system",
+          "'Segoe UI'",
+          "Roboto",
+          "'Helvetica Neue'",
+          "Arial",
+          "sans-serif"
+        ],
+        mono: [
+          "ui-monospace",
+          "'SFMono-Regular'",
+          "'Roboto Mono'",
+          "Menlo",
+          "Consolas",
+          "monospace"
+        ]
       },
       borderRadius: {
         sm: "6px",
