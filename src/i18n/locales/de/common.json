@@ -110,7 +110,16 @@
     "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
     "productNameRequired": "Bezeichnung ist erforderlich.",
     "unitPriceRequired": "Gib einen gültigen Preis ein.",
-    "vatPercentInvalid": "MwSt. muss zwischen 0 und 100 liegen."
+    "vatPercentInvalid": "MwSt. muss zwischen 0 und 100 liegen.",
+    "itemNameRequired": "Bezeichnung ist erforderlich.",
+    "quantityMustBePositive": "Menge muss größer als 0 sein.",
+    "quantityInvalid": "Gib eine gültige Menge ein.",
+    "priceInvalid": "Gib einen gültigen Preis ein.",
+    "invoiceNumberRequired": "Rechnungsnummer ist erforderlich.",
+    "dateRequired": "Dieses Datum ist erforderlich.",
+    "clientRequired": "Wähle einen Kunden aus.",
+    "atLeastOneItemRequired": "Füge mindestens eine Position hinzu.",
+    "invalidCurrencyCode": "Verwende einen 3-stelligen Währungscode, z. B. EUR."
   },
   "products": {
     "name": "Bezeichnung",
