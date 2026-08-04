@@ -6,11 +6,12 @@ import { InvoiceItemsTable } from "../components/InvoiceItemsTable";
 import { InvoiceVatSummaryTable } from "../components/InvoiceVatSummaryTable";
 import { InvoiceTotals } from "../components/InvoiceTotals";
 import { InvoiceFooter } from "../components/InvoiceFooter";
+import { PDF_FONT_FAMILY } from "../fonts";
 
 const ACCENT = "#1f3a5f";
 
 const styles = StyleSheet.create({
-  page: { padding: 32, fontFamily: "Helvetica", fontSize: 10, color: "#111" },
+  page: { padding: 32, fontFamily: PDF_FONT_FAMILY, fontSize: 10, color: "#111" },
   rule: { borderBottomWidth: 2, borderColor: ACCENT, marginBottom: 16 }
 });
 

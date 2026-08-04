@@ -7,11 +7,12 @@ import { InvoiceVatSummaryTable } from "../components/InvoiceVatSummaryTable";
 import { InvoiceTotals } from "../components/InvoiceTotals";
 import { InvoiceFooter } from "../components/InvoiceFooter";
 import { formatMoney } from "@/utils/money";
+import { PDF_FONT_FAMILY } from "../fonts";
 
 const ACCENT = "#c9634f";
 
 const styles = StyleSheet.create({
-  page: { padding: 32, fontFamily: "Helvetica", fontSize: 10, color: "#111" },
+  page: { padding: 32, fontFamily: PDF_FONT_FAMILY, fontSize: 10, color: "#111" },
   banner: {
     backgroundColor: ACCENT,
     marginHorizontal: -32,

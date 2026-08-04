@@ -6,12 +6,13 @@ import { InvoiceItemsTable } from "../components/InvoiceItemsTable";
 import { InvoiceVatSummaryTable } from "../components/InvoiceVatSummaryTable";
 import { InvoiceTotals } from "../components/InvoiceTotals";
 import { InvoiceFooter } from "../components/InvoiceFooter";
+import { PDF_FONT_FAMILY } from "../fonts";
 
 const ACCENT = "#111111";
 
 // Generous whitespace, no rules or fills — content carries the design.
 const styles = StyleSheet.create({
-  page: { padding: 48, fontFamily: "Helvetica", fontSize: 10, color: "#111" }
+  page: { padding: 48, fontFamily: PDF_FONT_FAMILY, fontSize: 10, color: "#111" }
 });
 
 /** Minimal — light, decoration-free layout for short, simple invoices. */

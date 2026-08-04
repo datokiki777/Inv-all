@@ -104,7 +104,8 @@ export function InvoiceItemRow({ index, products, onRemove }: InvoiceItemRowProp
             <Input type="number" step="0.01" min="0" inputMode="decimal" {...register(`items.${index}.discountValue`)} />
           </div>
         ) : null}
-        <div>
+        {/* col-start-3 pins Unit to the rightmost slot regardless of whether Discount Value (the middle slot) is rendered. */}
+        <div className="col-start-3">
           <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
           <Select {...register(`items.${index}.unit`)}>
             {UNITS.map((unit) => (

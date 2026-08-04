@@ -6,13 +6,14 @@ import { InvoiceItemsTable } from "../components/InvoiceItemsTable";
 import { InvoiceVatSummaryTable } from "../components/InvoiceVatSummaryTable";
 import { InvoiceTotals } from "../components/InvoiceTotals";
 import { InvoiceFooter } from "../components/InvoiceFooter";
+import { PDF_FONT_FAMILY } from "../fonts";
 
 const ACCENT = "#3a3a3a";
 
 // Tighter padding and smaller base font than the other templates —
 // optimized for invoices with many line items.
 const styles = StyleSheet.create({
-  page: { padding: 24, fontFamily: "Helvetica", fontSize: 8.5, color: "#111" }
+  page: { padding: 24, fontFamily: PDF_FONT_FAMILY, fontSize: 8.5, color: "#111" }
 });
 
 /** Compact — minimal whitespace, maximum line items per page. */

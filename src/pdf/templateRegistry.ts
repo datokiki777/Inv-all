@@ -1,5 +1,8 @@
 import type { InvoiceTemplateId, InvoiceTemplateMeta } from "@/types";
 import type { InvoicePdfTemplateComponent } from "./types";
+// Registers the Georgian-capable PDF font as a side effect, before any
+// template ever renders.
+import "./fonts";
 import { ClassicInvoiceTemplate } from "./templates/ClassicInvoiceTemplate";
 import { ModernInvoiceTemplate } from "./templates/ModernInvoiceTemplate";
 import { CompactInvoiceTemplate } from "./templates/CompactInvoiceTemplate";
