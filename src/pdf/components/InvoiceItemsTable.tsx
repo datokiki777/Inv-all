@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
   colQty: { flex: 0.8, fontSize: 9, textAlign: "right" },
   colUnit: { flex: 1, fontSize: 9, textAlign: "right" },
   colPrice: { flex: 1.4, fontSize: 9, textAlign: "right" },
-  colVat: { flex: 1, fontSize: 9, textAlign: "right" },
   colTotal: { flex: 1.4, fontSize: 9, textAlign: "right" },
   headerText: { fontSize: 8, color: "#888", textTransform: "uppercase" }
 });
@@ -32,8 +31,11 @@ const styles = StyleSheet.create({
  * is optional (pdfVisibility.showItemUnitColumn) — flex-based widths mean
  * the remaining columns simply reflow when it's hidden. There is no
  * per-item discount column — discounts are invoice-level only (see
- * InvoiceTotals), so there's exactly one discount to explain, not one
- * per line.
+ * InvoiceTotals). There is also no per-item VAT column: every item shares
+ * one invoice-wide VAT rate (see TaxSettingsEditor), so repeating the same
+ * percentage on every row would be redundant — the rate (and, if enabled,
+ * a per-rate breakdown) already appears once in InvoiceVatSummaryTable and
+ * the VAT total in InvoiceTotals.
  */
 export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Props) {
   const visibility = resolvePdfVisibility(invoice.pdfVisibility);
@@ -46,7 +48,6 @@ export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Prop
         <Text style={[styles.colQty, styles.headerText]}>{labels.quantity}</Text>
         {showUnit ? <Text style={[styles.colUnit, styles.headerText]}>{labels.unit}</Text> : null}
         <Text style={[styles.colPrice, styles.headerText]}>{labels.unitPrice}</Text>
-        <Text style={[styles.colVat, styles.headerText]}>{labels.vat}</Text>
         <Text style={[styles.colTotal, styles.headerText, { color: accentColor }]}>{labels.lineTotal}</Text>
       </View>
       {invoice.items.map((item) => (
@@ -58,7 +59,6 @@ export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Prop
           <Text style={styles.colQty}>{item.quantity}</Text>
           {showUnit ? <Text style={styles.colUnit}>{labels.units[item.unit]}</Text> : null}
           <Text style={styles.colPrice}>{formatMoney(item.unitPriceCents, invoice.currency, locale)}</Text>
-          <Text style={styles.colVat}>{item.vatPercent}%</Text>
           <Text style={styles.colTotal}>{formatMoney(itemTotal(item), invoice.currency, locale)}</Text>
         </View>
       ))}

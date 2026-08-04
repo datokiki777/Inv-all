@@ -65,7 +65,7 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
 
       <Input placeholder={t("invoice:form.itemDescription")} {...register(`items.${index}.description`)} />
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.quantity", { ns: "invoice" })}</p>
           <Input
@@ -88,19 +88,20 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
             {...register(`items.${index}.unitPrice`)}
           />
         </div>
-        <div>
-          <div className="mb-1 flex items-center gap-2">
-            <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
-            {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}
-          </div>
-          <Select {...register(`items.${index}.unit`)}>
-            {UNITS.map((unit) => (
-              <option key={unit} value={unit}>
-                {t(`products.units.${unit}`)}
-              </option>
-            ))}
-          </Select>
+      </div>
+
+      <div>
+        <div className="mb-1 flex items-center justify-between">
+          <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+          {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}
         </div>
+        <Select {...register(`items.${index}.unit`)}>
+          {UNITS.map((unit) => (
+            <option key={unit} value={unit}>
+              {t(`products.units.${unit}`)}
+            </option>
+          ))}
+        </Select>
       </div>
 
       <div className="flex justify-end">
