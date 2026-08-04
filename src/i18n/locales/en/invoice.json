@@ -76,5 +76,29 @@
     "companyMissing": "Set up your company first",
     "companyMissingHint": "Company details are required before creating an invoice.",
     "notFound": "Invoice not found"
+  },
+  "list": {
+    "searchPlaceholder": "Search by number or client…",
+    "filters": "Filters",
+    "allStatuses": "All statuses",
+    "allClients": "All clients",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearFilters": "Clear filters",
+    "loading": "Loading invoices…",
+    "loadError": "Couldn't load invoices",
+    "loadErrorHint": "Reload the app and try again.",
+    "noResults": "No invoices match your filters",
+    "duplicateSuccess": "Invoice duplicated",
+    "duplicateError": "Couldn't duplicate invoice. Try again.",
+    "deleteSuccess": "Invoice deleted",
+    "deleteError": "Couldn't delete invoice. Try again.",
+    "deleteTitle": "Delete invoice",
+    "deleteConfirm": "Delete invoice {{number}}? This can't be undone."
+  },
+  "preview": {
+    "loading": "Loading invoice…",
+    "loadError": "Couldn't load invoice",
+    "preparing": "Preparing…"
   }
 }

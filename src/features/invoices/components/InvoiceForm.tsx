@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { todayDateOnly } from "@/utils/date";
+import { todayDateOnly, addDays } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
 import { ClientPicker } from "./ClientPicker";
 import { InvoiceItemsEditor } from "./InvoiceItemsEditor";
@@ -29,12 +29,6 @@ interface InvoiceFormProps {
   suggestedInvoiceNumber?: string;
   onSubmit: (values: InvoiceFormValues) => Promise<void>;
   onClientCreated: (client: Client) => void;
-}
-
-function addDays(dateOnly: string, days: number): string {
-  const date = new Date(dateOnly);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
 }
 
 function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, suggestedInvoiceNumber: string | undefined): InvoiceFormValues {

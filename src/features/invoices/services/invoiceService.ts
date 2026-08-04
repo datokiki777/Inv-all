@@ -1,6 +1,6 @@
 import { invoiceRepository, settingsRepository } from "@/storage/repositories";
 import { generateId } from "@/utils/id";
-import { nowIso } from "@/utils/date";
+import { nowIso, todayDateOnly, addDays } from "@/utils/date";
 import { generateInvoiceNumber } from "@/utils/invoiceNumber";
 import { computeInvoiceTotals } from "@/utils/money";
 import { resolveItemsForTaxMode } from "@/utils/invoiceTax";
@@ -127,6 +127,35 @@ export const invoiceService = {
 
   async remove(id: string): Promise<void> {
     await invoiceRepository.remove(id);
+  },
+
+  /**
+   * Duplicates an invoice: same client/company/items/tax/discount, but a
+   * fresh id, a newly-suggested invoice number (sequence reserved like any
+   * other create), reset to draft/unpaid, and dates moved to today.
+   */
+  async duplicate(source: Invoice): Promise<Invoice> {
+    const now = nowIso();
+    const newNumber = await this.suggestNextInvoiceNumber();
+    const today = todayDateOnly();
+
+    const invoice: Invoice = {
+      ...source,
+      id: generateId(),
+      invoiceNumber: newNumber,
+      createdDate: today,
+      serviceDate: today,
+      dueDate: addDays(today, 14),
+      status: "draft",
+      paidAmountCents: 0,
+      remainingAmountCents: source.totalCents,
+      createdAt: now,
+      updatedAt: now
+    };
+
+    await invoiceRepository.save(invoice);
+    await reserveInvoiceNumberIfMatchingSuggestion(newNumber);
+    return invoice;
   }
 };
 

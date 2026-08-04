@@ -76,5 +76,29 @@
     "companyMissing": "Richte zuerst dein Unternehmen ein",
     "companyMissingHint": "Unternehmensdaten sind erforderlich, bevor eine Rechnung erstellt werden kann.",
     "notFound": "Rechnung nicht gefunden"
+  },
+  "list": {
+    "searchPlaceholder": "Suche nach Nummer oder Kunde…",
+    "filters": "Filter",
+    "allStatuses": "Alle Status",
+    "allClients": "Alle Kunden",
+    "dateFrom": "Von",
+    "dateTo": "Bis",
+    "clearFilters": "Filter zurücksetzen",
+    "loading": "Rechnungen werden geladen…",
+    "loadError": "Rechnungen konnten nicht geladen werden",
+    "loadErrorHint": "Lade die App neu und versuche es erneut.",
+    "noResults": "Keine Rechnungen entsprechen den Filtern",
+    "duplicateSuccess": "Rechnung dupliziert",
+    "duplicateError": "Rechnung konnte nicht dupliziert werden. Versuche es erneut.",
+    "deleteSuccess": "Rechnung gelöscht",
+    "deleteError": "Rechnung konnte nicht gelöscht werden. Versuche es erneut.",
+    "deleteTitle": "Rechnung löschen",
+    "deleteConfirm": "Rechnung {{number}} löschen? Dies kann nicht rückgängig gemacht werden."
+  },
+  "preview": {
+    "loading": "Rechnung wird geladen…",
+    "loadError": "Rechnung konnte nicht geladen werden",
+    "preparing": "Wird vorbereitet…"
   }
 }
