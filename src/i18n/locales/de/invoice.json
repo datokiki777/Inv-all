@@ -52,15 +52,15 @@
       "showItemUnitColumn": "Spalte \"Einheit\" in der Positionstabelle",
       "showVatSummaryTable": "MwSt.-Übersichtstabelle"
     },
-    "taxSettings": "Steuer",
-    "taxMode": "Steuermodus",
+    "taxSettings": "MwSt.",
+    "taxMode": "MwSt.-Modus",
     "taxModes": {
       "standard": "Regelsatz",
       "reverseCharge": "Reverse Charge",
       "taxFree": "Steuerfrei",
       "custom": "Benutzerdefiniert"
     },
-    "taxRatePercent": "Steuersatz (%)",
+    "taxRatePercent": "MwSt.-Satz (%)",
     "taxExplanationText": "Erläuterung auf der Rechnung",
     "reverseChargeHint": "Leer lassen, um den Standard-Reverse-Charge-Hinweis zu verwenden.",
     "discountNone": "Kein Rabatt",

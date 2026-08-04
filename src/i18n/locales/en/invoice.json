@@ -52,15 +52,15 @@
       "showItemUnitColumn": "\"Unit\" column in items table",
       "showVatSummaryTable": "VAT summary table"
     },
-    "taxSettings": "Tax",
-    "taxMode": "Tax mode",
+    "taxSettings": "VAT",
+    "taxMode": "VAT mode",
     "taxModes": {
       "standard": "Standard rate",
       "reverseCharge": "Reverse charge",
       "taxFree": "Tax-free",
       "custom": "Custom"
     },
-    "taxRatePercent": "Tax rate (%)",
+    "taxRatePercent": "VAT rate (%)",
     "taxExplanationText": "Explanation shown on PDF",
     "reverseChargeHint": "Leave blank to use the default reverse-charge note on the PDF.",
     "discountNone": "No discount",

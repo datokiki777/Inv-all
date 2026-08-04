@@ -11,7 +11,6 @@ const UNITS: Unit[] = ["hour", "day", "piece", "kg", "unit", "flatRate"];
 interface InvoiceItemRowProps {
   index: number;
   products: ProductOrService[];
-  showVatColumn: boolean;
   onRemove: () => void;
 }
 
@@ -20,8 +19,12 @@ interface InvoiceItemRowProps {
  * so each row can call useWatch for its own discountType — conditionally
  * rendering hooks inside a .map callback would break React's rules of
  * hooks the moment rows are added/removed.
+ *
+ * VAT is set once for the whole invoice (see TaxSettingsEditor's "VAT
+ * rate") rather than per item — InvoiceItemsEditor keeps every row's
+ * vatPercent in sync with that single rate, so there's no VAT input here.
  */
-export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: InvoiceItemRowProps) {
+export function InvoiceItemRow({ index, products, onRemove }: InvoiceItemRowProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const {
     control,
@@ -41,7 +44,6 @@ export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: Inv
     setValue(`items.${index}.description`, product.description ?? "", { shouldDirty: true });
     setValue(`items.${index}.unit`, product.unit, { shouldDirty: true });
     setValue(`items.${index}.unitPrice`, product.unitPriceCents / 100, { shouldDirty: true });
-    setValue(`items.${index}.vatPercent`, product.defaultVatPercent, { shouldDirty: true });
   }
 
   return (
@@ -62,7 +64,7 @@ export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: Inv
 
       <Input placeholder={t("invoice:form.itemDescription")} {...register(`items.${index}.description`)} />
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.quantity", { ns: "invoice" })}</p>
           <Input
@@ -73,16 +75,6 @@ export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: Inv
             invalid={!!rowErrors?.quantity}
             {...register(`items.${index}.quantity`)}
           />
-        </div>
-        <div>
-          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
-          <Select {...register(`items.${index}.unit`)}>
-            {UNITS.map((unit) => (
-              <option key={unit} value={unit}>
-                {t(`products.units.${unit}`)}
-              </option>
-            ))}
-          </Select>
         </div>
         <div>
           <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unitPrice", { ns: "invoice" })}</p>
@@ -112,12 +104,16 @@ export function InvoiceItemRow({ index, products, showVatColumn, onRemove }: Inv
             <Input type="number" step="0.01" min="0" inputMode="decimal" {...register(`items.${index}.discountValue`)} />
           </div>
         ) : null}
-        {showVatColumn ? (
-          <div>
-            <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.vat", { ns: "invoice" })} %</p>
-            <Input type="number" step="0.1" min="0" max="100" inputMode="decimal" {...register(`items.${index}.vatPercent`)} />
-          </div>
-        ) : null}
+        <div>
+          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+          <Select {...register(`items.${index}.unit`)}>
+            {UNITS.map((unit) => (
+              <option key={unit} value={unit}>
+                {t(`products.units.${unit}`)}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
 
       <div className="flex justify-end">

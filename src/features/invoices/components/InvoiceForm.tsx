@@ -62,7 +62,7 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
     status: "draft",
     templateId: settings.defaultInvoiceTemplateId,
     pdfLanguage: settings.defaultInvoiceLanguage,
-    pdfVisibility: defaultPdfVisibility
+    pdfVisibility: settings.lastInvoicePdfVisibility ?? defaultPdfVisibility
   };
 }
 

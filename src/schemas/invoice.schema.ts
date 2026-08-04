@@ -30,7 +30,7 @@ const paymentDetailsSchema = z.object({
   paymentTermsText: z.string().optional()
 });
 
-const pdfVisibilitySchema = z.object({
+export const pdfVisibilitySchema = z.object({
   showServiceDate: z.boolean(),
   showDueDate: z.boolean(),
   showCompanyEmail: z.boolean(),

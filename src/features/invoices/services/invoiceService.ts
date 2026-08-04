@@ -86,6 +86,7 @@ export const invoiceService = {
 
     await invoiceRepository.save(invoice);
     await reserveInvoiceNumberIfMatchingSuggestion(values.invoiceNumber);
+    await rememberLastPdfVisibility(values.pdfVisibility);
     return invoice;
   },
 
@@ -124,6 +125,7 @@ export const invoiceService = {
     };
 
     await invoiceRepository.save(invoice);
+    await rememberLastPdfVisibility(values.pdfVisibility);
     return invoice;
   },
 
@@ -185,4 +187,14 @@ async function reserveInvoiceNumberIfMatchingSuggestion(usedNumber: string): Pro
       updatedAt: nowIso()
     });
   }
+}
+
+/**
+ * Remembers the "Show in PDF" state as the starting point for the next new
+ * invoice, so a preference (e.g. always hiding a phone number) sticks
+ * instead of resetting to all-visible every time.
+ */
+async function rememberLastPdfVisibility(pdfVisibility: InvoiceFormValues["pdfVisibility"]): Promise<void> {
+  const settings = await settingsRepository.get();
+  await settingsRepository.save({ ...settings, lastInvoicePdfVisibility: pdfVisibility, updatedAt: nowIso() });
 }
