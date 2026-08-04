@@ -119,7 +119,9 @@
     "dateRequired": "Dieses Datum ist erforderlich.",
     "clientRequired": "Wähle einen Kunden aus.",
     "atLeastOneItemRequired": "Füge mindestens eine Position hinzu.",
-    "invalidCurrencyCode": "Verwende einen 3-stelligen Währungscode, z. B. EUR."
+    "invalidCurrencyCode": "Verwende einen 3-stelligen Währungscode, z. B. EUR.",
+    "invoiceNumberFormatRequired": "Gib ein Rechnungsnummernformat ein.",
+    "sequenceMustBePositive": "Muss mindestens 1 sein."
   },
   "products": {
     "name": "Bezeichnung",
@@ -149,5 +151,50 @@
     "deleteError": "Eintrag konnte nicht gelöscht werden. Versuche es erneut.",
     "editTitle": "Eintrag bearbeiten",
     "addTitle": "Eintrag hinzufügen"
+  },
+  "settings": {
+    "interfaceLanguage": "Sprache der Oberfläche",
+    "defaultInvoiceTemplateId": "Standard-PDF-Design",
+    "defaultInvoiceLanguage": "Standard-PDF-Sprache",
+    "defaultCurrency": "Standardwährung",
+    "defaultCurrencyHint": "3-stelliger Code, z. B. EUR, USD, GBP.",
+    "invoiceNumberFormat": "Rechnungsnummernformat",
+    "invoiceNumberFormatHint": "Verwende {{yyyy}}, {{mm}} und ein {{seq:4}}-Muster — z. B. INV-{{yyyy}}-{{seq:4}}.",
+    "nextInvoiceSequence": "Nächste Rechnungsnummer (laufend)",
+    "nextInvoiceSequenceHint": "Erhöht sich automatisch, sobald eine Rechnung mit der vorgeschlagenen Nummer gespeichert wird.",
+    "loading": "Einstellungen werden geladen…",
+    "loadError": "Einstellungen konnten nicht geladen werden",
+    "loadErrorHint": "Lade die App neu und versuche es erneut.",
+    "saveSuccess": "Einstellungen gespeichert",
+    "saveError": "Einstellungen konnten nicht gespeichert werden. Versuche es erneut."
+  },
+  "backup": {
+    "exportTitle": "Sicherung exportieren",
+    "exportHint": "Speichert alles — Unternehmen, Kunden, Produkte und Rechnungen — als eine JSON-Datei, die du beliebig aufbewahren kannst.",
+    "exportButton": "Sicherung exportieren",
+    "exporting": "Wird exportiert…",
+    "exportSuccess": "Sicherung heruntergeladen",
+    "exportError": "Sicherung konnte nicht exportiert werden. Versuche es erneut.",
+    "importTitle": "Aus Sicherung wiederherstellen",
+    "importHint": "Wähle eine zuvor exportierte JSON-Datei. Es ändert sich nichts, bevor du bestätigst.",
+    "importButton": "Sicherungsdatei wählen",
+    "confirmTitle": "Vor dem Wiederherstellen prüfen",
+    "confirmWarning": "Dadurch werden die auf diesem Gerät gespeicherten Daten verändert. Dies kann nicht rückgängig gemacht werden — exportiere im Zweifel zuerst eine aktuelle Sicherung.",
+    "backupDate": "Sicherung erstellt: {{date}}",
+    "backupCounts": "Enthält {{companies}} Unternehmen, {{clients}} Kunden, {{products}} Produkte, {{invoices}} Rechnungen.",
+    "importMode": "Importmodus",
+    "importModeMerge": "Zusammenführen",
+    "importModeReplace": "Alles ersetzen",
+    "importModeMergeHint": "Behält deine aktuellen Daten; Datensätze mit übereinstimmender ID werden von der Sicherung überschrieben.",
+    "importModeReplaceHint": "Löscht zuerst alle aktuellen Unternehmens-, Kunden-, Produkt- und Rechnungsdaten und lädt dann die Sicherung.",
+    "confirmImport": "Wiederherstellen",
+    "importing": "Wird wiederhergestellt…",
+    "importSuccess": "Wiederhergestellt: {{companies}} Unternehmen, {{clients}} Kunden, {{products}} Produkte, {{invoices}} Rechnungen",
+    "importError": "Sicherung konnte nicht wiederhergestellt werden. Versuche es erneut.",
+    "errors": {
+      "invalidJson": "Diese Datei ist kein gültiges JSON.",
+      "invalidBackupStructure": "Diese Datei sieht nicht wie eine Invoice-App-Sicherung aus.",
+      "unsupportedVersion": "Diese Sicherung wurde mit einer neueren App-Version erstellt."
+    }
   }
 }

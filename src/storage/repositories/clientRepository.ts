@@ -23,5 +23,11 @@ export const clientRepository = {
   async remove(id: string): Promise<void> {
     const db = await getDb();
     await db.delete(STORE.clients, id);
+  },
+
+  /** Used by Backup & Restore's "replace" import mode. */
+  async clear(): Promise<void> {
+    const db = await getDb();
+    await db.clear(STORE.clients);
   }
 };

@@ -119,7 +119,9 @@
     "dateRequired": "This date is required.",
     "clientRequired": "Select a client.",
     "atLeastOneItemRequired": "Add at least one item.",
-    "invalidCurrencyCode": "Use a 3-letter currency code, e.g. EUR."
+    "invalidCurrencyCode": "Use a 3-letter currency code, e.g. EUR.",
+    "invoiceNumberFormatRequired": "Enter an invoice number format.",
+    "sequenceMustBePositive": "Must be 1 or greater."
   },
   "products": {
     "name": "Name",
@@ -149,5 +151,50 @@
     "deleteError": "Couldn't delete item. Try again.",
     "editTitle": "Edit item",
     "addTitle": "Add item"
+  },
+  "settings": {
+    "interfaceLanguage": "Interface language",
+    "defaultInvoiceTemplateId": "Default PDF design",
+    "defaultInvoiceLanguage": "Default PDF language",
+    "defaultCurrency": "Default currency",
+    "defaultCurrencyHint": "3-letter code, e.g. EUR, USD, GBP.",
+    "invoiceNumberFormat": "Invoice number format",
+    "invoiceNumberFormatHint": "Use {{yyyy}}, {{mm}}, and a {{seq:4}}-style pattern — e.g. INV-{{yyyy}}-{{seq:4}}.",
+    "nextInvoiceSequence": "Next invoice sequence number",
+    "nextInvoiceSequenceHint": "Advances automatically each time an invoice is saved with the suggested number.",
+    "loading": "Loading settings…",
+    "loadError": "Couldn't load settings",
+    "loadErrorHint": "Reload the app and try again.",
+    "saveSuccess": "Settings saved",
+    "saveError": "Couldn't save settings. Try again."
+  },
+  "backup": {
+    "exportTitle": "Export a backup",
+    "exportHint": "Saves everything — company, clients, products, and invoices — as one JSON file you can store anywhere.",
+    "exportButton": "Export backup",
+    "exporting": "Exporting…",
+    "exportSuccess": "Backup downloaded",
+    "exportError": "Couldn't export backup. Try again.",
+    "importTitle": "Restore from a backup",
+    "importHint": "Choose a previously exported JSON file. Nothing changes until you confirm.",
+    "importButton": "Choose backup file",
+    "confirmTitle": "Review before restoring",
+    "confirmWarning": "This will modify the data stored on this device. This can't be undone — export a fresh backup first if you're unsure.",
+    "backupDate": "Backup created: {{date}}",
+    "backupCounts": "Contains {{companies}} company, {{clients}} clients, {{products}} products, {{invoices}} invoices.",
+    "importMode": "Import mode",
+    "importModeMerge": "Merge",
+    "importModeReplace": "Replace all",
+    "importModeMergeHint": "Keeps your current data; records with matching IDs are overwritten by the backup.",
+    "importModeReplaceHint": "Deletes all current company, client, product, and invoice data first, then loads the backup.",
+    "confirmImport": "Restore",
+    "importing": "Restoring…",
+    "importSuccess": "Restored {{companies}} company, {{clients}} clients, {{products}} products, {{invoices}} invoices",
+    "importError": "Couldn't restore backup. Try again.",
+    "errors": {
+      "invalidJson": "That file isn't valid JSON.",
+      "invalidBackupStructure": "That file doesn't look like an Invoice App backup.",
+      "unsupportedVersion": "This backup was made with a newer version of the app."
+    }
   }
 }
