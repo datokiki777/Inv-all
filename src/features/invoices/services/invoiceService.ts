@@ -131,6 +131,15 @@ export const invoiceService = {
     await invoiceRepository.remove(id);
   },
 
+  /** Quick status change (Dashboard / Invoices list) without going through the full edit form. */
+  async updateStatus(id: string, status: Invoice["status"]): Promise<Invoice> {
+    const existing = await invoiceRepository.getById(id);
+    if (!existing) throw new Error(`Invoice ${id} not found`);
+    const updated: Invoice = { ...existing, status, updatedAt: nowIso() };
+    await invoiceRepository.save(updated);
+    return updated;
+  },
+
   /**
    * Duplicates an invoice: same client/company/items/tax/discount, but a
    * fresh id, a newly-suggested invoice number (sequence reserved like any

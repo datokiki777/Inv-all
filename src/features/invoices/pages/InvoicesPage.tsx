@@ -10,12 +10,12 @@ import { useInvoices } from "@/features/invoices/hooks/useInvoices";
 import { InvoiceListItem } from "@/features/invoices/components/InvoiceListItem";
 import { InvoiceFilters } from "@/features/invoices/components/InvoiceFilters";
 import { DeleteInvoiceDialog } from "@/features/invoices/components/DeleteInvoiceDialog";
-import type { Invoice } from "@/types";
+import type { Invoice, InvoiceStatus } from "@/types";
 
 export function InvoicesPage() {
   const { t } = useTranslation(["common", "invoice"]);
   const toast = useToast();
-  const { invoices, allCount, status, filters, setFilters, clientOptions, duplicate, remove } = useInvoices();
+  const { invoices, allCount, status, filters, setFilters, clientOptions, duplicate, remove, updateStatus } = useInvoices();
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
 
   async function handleDuplicate(invoice: Invoice) {
@@ -24,6 +24,15 @@ export function InvoicesPage() {
       toast.success(t("invoice:list.duplicateSuccess"));
     } catch {
       toast.error(t("invoice:list.duplicateError"));
+    }
+  }
+
+  async function handleStatusChange(invoice: Invoice, newStatus: InvoiceStatus) {
+    try {
+      await updateStatus(invoice.id, newStatus);
+      toast.success(t("invoice:list.statusUpdateSuccess"));
+    } catch {
+      toast.error(t("invoice:list.statusUpdateError"));
     }
   }
 
@@ -82,6 +91,7 @@ export function InvoicesPage() {
               invoice={invoice}
               onDuplicate={() => handleDuplicate(invoice)}
               onDelete={() => setDeletingInvoice(invoice)}
+              onStatusChange={(newStatus) => handleStatusChange(invoice, newStatus)}
             />
           ))}
         </div>

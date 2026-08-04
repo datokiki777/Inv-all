@@ -117,7 +117,9 @@
     "deleteSuccess": "Rechnung gelöscht",
     "deleteError": "Rechnung konnte nicht gelöscht werden. Versuche es erneut.",
     "deleteTitle": "Rechnung löschen",
-    "deleteConfirm": "Rechnung {{number}} löschen? Dies kann nicht rückgängig gemacht werden."
+    "deleteConfirm": "Rechnung {{number}} löschen? Dies kann nicht rückgängig gemacht werden.",
+    "statusUpdateSuccess": "Status aktualisiert",
+    "statusUpdateError": "Status konnte nicht aktualisiert werden. Versuche es erneut."
   },
   "preview": {
     "loading": "Rechnung wird geladen…",

@@ -51,6 +51,12 @@ export function useInvoices() {
     setInvoices((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
+  const updateStatus = useCallback(async (id: string, newStatus: Invoice["status"]) => {
+    const updated = await invoiceService.updateStatus(id, newStatus);
+    setInvoices((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    return updated;
+  }, []);
+
   return {
     invoices: filtered,
     allCount: invoices.length,
@@ -59,6 +65,7 @@ export function useInvoices() {
     setFilters,
     clientOptions,
     duplicate,
-    remove
+    remove,
+    updateStatus
   };
 }
