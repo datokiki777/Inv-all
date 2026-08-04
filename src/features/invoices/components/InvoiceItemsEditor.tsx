@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { blankInvoiceFormItem } from "@/utils/invoiceFormMapping";
 import { InvoiceItemRow } from "./InvoiceItemRow";
-import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import type { InvoiceFormValues } from "@/schemas";
 import type { ProductOrService } from "@/types";
 
@@ -50,16 +49,18 @@ export function InvoiceItemsEditor({ products }: InvoiceItemsEditorProps) {
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-ink">{t("invoice:form.items")}</p>
-        <div className="flex items-center gap-3">
-          <PdfVisibilitySwitch visKey="showItemDiscount" label={t("invoice:fields.discount", { ns: "invoice" })} />
-          <PdfVisibilitySwitch visKey="showItemUnitColumn" label={t("invoice:fields.unit", { ns: "invoice" })} />
-        </div>
       </div>
       {itemsError ? <p className="text-xs text-danger">{itemsError}</p> : null}
 
       <div className="space-y-3">
         {fields.map((field, index) => (
-          <InvoiceItemRow key={field.id} index={index} products={products} onRemove={() => remove(index)} />
+          <InvoiceItemRow
+            key={field.id}
+            index={index}
+            products={products}
+            showVisibilityToggles={index === 0}
+            onRemove={() => remove(index)}
+          />
         ))}
       </div>
 

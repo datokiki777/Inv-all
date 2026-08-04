@@ -30,6 +30,16 @@ export function InvoiceFooter({ invoice, labels }: Props) {
         {visibility.showBankDetails && invoice.paymentDetails.bankDetails ? (
           <View style={styles.payment}>
             <Text>{labels.paymentDetails}</Text>
+            {invoice.paymentDetails.bankDetails.bankName ? (
+              <Text>
+                {labels.bankName}: {invoice.paymentDetails.bankDetails.bankName}
+              </Text>
+            ) : null}
+            {invoice.paymentDetails.bankDetails.accountHolder ? (
+              <Text>
+                {labels.accountHolder}: {invoice.paymentDetails.bankDetails.accountHolder}
+              </Text>
+            ) : null}
             {invoice.paymentDetails.bankDetails.iban ? <Text>IBAN: {invoice.paymentDetails.bankDetails.iban}</Text> : null}
             {invoice.paymentDetails.bankDetails.bic ? <Text>BIC: {invoice.paymentDetails.bankDetails.bic}</Text> : null}
           </View>

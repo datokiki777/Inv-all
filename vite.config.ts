@@ -37,8 +37,7 @@ export default defineConfig({
           "**/*.svg",
           "**/*.png",
           "**/*.ttf",
-          "**/*.pfb",
-          "**/*.woff2"
+          "**/*.pfb"
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: false,

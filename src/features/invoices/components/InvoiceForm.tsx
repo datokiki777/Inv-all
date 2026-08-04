@@ -184,14 +184,9 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         <TaxSettingsEditor />
         <DiscountEditor />
 
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label={t("invoice:form.currency")} htmlFor="currency" error={err("currency")}>
-            <Input id="currency" maxLength={3} className="uppercase" {...register("currency")} />
-          </FormField>
-          <FormField label={t("invoice:form.paidAmount")} htmlFor="paidAmount">
-            <Input id="paidAmount" type="number" step="0.01" min="0" inputMode="decimal" {...register("paidAmount")} />
-          </FormField>
-        </div>
+        <FormField label={t("invoice:form.currency")} htmlFor="currency" error={err("currency")}>
+          <Input id="currency" maxLength={3} className="uppercase" {...register("currency")} />
+        </FormField>
 
         <div className="space-y-3 rounded-lg border border-line p-4">
           <div className="flex items-center justify-between gap-3">

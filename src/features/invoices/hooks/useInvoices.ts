@@ -51,8 +51,8 @@ export function useInvoices() {
     setInvoices((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
-  const updateStatus = useCallback(async (id: string, newStatus: Invoice["status"]) => {
-    const updated = await invoiceService.updateStatus(id, newStatus);
+  const updateStatus = useCallback(async (id: string, newStatus: Invoice["status"], paidAmountCents?: number) => {
+    const updated = await invoiceService.updateStatus(id, newStatus, paidAmountCents);
     setInvoices((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     return updated;
   }, []);

@@ -30,8 +30,8 @@ export function useDashboardData() {
   // and the recent-invoices badges without a full page reload.
   const metrics = useMemo(() => computeDashboardMetrics(invoices, todayDateOnly()), [invoices]);
 
-  const updateStatus = useCallback(async (id: string, newStatus: InvoiceStatus) => {
-    const updated = await invoiceService.updateStatus(id, newStatus);
+  const updateStatus = useCallback(async (id: string, newStatus: InvoiceStatus, paidAmountCents?: number) => {
+    const updated = await invoiceService.updateStatus(id, newStatus, paidAmountCents);
     setInvoices((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     return updated;
   }, []);

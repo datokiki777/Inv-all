@@ -11,8 +11,17 @@ import type { InvoiceFormValues, InvoiceItemFormValues } from "@/schemas";
 
 type DiscountFormType = "none" | "percent" | "fixed";
 
+/**
+ * Fixed-amount discount values are entered in the form as decimal major
+ * currency units (e.g. 100 meaning €100), but `Discount.value` for a
+ * "fixed" discount is defined in cents everywhere else (money.ts applies
+ * it directly against amountCents) — so it must be converted here, the
+ * one place a form value turns into a Discount. Percent discounts need
+ * no conversion; the number IS the percentage.
+ */
 export function formDiscountToDiscount(type: DiscountFormType, value: number | undefined): Discount | undefined {
   if (type === "none") return undefined;
+  if (type === "fixed") return { type, value: Math.round((value ?? 0) * 100) };
   return { type, value: value ?? 0 };
 }
 
@@ -34,8 +43,10 @@ export function formItemsToInvoiceItems(items: Partial<InvoiceItemFormValues>[])
   return items.map(formItemToInvoiceItem);
 }
 
+/** Reverse of formDiscountToDiscount — converts a fixed discount's cents back to decimal major units for display. */
 function discountToFormDiscount(discount: Discount | undefined): Pick<InvoiceItemFormValues, "discountType" | "discountValue"> {
   if (!discount) return { discountType: "none", discountValue: undefined };
+  if (discount.type === "fixed") return { discountType: "fixed", discountValue: discount.value / 100 };
   return { discountType: discount.type, discountValue: discount.value };
 }
 

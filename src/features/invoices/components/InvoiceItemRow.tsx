@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import type { InvoiceFormValues } from "@/schemas";
 import type { ProductOrService, Unit } from "@/types";
 
@@ -11,6 +12,9 @@ const UNITS: Unit[] = ["hour", "day", "piece", "kg", "unit", "flatRate"];
 interface InvoiceItemRowProps {
   index: number;
   products: ProductOrService[];
+  /** Show the "Show in PDF" switches for Discount/Unit on this row — these are
+   *  whole-table settings, not per-item, so only the first row renders them. */
+  showVisibilityToggles: boolean;
   onRemove: () => void;
 }
 
@@ -24,7 +28,7 @@ interface InvoiceItemRowProps {
  * rate") rather than per item — InvoiceItemsEditor keeps every row's
  * vatPercent in sync with that single rate, so there's no VAT input here.
  */
-export function InvoiceItemRow({ index, products, onRemove }: InvoiceItemRowProps) {
+export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemove }: InvoiceItemRowProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const {
     control,
@@ -91,7 +95,10 @@ export function InvoiceItemRow({ index, products, onRemove }: InvoiceItemRowProp
 
       <div className="grid grid-cols-3 gap-2">
         <div>
-          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.discount", { ns: "invoice" })}</p>
+          <div className="mb-1 flex items-center gap-2">
+            <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.discount", { ns: "invoice" })}</p>
+            {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemDiscount" /> : null}
+          </div>
           <Select {...register(`items.${index}.discountType`)}>
             <option value="none">{t("invoice:form.discountNone")}</option>
             <option value="percent">{t("invoice:form.discountPercent")}</option>
@@ -106,7 +113,10 @@ export function InvoiceItemRow({ index, products, onRemove }: InvoiceItemRowProp
         ) : null}
         {/* col-start-3 pins Unit to the rightmost slot regardless of whether Discount Value (the middle slot) is rendered. */}
         <div className="col-start-3">
-          <p className="mb-1 text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+          <div className="mb-1 flex items-center gap-2">
+            <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+            {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}
+          </div>
           <Select {...register(`items.${index}.unit`)}>
             {UNITS.map((unit) => (
               <option key={unit} value={unit}>

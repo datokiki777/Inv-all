@@ -119,7 +119,10 @@
     "deleteTitle": "Delete invoice",
     "deleteConfirm": "Delete invoice {{number}}? This can't be undone.",
     "statusUpdateSuccess": "Status updated",
-    "statusUpdateError": "Couldn't update status. Try again."
+    "statusUpdateError": "Couldn't update status. Try again.",
+    "partialPaymentTitle": "How much has been paid?",
+    "partialPaymentHint": "Invoice total: {{total}}",
+    "partialPaymentLabel": "Amount paid"
   },
   "preview": {
     "loading": "Loading invoice…",

@@ -1,0 +1,10 @@
+NotoSansGeorgian-Regular.ttf
+
+Source: Google Fonts (github.com/google/fonts), ofl/notosansgeorgian
+This is a static "wght=400, wdth=100" instance generated from the
+official variable font using fontTools' varLib.instancer, so it covers
+the same glyph set (Georgian, Latin, common symbols, currency signs)
+as the original.
+
+License: SIL Open Font License 1.1 (OFL-1.1)
+https://openfontlicense.org/open-font-license-official-text/

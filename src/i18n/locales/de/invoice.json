@@ -119,7 +119,10 @@
     "deleteTitle": "Rechnung löschen",
     "deleteConfirm": "Rechnung {{number}} löschen? Dies kann nicht rückgängig gemacht werden.",
     "statusUpdateSuccess": "Status aktualisiert",
-    "statusUpdateError": "Status konnte nicht aktualisiert werden. Versuche es erneut."
+    "statusUpdateError": "Status konnte nicht aktualisiert werden. Versuche es erneut.",
+    "partialPaymentTitle": "Wie viel wurde bezahlt?",
+    "partialPaymentHint": "Rechnungssumme: {{total}}",
+    "partialPaymentLabel": "Bezahlter Betrag"
   },
   "preview": {
     "loading": "Rechnung wird geladen…",

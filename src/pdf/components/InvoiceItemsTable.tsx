@@ -15,6 +15,8 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: "row", borderBottomWidth: 1, borderColor: "#ccc", paddingBottom: 4, marginBottom: 4 },
   row: { flexDirection: "row", paddingVertical: 3, borderBottomWidth: 0.5, borderColor: "#eee" },
   colDesc: { flex: 4, fontSize: 9 },
+  itemName: { fontSize: 9 },
+  itemDescription: { fontSize: 8, color: "#888", marginTop: 1 },
   colQty: { flex: 0.8, fontSize: 9, textAlign: "right" },
   colUnit: { flex: 1, fontSize: 9, textAlign: "right" },
   colPrice: { flex: 1.4, fontSize: 9, textAlign: "right" },
@@ -56,7 +58,10 @@ export function InvoiceItemsTable({ invoice, labels, accentColor, locale }: Prop
       </View>
       {invoice.items.map((item) => (
         <View key={item.id} style={styles.row} wrap={false}>
-          <Text style={styles.colDesc}>{item.name}</Text>
+          <View style={styles.colDesc}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            {item.description ? <Text style={styles.itemDescription}>{item.description}</Text> : null}
+          </View>
           <Text style={styles.colQty}>{item.quantity}</Text>
           {showUnit ? <Text style={styles.colUnit}>{labels.units[item.unit]}</Text> : null}
           <Text style={styles.colPrice}>{formatMoney(item.unitPriceCents, invoice.currency, locale)}</Text>

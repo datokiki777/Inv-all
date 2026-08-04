@@ -133,11 +133,32 @@ export const invoiceService = {
     await invoiceRepository.remove(id);
   },
 
-  /** Quick status change (Dashboard / Invoices list) without going through the full edit form. */
-  async updateStatus(id: string, status: Invoice["status"]): Promise<Invoice> {
+  /**
+   * Quick status change (Dashboard / Invoices list) without going through
+   * the full edit form. Since "Paid amount" is no longer editable on the
+   * invoice form, this is also the only place paidAmountCents can change:
+   * marking "paid" assumes full payment; marking "partiallyPaid" requires
+   * the caller to supply how much was actually paid (the UI prompts for
+   * it). Any other status leaves the existing paid amount untouched.
+   */
+  async updateStatus(id: string, status: Invoice["status"], paidAmountCents?: number): Promise<Invoice> {
     const existing = await invoiceRepository.getById(id);
     if (!existing) throw new Error(`Invoice ${id} not found`);
-    const updated: Invoice = { ...existing, status, updatedAt: nowIso() };
+
+    const nextPaidAmountCents =
+      paidAmountCents !== undefined
+        ? paidAmountCents
+        : status === "paid"
+          ? existing.totalCents
+          : existing.paidAmountCents;
+
+    const updated: Invoice = {
+      ...existing,
+      status,
+      paidAmountCents: nextPaidAmountCents,
+      remainingAmountCents: existing.totalCents - nextPaidAmountCents,
+      updatedAt: nowIso()
+    };
     await invoiceRepository.save(updated);
     return updated;
   },

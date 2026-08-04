@@ -30,6 +30,8 @@ export interface InvoicePdfLabels {
   paid: string;
   remaining: string;
   paymentDetails: string;
+  bankName: string;
+  accountHolder: string;
   notes: string;
   page: string;
   of: string;

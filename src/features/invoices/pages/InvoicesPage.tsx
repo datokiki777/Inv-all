@@ -10,6 +10,7 @@ import { useInvoices } from "@/features/invoices/hooks/useInvoices";
 import { InvoiceListItem } from "@/features/invoices/components/InvoiceListItem";
 import { InvoiceFilters } from "@/features/invoices/components/InvoiceFilters";
 import { DeleteInvoiceDialog } from "@/features/invoices/components/DeleteInvoiceDialog";
+import { PartialPaymentDialog } from "@/features/invoices/components/PartialPaymentDialog";
 import type { Invoice, InvoiceStatus } from "@/types";
 
 export function InvoicesPage() {
@@ -17,6 +18,7 @@ export function InvoicesPage() {
   const toast = useToast();
   const { invoices, allCount, status, filters, setFilters, clientOptions, duplicate, remove, updateStatus } = useInvoices();
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
+  const [partialPaymentInvoice, setPartialPaymentInvoice] = useState<Invoice | null>(null);
 
   async function handleDuplicate(invoice: Invoice) {
     try {
@@ -28,11 +30,27 @@ export function InvoicesPage() {
   }
 
   async function handleStatusChange(invoice: Invoice, newStatus: InvoiceStatus) {
+    if (newStatus === "partiallyPaid") {
+      setPartialPaymentInvoice(invoice);
+      return;
+    }
     try {
       await updateStatus(invoice.id, newStatus);
       toast.success(t("invoice:list.statusUpdateSuccess"));
     } catch {
       toast.error(t("invoice:list.statusUpdateError"));
+    }
+  }
+
+  async function handlePartialPaymentConfirm(paidAmountCents: number) {
+    if (!partialPaymentInvoice) return;
+    try {
+      await updateStatus(partialPaymentInvoice.id, "partiallyPaid", paidAmountCents);
+      toast.success(t("invoice:list.statusUpdateSuccess"));
+    } catch {
+      toast.error(t("invoice:list.statusUpdateError"));
+    } finally {
+      setPartialPaymentInvoice(null);
     }
   }
 
@@ -101,6 +119,12 @@ export function InvoicesPage() {
         invoice={deletingInvoice}
         onOpenChange={(open) => !open && setDeletingInvoice(null)}
         onConfirm={handleDelete}
+      />
+
+      <PartialPaymentDialog
+        invoice={partialPaymentInvoice}
+        onOpenChange={(open) => !open && setPartialPaymentInvoice(null)}
+        onConfirm={handlePartialPaymentConfirm}
       />
     </div>
   );
