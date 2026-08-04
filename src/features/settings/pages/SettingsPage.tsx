@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Building2, DatabaseBackup } from "lucide-react";
 import i18n from "@/i18n";
 import { useSettingsForm } from "@/features/settings/hooks/useSettingsForm";
 import { SettingsForm } from "@/features/settings/components/SettingsForm";
@@ -37,13 +37,25 @@ export function SettingsPage() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl text-ink">{t("pages.settings")}</h1>
 
-      <Link
-        to="/settings/backup"
-        className="flex items-center justify-between rounded-lg border border-line bg-surface-raised px-4 py-3.5 text-sm text-ink"
-      >
-        {t("pages.backupRestore")}
-        <ChevronRight size={18} className="text-ink-faint" />
-      </Link>
+      <div className="space-y-2">
+        <Link
+          to="/company"
+          className="flex items-center gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3.5 text-sm text-ink"
+        >
+          <Building2 size={18} className="shrink-0 text-ink-faint" />
+          <span className="flex-1">{t("pages.company")}</span>
+          <ChevronRight size={18} className="text-ink-faint" />
+        </Link>
+
+        <Link
+          to="/settings/backup"
+          className="flex items-center gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3.5 text-sm text-ink"
+        >
+          <DatabaseBackup size={18} className="shrink-0 text-ink-faint" />
+          <span className="flex-1">{t("pages.backupRestore")}</span>
+          <ChevronRight size={18} className="text-ink-faint" />
+        </Link>
+      </div>
 
       {status === "loading" ? <LoadingSpinner label={t("settings.loading")} /> : null}
 
