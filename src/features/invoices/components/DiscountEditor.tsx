@@ -1,4 +1,4 @@
-import { useFormContext, useWatch } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
@@ -14,11 +14,22 @@ export function DiscountEditor() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <FormField label={t("invoice:fields.discount", { ns: "invoice" })} htmlFor="discountType">
-        <Select id="discountType" {...register("discountType")}>
-          <option value="none">{t("invoice:form.discountNone")}</option>
-          <option value="percent">{t("invoice:form.discountPercent")}</option>
-          <option value="fixed">{t("invoice:form.discountFixed")}</option>
-        </Select>
+        <Controller
+          control={control}
+          name="discountType"
+          render={({ field }) => (
+            <Select
+              id="discountType"
+              value={field.value}
+              onChange={field.onChange}
+              options={[
+                { value: "none", label: t("invoice:form.discountNone") },
+                { value: "percent", label: t("invoice:form.discountPercent") },
+                { value: "fixed", label: t("invoice:form.discountFixed") }
+              ]}
+            />
+          )}
+        />
       </FormField>
       {discountType !== "none" ? (
         <FormField label={t("invoice:form.discountValue")} htmlFor="discountValue">

@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { productFormSchema, type ProductFormValues } from "@/schemas";
@@ -32,6 +32,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   const { t } = useTranslation();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<ProductFormValues>({
@@ -64,13 +65,18 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
           <Input id="unitPrice" type="number" step="0.01" min="0" inputMode="decimal" invalid={!!errors.unitPrice} {...register("unitPrice")} />
         </FormField>
         <FormField label={t("products.unit")} htmlFor="unit">
-          <Select id="unit" {...register("unit")}>
-            {UNITS.map((unit) => (
-              <option key={unit} value={unit}>
-                {t(`products.units.${unit}`)}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            control={control}
+            name="unit"
+            render={({ field }) => (
+              <Select
+                id="unit"
+                value={field.value}
+                onChange={field.onChange}
+                options={UNITS.map((unit) => ({ value: unit, label: t(`products.units.${unit}`) }))}
+              />
+            )}
+          />
         </FormField>
       </div>
 

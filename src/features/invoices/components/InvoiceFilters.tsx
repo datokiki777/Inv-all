@@ -42,24 +42,24 @@ export function InvoiceFilters({ filters, onChange, clientOptions }: InvoiceFilt
 
       {expanded ? (
         <div className="space-y-2.5 rounded-lg border border-line bg-surface-raised p-3.5">
-          <Select value={filters.status} onChange={(e) => onChange({ ...filters, status: e.target.value as Filters["status"] })}>
-            <option value="all">{t("invoice:list.allStatuses")}</option>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {t(`invoice:status.${status}`)}
-              </option>
-            ))}
-          </Select>
+          <Select
+            value={filters.status}
+            onChange={(value) => onChange({ ...filters, status: value as Filters["status"] })}
+            options={[
+              { value: "all", label: t("invoice:list.allStatuses") },
+              ...STATUSES.map((status) => ({ value: status, label: t(`invoice:status.${status}`) }))
+            ]}
+          />
 
           {clientOptions.length > 0 ? (
-            <Select value={filters.clientId} onChange={(e) => onChange({ ...filters, clientId: e.target.value })}>
-              <option value="all">{t("invoice:list.allClients")}</option>
-              {clientOptions.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.name}
-                </option>
-              ))}
-            </Select>
+            <Select
+              value={filters.clientId}
+              onChange={(value) => onChange({ ...filters, clientId: value })}
+              options={[
+                { value: "all", label: t("invoice:list.allClients") },
+                ...clientOptions.map((client) => ({ value: client.id, label: client.name }))
+              ]}
+            />
           ) : null}
 
           <div className="grid grid-cols-2 gap-2">

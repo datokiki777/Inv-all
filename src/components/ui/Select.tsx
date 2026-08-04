@@ -1,33 +1,76 @@
-import { forwardRef, type SelectHTMLAttributes } from "react";
-import { ChevronDown } from "lucide-react";
+import * as RadixSelect from "@radix-ui/react-select";
+import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/utils/cn";
 
-export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface SelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
   invalid?: boolean;
+  disabled?: boolean;
+  id?: string;
+  "aria-label"?: string;
 }
 
 /**
- * Native <select> rather than a Radix listbox: on Android it opens the
- * system picker, which is faster to use and more accessible than a
- * custom-rendered dropdown for a fixed short option list.
+ * Fully custom in-app dropdown (Radix Select), styled to match the rest
+ * of the UI — deliberately NOT a native <select>, which hands off to the
+ * OS's own picker chrome (Android's system dropdown) instead of staying
+ * inside the app's own visual language. Date inputs are the one
+ * exception left native — the OS calendar is what people already know
+ * how to use, and re-implementing it adds nothing.
  */
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, invalid, children, ...props }, ref) => (
-    <div className="relative">
-      <select
-        ref={ref}
+export function Select({ value, onChange, options, placeholder, invalid, disabled, id, ...aria }: SelectProps) {
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <RadixSelect.Root value={value} onValueChange={onChange} disabled={disabled}>
+      <RadixSelect.Trigger
+        id={id}
+        aria-label={aria["aria-label"]}
         className={cn(
-          "h-11 w-full appearance-none rounded border bg-surface-sunken px-3 pr-9 text-sm text-ink",
-          "focus:outline-none focus:ring-1 focus:ring-accent",
-          invalid ? "border-danger" : "border-line",
-          className
+          "flex h-11 w-full items-center justify-between gap-2 rounded border bg-surface-sunken px-3 text-sm text-ink",
+          "focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50",
+          invalid ? "border-danger" : "border-line"
         )}
-        {...props}
       >
-        {children}
-      </select>
-      <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-    </div>
-  )
-);
-Select.displayName = "Select";
+        <RadixSelect.Value placeholder={placeholder}>{selected?.label}</RadixSelect.Value>
+        <RadixSelect.Icon>
+          <ChevronDown size={16} className="text-ink-faint" />
+        </RadixSelect.Icon>
+      </RadixSelect.Trigger>
+
+      <RadixSelect.Portal>
+        <RadixSelect.Content
+          position="popper"
+          sideOffset={4}
+          className="z-[70] max-h-[min(24rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-line bg-surface-raised shadow-xl"
+        >
+          <RadixSelect.Viewport className="p-1">
+            {options.map((option) => (
+              <RadixSelect.Item
+                key={option.value}
+                value={option.value}
+                className={cn(
+                  "relative flex h-11 cursor-pointer select-none items-center rounded px-3 pr-8 text-sm text-ink outline-none",
+                  "data-[highlighted]:bg-surface-sunken data-[state=checked]:text-accent"
+                )}
+              >
+                <RadixSelect.ItemText>{option.label}</RadixSelect.ItemText>
+                <RadixSelect.ItemIndicator className="absolute right-3 flex items-center">
+                  <Check size={15} />
+                </RadixSelect.ItemIndicator>
+              </RadixSelect.Item>
+            ))}
+          </RadixSelect.Viewport>
+        </RadixSelect.Content>
+      </RadixSelect.Portal>
+    </RadixSelect.Root>
+  );
+}

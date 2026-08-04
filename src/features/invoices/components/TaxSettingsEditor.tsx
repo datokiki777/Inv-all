@@ -1,4 +1,4 @@
-import { useFormContext, useWatch } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
@@ -25,13 +25,18 @@ export function TaxSettingsEditor() {
       </div>
 
       <FormField label={t("invoice:form.taxMode")} htmlFor="taxMode">
-        <Select id="taxMode" {...register("taxMode")}>
-          {MODES.map((mode) => (
-            <option key={mode} value={mode}>
-              {t(`invoice:form.taxModes.${mode}`)}
-            </option>
-          ))}
-        </Select>
+        <Controller
+          control={control}
+          name="taxMode"
+          render={({ field }) => (
+            <Select
+              id="taxMode"
+              value={field.value}
+              onChange={field.onChange}
+              options={MODES.map((mode) => ({ value: mode, label: t(`invoice:form.taxModes.${mode}`) }))}
+            />
+          )}
+        />
       </FormField>
 
       {taxMode === "standard" || taxMode === "custom" ? (

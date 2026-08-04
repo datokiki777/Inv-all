@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Plus } from "lucide-react";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +23,7 @@ export function ClientPicker({ clients, onClientCreated }: ClientPickerProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const toast = useToast();
   const {
-    register,
+    control,
     setValue,
     formState: { errors }
   } = useFormContext<InvoiceFormValues>();
@@ -48,14 +48,20 @@ export function ClientPicker({ clients, onClientCreated }: ClientPickerProps) {
       <FormField label={t("invoice:form.client")} htmlFor="clientId" required error={error}>
         <div className="flex gap-2">
           <div className="flex-1">
-            <Select id="clientId" invalid={!!error} {...register("clientId")}>
-              <option value="">{t("invoice:form.selectClient")}</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {getClientDisplayName(client)}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="clientId"
+              render={({ field }) => (
+                <Select
+                  id="clientId"
+                  invalid={!!error}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t("invoice:form.selectClient")}
+                  options={clients.map((client) => ({ value: client.id, label: getClientDisplayName(client) }))}
+                />
+              )}
+            />
           </div>
           <Button type="button" variant="secondary" size="default" onClick={() => setAddOpen(true)} aria-label={t("clients.addTitle")}>
             <Plus size={18} />

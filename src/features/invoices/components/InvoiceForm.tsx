@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { invoiceFormSchema, type InvoiceFormValues } from "@/schemas";
@@ -77,6 +77,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
   });
   const {
     register,
+    control,
     handleSubmit,
     watch,
     reset,
@@ -194,13 +195,18 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
             {company.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" /> : null}
           </div>
           <FormField label={t("invoice:form.paymentMethod")} htmlFor="paymentMethod">
-            <Select id="paymentMethod" {...register("paymentMethod")}>
-              {PAYMENT_METHODS.map((method) => (
-                <option key={method} value={method}>
-                  {t(`invoice:form.paymentMethods.${method}`)}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <Select
+                  id="paymentMethod"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={PAYMENT_METHODS.map((method) => ({ value: method, label: t(`invoice:form.paymentMethods.${method}`) }))}
+                />
+              )}
+            />
           </FormField>
           <FormField label={t("invoice:form.paymentTermsText")} htmlFor="paymentTermsText">
             <Textarea id="paymentTermsText" {...register("paymentTermsText")} />
@@ -217,19 +223,35 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
 
         <div className="grid grid-cols-2 gap-3">
           <FormField label={t("invoice:form.template")} htmlFor="templateId">
-            <Select id="templateId" {...register("templateId")}>
-              {TEMPLATES.map((template) => (
-                <option key={template} value={template}>
-                  {t(`invoice:form.templates.${template}`)}
-                </option>
-              ))}
-            </Select>
+            <Controller
+              control={control}
+              name="templateId"
+              render={({ field }) => (
+                <Select
+                  id="templateId"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
+                />
+              )}
+            />
           </FormField>
           <FormField label={t("invoice:form.pdfLanguage")} htmlFor="pdfLanguage">
-            <Select id="pdfLanguage" {...register("pdfLanguage")}>
-              <option value="de">{t("languages.de")}</option>
-              <option value="en">{t("languages.en")}</option>
-            </Select>
+            <Controller
+              control={control}
+              name="pdfLanguage"
+              render={({ field }) => (
+                <Select
+                  id="pdfLanguage"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "de", label: t("languages.de") },
+                    { value: "en", label: t("languages.en") }
+                  ]}
+                />
+              )}
+            />
           </FormField>
         </div>
 

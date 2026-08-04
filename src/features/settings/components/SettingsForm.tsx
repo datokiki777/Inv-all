@@ -38,6 +38,7 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
 
   const interfaceLanguage = watch("interfaceLanguage");
   const defaultInvoiceLanguage = watch("defaultInvoiceLanguage");
+  const defaultInvoiceTemplateId = watch("defaultInvoiceTemplateId");
 
   function err(key: keyof AppSettingsFormValues) {
     const message = errors[key]?.message;
@@ -63,13 +64,12 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
       </FormField>
 
       <FormField label={t("settings.defaultInvoiceTemplateId")} htmlFor="defaultInvoiceTemplateId">
-        <Select id="defaultInvoiceTemplateId" {...register("defaultInvoiceTemplateId")}>
-          {TEMPLATES.map((template) => (
-            <option key={template} value={template}>
-              {t(`invoice:form.templates.${template}`)}
-            </option>
-          ))}
-        </Select>
+        <Select
+          id="defaultInvoiceTemplateId"
+          value={defaultInvoiceTemplateId}
+          onChange={(v) => setValue("defaultInvoiceTemplateId", v as AppSettingsFormValues["defaultInvoiceTemplateId"], { shouldDirty: true })}
+          options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
+        />
       </FormField>
 
       <FormField label={t("settings.defaultInvoiceLanguage")} htmlFor="defaultInvoiceLanguage">

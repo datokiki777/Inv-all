@@ -1,4 +1,5 @@
-import { useFormContext } from "react-hook-form";
+import { useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
@@ -31,11 +32,13 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
   const { t } = useTranslation(["common", "invoice"]);
   const {
     register,
+    control,
     setValue,
     formState: { errors }
   } = useFormContext<InvoiceFormValues>();
 
   const rowErrors = errors.items?.[index];
+  const [pickedProductId, setPickedProductId] = useState("");
 
   function applyProduct(productId: string) {
     const product = products.find((p) => p.id === productId);
@@ -45,19 +48,24 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
     setValue(`items.${index}.description`, product.description ?? "", { shouldDirty: true });
     setValue(`items.${index}.unit`, product.unit, { shouldDirty: true });
     setValue(`items.${index}.unitPrice`, product.unitPriceCents / 100, { shouldDirty: true });
+    // Reset right away so the picker always shows its placeholder again,
+    // ready to copy another (or the same) saved product into this row.
+    setPickedProductId("");
   }
 
   return (
     <div className="space-y-2.5 rounded-lg border border-line bg-surface-raised p-3.5">
       {products.length > 0 ? (
-        <Select aria-label={t("invoice:form.pickProduct")} defaultValue="" onChange={(e) => e.target.value && applyProduct(e.target.value)}>
-          <option value="">{t("invoice:form.pickProduct")}</option>
-          {products.map((product) => (
-            <option key={product.id} value={product.id}>
-              {product.name}
-            </option>
-          ))}
-        </Select>
+        <Select
+          aria-label={t("invoice:form.pickProduct")}
+          value={pickedProductId}
+          onChange={(productId) => {
+            setPickedProductId(productId);
+            applyProduct(productId);
+          }}
+          placeholder={t("invoice:form.pickProduct")}
+          options={products.map((product) => ({ value: product.id, label: product.name }))}
+        />
       ) : null}
 
       <Input placeholder={t("invoice:form.itemName")} invalid={!!rowErrors?.name} {...register(`items.${index}.name`)} />
@@ -95,13 +103,17 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
           <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
           {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}
         </div>
-        <Select {...register(`items.${index}.unit`)}>
-          {UNITS.map((unit) => (
-            <option key={unit} value={unit}>
-              {t(`products.units.${unit}`)}
-            </option>
-          ))}
-        </Select>
+        <Controller
+          control={control}
+          name={`items.${index}.unit`}
+          render={({ field }) => (
+            <Select
+              value={field.value}
+              onChange={field.onChange}
+              options={UNITS.map((unit) => ({ value: unit, label: t(`products.units.${unit}`) }))}
+            />
+          )}
+        />
       </div>
 
       <div className="flex justify-end">
