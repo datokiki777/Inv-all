@@ -7,15 +7,24 @@ import type { Company, Client, Invoice, ProductOrService, AppSettings } from "@/
  * migration block below — existing data is never dropped on upgrade.
  */
 export const DB_NAME = "invoice-app-db";
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 export const STORE = {
   companies: "companies",
   clients: "clients",
   invoices: "invoices",
   products: "products",
-  settings: "settings"
+  settings: "settings",
+  invoiceDrafts: "invoiceDrafts"
 } as const;
+
+/** A saved-but-not-submitted Invoice form, keyed by "new" (create page) or the invoice id (edit page). */
+export interface InvoiceDraftRecord {
+  key: string;
+  /** Serialized InvoiceFormValues — stored as unknown here to avoid a schemas -> storage dependency. */
+  values: unknown;
+  savedAt: string;
+}
 
 interface InvoiceAppDB extends DBSchema {
   companies: { key: string; value: Company };
@@ -30,6 +39,7 @@ interface InvoiceAppDB extends DBSchema {
   };
   products: { key: string; value: ProductOrService; indexes: { "by-name": string } };
   settings: { key: string; value: AppSettings };
+  invoiceDrafts: { key: string; value: InvoiceDraftRecord };
 }
 
 let dbPromise: Promise<IDBPDatabase<InvoiceAppDB>> | null = null;
@@ -54,8 +64,14 @@ export function getDb(): Promise<IDBPDatabase<InvoiceAppDB>> {
           db.createObjectStore(STORE.settings, { keyPath: "id" });
         }
 
+        if (oldVersion < 2) {
+          // Autosave scratch space for in-progress Invoice forms (see
+          // invoiceDraftRepository). Existing stores/data are untouched.
+          db.createObjectStore(STORE.invoiceDrafts, { keyPath: "key" });
+        }
+
         // Next migration goes here, e.g.:
-        // if (oldVersion < 2) { ... add a new index / store without touching existing data ... }
+        // if (oldVersion < 3) { ... add a new index / store without touching existing data ... }
       }
     });
   }

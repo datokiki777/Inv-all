@@ -38,6 +38,15 @@
     "clients": "No clients yet",
     "products": "No products or services yet"
   },
+  "dashboard": {
+    "loading": "Loading dashboard…",
+    "loadError": "Couldn't load dashboard data",
+    "outstanding": "Outstanding",
+    "overdue": "Overdue",
+    "draftCount": "{{count}} draft invoice not yet sent",
+    "draftCount_other": "{{count}} draft invoices not yet sent",
+    "recentInvoices": "Recent invoices"
+  },
   "company": {
     "logo": "Logo",
     "logoAlt": "Company logo",

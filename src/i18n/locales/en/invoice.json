@@ -75,7 +75,10 @@
     "loadErrorHint": "Reload the app and try again.",
     "companyMissing": "Set up your company first",
     "companyMissingHint": "Company details are required before creating an invoice.",
-    "notFound": "Invoice not found"
+    "notFound": "Invoice not found",
+    "draftFound": "Unsaved draft from {{date}}",
+    "restoreDraft": "Restore",
+    "discardDraft": "Discard"
   },
   "list": {
     "searchPlaceholder": "Search by number or client…",

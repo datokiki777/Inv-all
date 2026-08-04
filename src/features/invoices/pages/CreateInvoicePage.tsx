@@ -13,7 +13,7 @@ export function CreateInvoicePage() {
   const { t } = useTranslation(["common", "invoice"]);
   const navigate = useNavigate();
   const toast = useToast();
-  const { status, company, clients, products, settings } = useInvoiceFormData();
+  const { status, company, clients, products, settings, suggestedInvoiceNumber } = useInvoiceFormData();
 
   async function handleSubmit(values: InvoiceFormValues) {
     if (!company) return;
@@ -52,9 +52,11 @@ export function CreateInvoicePage() {
 
       {status === "ready" && company && settings ? (
         <InvoiceForm
+          draftKey="new"
           clients={clients}
           products={products}
           settings={settings}
+          suggestedInvoiceNumber={suggestedInvoiceNumber}
           onSubmit={handleSubmit}
           onClientCreated={() => {}}
         />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { todayDateOnly, addDays } from "@/utils/date";
+import { todayDateOnly, addDays, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
+import { useInvoiceDraftAutosave, loadInvoiceDraft, clearInvoiceDraft, type InvoiceDraftSnapshot } from "@/features/invoices/hooks/useInvoiceDraft";
 import { ClientPicker } from "./ClientPicker";
 import { InvoiceItemsEditor } from "./InvoiceItemsEditor";
 import { TaxSettingsEditor } from "./TaxSettingsEditor";
@@ -22,6 +23,8 @@ const TEMPLATES = ["classic", "modern", "compact", "minimal"] as const;
 const PAYMENT_METHODS = ["bankTransfer", "cash", "paypal", "other"] as const;
 
 interface InvoiceFormProps {
+  /** "new" for the create page, the invoice id for the edit page — scopes autosave/restore to this form. */
+  draftKey: string;
   invoice?: Invoice;
   clients: Client[];
   products: ProductOrService[];
@@ -58,9 +61,10 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
   };
 }
 
-export function InvoiceForm({ invoice, clients, products, settings, suggestedInvoiceNumber, onSubmit, onClientCreated }: InvoiceFormProps) {
-  const { t } = useTranslation(["common", "invoice"]);
+export function InvoiceForm({ draftKey, invoice, clients, products, settings, suggestedInvoiceNumber, onSubmit, onClientCreated }: InvoiceFormProps) {
+  const { t, i18n } = useTranslation(["common", "invoice"]);
   const [clientList, setClientList] = useState(clients);
+  const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -69,8 +73,35 @@ export function InvoiceForm({ invoice, clients, products, settings, suggestedInv
   const {
     register,
     handleSubmit,
+    watch,
+    reset,
     formState: { errors, isSubmitting }
   } = methods;
+
+  // Offer to restore an autosaved draft once, right after mount.
+  useEffect(() => {
+    let cancelled = false;
+    loadInvoiceDraft(draftKey).then((snapshot) => {
+      if (!cancelled && snapshot) setDraftFound(snapshot);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
+
+  useInvoiceDraftAutosave(draftKey, watch, true);
+
+  function restoreDraft() {
+    if (!draftFound) return;
+    reset(draftFound.values);
+    setDraftFound(null);
+  }
+
+  function discardDraft() {
+    clearInvoiceDraft(draftKey);
+    setDraftFound(null);
+  }
 
   function err(key: keyof InvoiceFormValues) {
     const message = errors[key]?.message as string | undefined;
@@ -79,10 +110,27 @@ export function InvoiceForm({ invoice, clients, products, settings, suggestedInv
 
   return (
     <FormProvider {...methods}>
+      {draftFound ? (
+        <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent/10 p-3.5 text-sm">
+          <p className="text-ink">
+            {t("invoice:form.draftFound", { date: formatDate(draftFound.savedAt, i18n.language === "de" ? "de-DE" : "en-US") })}
+          </p>
+          <div className="flex shrink-0 gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={discardDraft}>
+              {t("invoice:form.discardDraft")}
+            </Button>
+            <Button type="button" size="sm" onClick={restoreDraft}>
+              {t("invoice:form.restoreDraft")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <form
         className="space-y-6 pb-4"
         onSubmit={handleSubmit(async (values) => {
           await onSubmit(values);
+          await clearInvoiceDraft(draftKey);
         })}
       >
         <FormField label={t("invoice:fields.invoiceNumber", { ns: "invoice" })} htmlFor="invoiceNumber" required error={err("invoiceNumber")}>

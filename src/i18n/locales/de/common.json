@@ -38,6 +38,15 @@
     "clients": "Noch keine Kunden",
     "products": "Noch keine Produkte oder Leistungen"
   },
+  "dashboard": {
+    "loading": "Übersicht wird geladen…",
+    "loadError": "Übersichtsdaten konnten nicht geladen werden",
+    "outstanding": "Offene Beträge",
+    "overdue": "Überfällig",
+    "draftCount": "{{count}} Entwurf noch nicht versendet",
+    "draftCount_other": "{{count}} Entwürfe noch nicht versendet",
+    "recentInvoices": "Letzte Rechnungen"
+  },
   "company": {
     "logo": "Logo",
     "logoAlt": "Firmenlogo",

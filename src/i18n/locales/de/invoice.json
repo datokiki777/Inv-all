@@ -75,7 +75,10 @@
     "loadErrorHint": "Lade die App neu und versuche es erneut.",
     "companyMissing": "Richte zuerst dein Unternehmen ein",
     "companyMissingHint": "Unternehmensdaten sind erforderlich, bevor eine Rechnung erstellt werden kann.",
-    "notFound": "Rechnung nicht gefunden"
+    "notFound": "Rechnung nicht gefunden",
+    "draftFound": "Nicht gespeicherter Entwurf vom {{date}}",
+    "restoreDraft": "Wiederherstellen",
+    "discardDraft": "Verwerfen"
   },
   "list": {
     "searchPlaceholder": "Suche nach Nummer oder Kunde…",

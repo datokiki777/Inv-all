@@ -55,6 +55,7 @@ export function EditInvoicePage() {
 
       {status === "ready" && company && settings && invoice ? (
         <InvoiceForm
+          draftKey={invoice.id}
           invoice={invoice}
           clients={clients}
           products={products}
