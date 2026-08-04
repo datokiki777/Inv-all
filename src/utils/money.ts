@@ -69,6 +69,39 @@ export function grandTotal(taxableAmountCents: number, vatCents: number): number
   return taxableAmountCents + vatCents;
 }
 
+export interface VatBreakdownRow {
+  vatPercent: number;
+  netCents: number;
+  vatCents: number;
+}
+
+/**
+ * Per-rate VAT breakdown (e.g. "19%: net 950.00 / VAT 180.50"), using the
+ * exact same proportional-discount distribution as vatTotal() above, so
+ * the rows always sum to the same overall VAT total shown elsewhere.
+ */
+export function computeVatBreakdown(items: InvoiceItem[], invoiceLevelDiscount?: Discount): VatBreakdownRow[] {
+  const rawSubtotal = subtotal(items);
+  if (rawSubtotal === 0) return [];
+
+  const discountedSubtotal = taxableAmount(rawSubtotal, invoiceLevelDiscount);
+  const factor = discountedSubtotal / rawSubtotal;
+
+  const netByRate = new Map<number, number>();
+  for (const item of items) {
+    const lineTaxable = itemTotal(item) * factor;
+    netByRate.set(item.vatPercent, (netByRate.get(item.vatPercent) ?? 0) + lineTaxable);
+  }
+
+  return Array.from(netByRate.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([vatPercent, rawNetCents]) => {
+      const netCents = round(rawNetCents);
+      const vatCents = round(rawNetCents * (vatPercent / 100));
+      return { vatPercent, netCents, vatCents };
+    });
+}
+
 export function remainingAmount(totalCents: number, paidAmountCents: number): number {
   return totalCents - paidAmountCents;
 }

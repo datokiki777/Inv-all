@@ -11,11 +11,13 @@ import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { todayDateOnly, addDays, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
+import { defaultPdfVisibility } from "@/utils/invoicePdfVisibility";
 import { useInvoiceDraftAutosave, loadInvoiceDraft, clearInvoiceDraft, type InvoiceDraftSnapshot } from "@/features/invoices/hooks/useInvoiceDraft";
 import { ClientPicker } from "./ClientPicker";
 import { InvoiceItemsEditor } from "./InvoiceItemsEditor";
 import { TaxSettingsEditor } from "./TaxSettingsEditor";
 import { DiscountEditor } from "./DiscountEditor";
+import { InvoiceVisibilityToggles } from "./InvoiceVisibilityToggles";
 import { InvoiceTotalsPreview } from "./InvoiceTotalsPreview";
 
 const STATUSES = ["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"] as const;
@@ -57,7 +59,8 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
     paymentTermsText: "",
     status: "draft",
     templateId: settings.defaultInvoiceTemplateId,
-    pdfLanguage: settings.defaultInvoiceLanguage
+    pdfLanguage: settings.defaultInvoiceLanguage,
+    pdfVisibility: defaultPdfVisibility
   };
 }
 
@@ -218,6 +221,8 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
             ))}
           </Select>
         </FormField>
+
+        <InvoiceVisibilityToggles />
 
         <InvoiceTotalsPreview />
 

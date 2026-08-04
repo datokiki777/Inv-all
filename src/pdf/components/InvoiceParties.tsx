@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "@react-pdf/renderer";
 import type { Invoice } from "@/types";
 import type { InvoicePdfLabels } from "../types";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
+import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
 
 interface Props {
   invoice: Invoice;
@@ -15,15 +16,37 @@ const styles = StyleSheet.create({
 
 /** "Bill to" client block, shared across all templates. */
 export function InvoiceParties({ invoice, labels }: Props) {
+  const visibility = resolvePdfVisibility(invoice.pdfVisibility);
+  const client = invoice.client;
+
   return (
     <View style={styles.block}>
       <Text style={styles.label}>{labels.billTo}</Text>
-      <Text>{getClientDisplayName(invoice.client)}</Text>
-      <Text>{invoice.client.addressLine1}</Text>
+      <Text>{getClientDisplayName(client)}</Text>
+      <Text>{client.addressLine1}</Text>
       <Text>
-        {invoice.client.postalCode} {invoice.client.city}, {invoice.client.country}
+        {client.postalCode} {client.city}, {client.country}
       </Text>
-      {invoice.client.vatId ? <Text>{invoice.client.vatId}</Text> : null}
+      {visibility.showClientEmail && client.email ? (
+        <Text>
+          {labels.email}: {client.email}
+        </Text>
+      ) : null}
+      {visibility.showClientPhone && client.phone ? (
+        <Text>
+          {labels.phone}: {client.phone}
+        </Text>
+      ) : null}
+      {visibility.showClientVatId && client.vatId ? (
+        <Text>
+          {labels.vatId}: {client.vatId}
+        </Text>
+      ) : null}
+      {visibility.showClientTaxNumber && client.taxNumber ? (
+        <Text>
+          {labels.taxNumber}: {client.taxNumber}
+        </Text>
+      ) : null}
     </View>
   );
 }

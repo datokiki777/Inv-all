@@ -37,6 +37,28 @@ export type InvoiceStatus =
 
 export type InvoiceLanguage = "de" | "en";
 
+/**
+ * "Show in PDF" switches for optional fields/sections. Optional on the
+ * entity itself (older saved invoices won't have it) — always read through
+ * resolvePdfVisibility() in utils/invoicePdfVisibility.ts, which fills in
+ * `true` for anything missing, so existing invoices render exactly as
+ * before.
+ */
+export interface InvoicePdfVisibility {
+  showCompanyEmail: boolean;
+  showCompanyPhone: boolean;
+  showCompanyVatId: boolean;
+  showCompanyTaxNumber: boolean;
+  showClientEmail: boolean;
+  showClientPhone: boolean;
+  showClientVatId: boolean;
+  showClientTaxNumber: boolean;
+  showNotes: boolean;
+  showBankDetails: boolean;
+  showItemUnitColumn: boolean;
+  showVatSummaryTable: boolean;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -70,6 +92,8 @@ export interface Invoice {
   status: InvoiceStatus;
   templateId: InvoiceTemplateId;
   pdfLanguage: InvoiceLanguage;
+  /** Optional for backward compatibility with invoices saved before this field existed. */
+  pdfVisibility?: InvoicePdfVisibility;
 
   createdAt: string;
   updatedAt: string;

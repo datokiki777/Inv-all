@@ -79,6 +79,7 @@ export const invoiceService = {
       status: values.status,
       templateId: values.templateId,
       pdfLanguage: values.pdfLanguage,
+      pdfVisibility: values.pdfVisibility,
       createdAt: now,
       updatedAt: now
     };
@@ -118,6 +119,7 @@ export const invoiceService = {
       status: values.status,
       templateId: values.templateId,
       pdfLanguage: values.pdfLanguage,
+      pdfVisibility: values.pdfVisibility,
       updatedAt: nowIso()
     };
 

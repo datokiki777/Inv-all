@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "@react-pdf/renderer";
 import type { Invoice } from "@/types";
 import type { InvoicePdfLabels } from "../types";
+import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
 
 interface Props {
   invoice: Invoice;
@@ -21,17 +22,19 @@ const styles = StyleSheet.create({
  * correct regardless of how many pages the item table produces.
  */
 export function InvoiceFooter({ invoice, labels }: Props) {
+  const visibility = resolvePdfVisibility(invoice.pdfVisibility);
+
   return (
     <>
       <View>
-        {invoice.paymentDetails.bankDetails ? (
+        {visibility.showBankDetails && invoice.paymentDetails.bankDetails ? (
           <View style={styles.payment}>
             <Text>{labels.paymentDetails}</Text>
             {invoice.paymentDetails.bankDetails.iban ? <Text>IBAN: {invoice.paymentDetails.bankDetails.iban}</Text> : null}
             {invoice.paymentDetails.bankDetails.bic ? <Text>BIC: {invoice.paymentDetails.bankDetails.bic}</Text> : null}
           </View>
         ) : null}
-        {invoice.note ? (
+        {visibility.showNotes && invoice.note ? (
           <View style={styles.notes}>
             <Text>{labels.notes}</Text>
             <Text>{invoice.note}</Text>

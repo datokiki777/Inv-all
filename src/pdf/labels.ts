@@ -15,6 +15,7 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
     billTo: "Bill to",
     description: "Description",
     quantity: "Qty",
+    unit: "Unit",
     unitPrice: "Unit price",
     vat: "VAT",
     lineTotal: "Total",
@@ -28,7 +29,24 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
     notes: "Notes",
     page: "Page",
     of: "of",
-    reverseChargeNote: "Reverse charge: VAT liability is transferred to the recipient."
+    reverseChargeNote: "Reverse charge: VAT liability is transferred to the recipient.",
+    email: "Email",
+    phone: "Phone",
+    vatId: "VAT ID",
+    taxNumber: "Tax number",
+    vatSummaryTitle: "VAT summary",
+    vatSummaryRate: "VAT rate",
+    vatSummaryNet: "Net",
+    vatSummaryVat: "VAT",
+    vatSummaryTotal: "Total",
+    units: {
+      hour: "hour",
+      day: "day",
+      piece: "piece",
+      kg: "kg",
+      unit: "unit",
+      flatRate: "flat rate"
+    }
   },
   de: {
     invoiceNumber: "Rechnungsnr.",
@@ -38,6 +56,7 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
     billTo: "Rechnungsempfänger",
     description: "Beschreibung",
     quantity: "Menge",
+    unit: "Einheit",
     unitPrice: "Einzelpreis",
     vat: "MwSt.",
     lineTotal: "Gesamt",
@@ -51,7 +70,24 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
     notes: "Anmerkungen",
     page: "Seite",
     of: "von",
-    reverseChargeNote: "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge)."
+    reverseChargeNote: "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge).",
+    email: "E-Mail",
+    phone: "Telefon",
+    vatId: "USt-IdNr.",
+    taxNumber: "Steuernummer",
+    vatSummaryTitle: "MwSt.-Übersicht",
+    vatSummaryRate: "MwSt.-Satz",
+    vatSummaryNet: "Netto",
+    vatSummaryVat: "MwSt.",
+    vatSummaryTotal: "Gesamt",
+    units: {
+      hour: "Stunde",
+      day: "Tag",
+      piece: "Stück",
+      kg: "Kilogramm",
+      unit: "Einheit",
+      flatRate: "Pauschale"
+    }
   }
 };
 

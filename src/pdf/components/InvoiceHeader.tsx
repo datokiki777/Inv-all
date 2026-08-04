@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import type { Invoice } from "@/types";
 import type { InvoicePdfLabels } from "../types";
+import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
 
 interface Props {
   invoice: Invoice;
@@ -18,16 +19,39 @@ const styles = StyleSheet.create({
 
 /** Logo + company block on the left, invoice number/dates on the right. Reused by every template. */
 export function InvoiceHeader({ invoice, labels, accentColor }: Props) {
+  const visibility = resolvePdfVisibility(invoice.pdfVisibility);
+  const company = invoice.company;
+
   return (
     <View style={styles.row}>
       <View>
-        {invoice.company.logoDataUrl ? <Image src={invoice.company.logoDataUrl} style={styles.logo} /> : null}
+        {company.logoDataUrl ? <Image src={company.logoDataUrl} style={styles.logo} /> : null}
         <View style={styles.companyBlock}>
-          <Text>{invoice.company.name}</Text>
-          <Text>{invoice.company.addressLine1}</Text>
+          <Text>{company.name}</Text>
+          <Text>{company.addressLine1}</Text>
           <Text>
-            {invoice.company.postalCode} {invoice.company.city}, {invoice.company.country}
+            {company.postalCode} {company.city}, {company.country}
           </Text>
+          {visibility.showCompanyEmail && company.email ? (
+            <Text>
+              {labels.email}: {company.email}
+            </Text>
+          ) : null}
+          {visibility.showCompanyPhone && company.phone ? (
+            <Text>
+              {labels.phone}: {company.phone}
+            </Text>
+          ) : null}
+          {visibility.showCompanyVatId && company.vatId ? (
+            <Text>
+              {labels.vatId}: {company.vatId}
+            </Text>
+          ) : null}
+          {visibility.showCompanyTaxNumber && company.taxNumber ? (
+            <Text>
+              {labels.taxNumber}: {company.taxNumber}
+            </Text>
+          ) : null}
         </View>
       </View>
       <View style={styles.metaBlock}>

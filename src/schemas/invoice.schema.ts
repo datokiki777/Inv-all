@@ -30,6 +30,21 @@ const paymentDetailsSchema = z.object({
   paymentTermsText: z.string().optional()
 });
 
+const pdfVisibilitySchema = z.object({
+  showCompanyEmail: z.boolean(),
+  showCompanyPhone: z.boolean(),
+  showCompanyVatId: z.boolean(),
+  showCompanyTaxNumber: z.boolean(),
+  showClientEmail: z.boolean(),
+  showClientPhone: z.boolean(),
+  showClientVatId: z.boolean(),
+  showClientTaxNumber: z.boolean(),
+  showNotes: z.boolean(),
+  showBankDetails: z.boolean(),
+  showItemUnitColumn: z.boolean(),
+  showVatSummaryTable: z.boolean()
+});
+
 export const invoiceItemSchema = z.object({
   id: z.string().uuid(),
   productId: z.string().uuid().optional(),
@@ -66,6 +81,7 @@ export const invoiceSchema = z.object({
   status: z.enum(["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"]),
   templateId: z.enum(["classic", "modern", "compact", "minimal"]),
   pdfLanguage: z.enum(["de", "en"]),
+  pdfVisibility: pdfVisibilitySchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -117,7 +133,8 @@ export const invoiceFormSchema = z.object({
   paymentTermsText: z.string().optional(),
   status: z.enum(["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"]),
   templateId: z.enum(["classic", "modern", "compact", "minimal"]),
-  pdfLanguage: z.enum(["de", "en"])
+  pdfLanguage: z.enum(["de", "en"]),
+  pdfVisibility: pdfVisibilitySchema
 });
 
 export type InvoiceItemFormValues = z.infer<typeof invoiceItemFormSchema>;

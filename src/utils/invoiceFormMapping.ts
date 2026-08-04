@@ -1,4 +1,5 @@
 import { generateId } from "@/utils/id";
+import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
 import type { Discount, Invoice, InvoiceItem, Unit } from "@/types";
 import type { InvoiceFormValues, InvoiceItemFormValues } from "@/schemas";
 
@@ -72,7 +73,8 @@ export function invoiceToFormValues(invoice: Invoice): InvoiceFormValues {
     paymentTermsText: invoice.paymentDetails.paymentTermsText,
     status: invoice.status,
     templateId: invoice.templateId,
-    pdfLanguage: invoice.pdfLanguage
+    pdfLanguage: invoice.pdfLanguage,
+    pdfVisibility: resolvePdfVisibility(invoice.pdfVisibility)
   };
 }
 

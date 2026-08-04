@@ -1,4 +1,4 @@
-import type { Invoice } from "@/types";
+import type { Invoice, Unit } from "@/types";
 
 /**
  * Contract every PDF template must implement. Templates receive only the
@@ -19,6 +19,7 @@ export interface InvoicePdfLabels {
   billTo: string;
   description: string;
   quantity: string;
+  unit: string;
   unitPrice: string;
   vat: string;
   lineTotal: string;
@@ -33,6 +34,16 @@ export interface InvoicePdfLabels {
   page: string;
   of: string;
   reverseChargeNote: string;
+  email: string;
+  phone: string;
+  vatId: string;
+  taxNumber: string;
+  vatSummaryTitle: string;
+  vatSummaryRate: string;
+  vatSummaryNet: string;
+  vatSummaryVat: string;
+  vatSummaryTotal: string;
+  units: Record<Unit, string>;
 }
 
 export type InvoicePdfTemplateComponent = (props: InvoicePdfTemplateProps) => JSX.Element;
