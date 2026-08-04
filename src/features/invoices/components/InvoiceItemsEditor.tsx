@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { blankInvoiceFormItem } from "@/utils/invoiceFormMapping";
 import { InvoiceItemRow } from "./InvoiceItemRow";
+import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import type { InvoiceFormValues } from "@/schemas";
 import type { ProductOrService } from "@/types";
 
@@ -27,7 +28,10 @@ export function InvoiceItemsEditor({ products }: InvoiceItemsEditorProps) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-ink">{t("invoice:form.items")}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-ink">{t("invoice:form.items")}</p>
+        <PdfVisibilitySwitch visKey="showItemUnitColumn" label={t("invoice:visibility.showItemUnitColumn")} />
+      </div>
       {itemsError ? <p className="text-xs text-danger">{itemsError}</p> : null}
 
       <div className="space-y-3">

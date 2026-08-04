@@ -4,6 +4,7 @@ import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { FormField } from "@/components/ui/FormField";
+import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import type { InvoiceFormValues } from "@/schemas";
 import type { TaxMode } from "@/types";
 
@@ -14,10 +15,14 @@ export function TaxSettingsEditor() {
   const { t } = useTranslation(["common", "invoice"]);
   const { register, control } = useFormContext<InvoiceFormValues>();
   const taxMode = useWatch({ control, name: "taxMode" });
+  const hasVatRate = taxMode !== "reverseCharge" && taxMode !== "taxFree";
 
   return (
     <div className="space-y-3 rounded-lg border border-line p-4">
-      <p className="text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
+        {hasVatRate ? <PdfVisibilitySwitch visKey="showVatSummaryTable" label={t("invoice:visibility.showVatSummaryTable")} /> : null}
+      </div>
 
       <FormField label={t("invoice:form.taxMode")} htmlFor="taxMode">
         <Select id="taxMode" {...register("taxMode")}>

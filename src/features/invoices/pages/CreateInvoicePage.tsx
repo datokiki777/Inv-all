@@ -53,6 +53,7 @@ export function CreateInvoicePage() {
       {status === "ready" && company && settings ? (
         <InvoiceForm
           draftKey="new"
+          company={company}
           clients={clients}
           products={products}
           settings={settings}

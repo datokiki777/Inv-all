@@ -3,7 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { invoiceFormSchema, type InvoiceFormValues } from "@/schemas";
-import type { AppSettings, Client, Invoice, ProductOrService } from "@/types";
+import type { AppSettings, Client, Company, Invoice, ProductOrService } from "@/types";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
@@ -17,7 +17,9 @@ import { ClientPicker } from "./ClientPicker";
 import { InvoiceItemsEditor } from "./InvoiceItemsEditor";
 import { TaxSettingsEditor } from "./TaxSettingsEditor";
 import { DiscountEditor } from "./DiscountEditor";
-import { InvoiceVisibilityToggles } from "./InvoiceVisibilityToggles";
+import { CompanyPdfSummary } from "./CompanyPdfSummary";
+import { ClientPdfSummary } from "./ClientPdfSummary";
+import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import { InvoiceTotalsPreview } from "./InvoiceTotalsPreview";
 
 const STATUSES = ["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"] as const;
@@ -28,6 +30,7 @@ interface InvoiceFormProps {
   /** "new" for the create page, the invoice id for the edit page — scopes autosave/restore to this form. */
   draftKey: string;
   invoice?: Invoice;
+  company: Company;
   clients: Client[];
   products: ProductOrService[];
   settings: AppSettings;
@@ -64,7 +67,7 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
   };
 }
 
-export function InvoiceForm({ draftKey, invoice, clients, products, settings, suggestedInvoiceNumber, onSubmit, onClientCreated }: InvoiceFormProps) {
+export function InvoiceForm({ draftKey, invoice, company, clients, products, settings, suggestedInvoiceNumber, onSubmit, onClientCreated }: InvoiceFormProps) {
   const { t, i18n } = useTranslation(["common", "invoice"]);
   const [clientList, setClientList] = useState(clients);
   const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
@@ -80,6 +83,9 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
     reset,
     formState: { errors, isSubmitting }
   } = methods;
+
+  const selectedClientId = watch("clientId");
+  const selectedClient = clientList.find((c) => c.id === selectedClientId);
 
   // Offer to restore an autosaved draft once, right after mount.
   useEffect(() => {
@@ -152,6 +158,8 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
           </FormField>
         </div>
 
+        <CompanyPdfSummary company={company} />
+
         <ClientPicker
           clients={clientList}
           onClientCreated={(client) => {
@@ -159,6 +167,8 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
             onClientCreated(client);
           }}
         />
+
+        <ClientPdfSummary client={selectedClient} />
 
         <InvoiceItemsEditor products={products} />
 
@@ -175,7 +185,10 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
         </div>
 
         <div className="space-y-3 rounded-lg border border-line p-4">
-          <p className="text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
+            {company.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" label={t("invoice:visibility.showBankDetails")} /> : null}
+          </div>
           <FormField label={t("invoice:form.paymentMethod")} htmlFor="paymentMethod">
             <Select id="paymentMethod" {...register("paymentMethod")}>
               {PAYMENT_METHODS.map((method) => (
@@ -190,7 +203,11 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
           </FormField>
         </div>
 
-        <FormField label={t("invoice:form.note")} htmlFor="note">
+        <FormField
+          label={t("invoice:form.note")}
+          htmlFor="note"
+          headerRight={<PdfVisibilitySwitch visKey="showNotes" label={t("invoice:visibility.showNotes")} />}
+        >
           <Textarea id="note" {...register("note")} />
         </FormField>
 
@@ -221,8 +238,6 @@ export function InvoiceForm({ draftKey, invoice, clients, products, settings, su
             ))}
           </Select>
         </FormField>
-
-        <InvoiceVisibilityToggles />
 
         <InvoiceTotalsPreview />
 

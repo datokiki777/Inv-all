@@ -34,6 +34,7 @@
     "removeItem": "Entfernen",
     "itemDiscount": "Positionsrabatt",
     "pdfVisibility": "Was auf der Rechnung erscheint",
+    "showInPdf": "In PDF anzeigen",
     "pdfVisibilityCompany": "Dein Unternehmen",
     "pdfVisibilityClient": "Kunde",
     "pdfVisibilityOther": "Weitere",

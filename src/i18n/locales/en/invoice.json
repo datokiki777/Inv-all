@@ -34,6 +34,7 @@
     "removeItem": "Remove",
     "itemDiscount": "Item discount",
     "pdfVisibility": "What shows on the PDF",
+    "showInPdf": "Show in PDF",
     "pdfVisibilityCompany": "Your company",
     "pdfVisibilityClient": "Client",
     "pdfVisibilityOther": "Other",
