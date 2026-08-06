@@ -2,24 +2,9 @@ import { invoiceRepository, settingsRepository } from "@/storage/repositories";
 import { generateId } from "@/utils/id";
 import { nowIso, todayDateOnly, addDays } from "@/utils/date";
 import { generateInvoiceNumber } from "@/utils/invoiceNumber";
-import { computeInvoiceTotals } from "@/utils/money";
-import { resolveItemsForTaxMode } from "@/utils/invoiceTax";
-import { formDiscountToDiscount, formItemsToInvoiceItems } from "@/utils/invoiceFormMapping";
-import type { Invoice, Company, Client, ClientSnapshot, TaxSettings } from "@/types";
+import { buildInvoiceFromForm } from "@/utils/invoiceFormMapping";
+import type { Invoice, Company, Client } from "@/types";
 import type { InvoiceFormValues } from "@/schemas";
-
-function toClientSnapshot(client: Client): ClientSnapshot {
-  const { createdAt: _createdAt, updatedAt: _updatedAt, notes: _notes, ...snapshot } = client;
-  return snapshot;
-}
-
-function toTaxSettings(values: InvoiceFormValues): TaxSettings {
-  return {
-    mode: values.taxMode,
-    ratePercent: values.taxMode === "reverseCharge" || values.taxMode === "taxFree" ? undefined : values.taxRatePercent,
-    explanationText: values.taxExplanationText
-  };
-}
 
 interface InvoiceContext {
   company: Company;
@@ -27,11 +12,11 @@ interface InvoiceContext {
 }
 
 /**
- * Orchestration between the Invoice form and invoiceRepository. This is
- * the one place that: resolves the client snapshot, converts decimal
- * amounts to cents, applies the tax-mode rule (resolveItemsForTaxMode),
- * and runs the pure computeInvoiceTotals(). The form and the PDF layer
- * never duplicate this logic.
+ * Orchestration between the Invoice form and invoiceRepository. The
+ * actual field mapping/calculation lives in the pure
+ * buildInvoiceFromForm() (utils/invoiceFormMapping.ts), shared with the
+ * in-form live preview — this layer only adds id/timestamp handling and
+ * persistence side effects (sequence reservation, remembering visibility).
  */
 export const invoiceService = {
   async list(): Promise<Invoice[]> {
@@ -50,39 +35,7 @@ export const invoiceService = {
 
   async create(values: InvoiceFormValues, context: InvoiceContext): Promise<Invoice> {
     const now = nowIso();
-    const taxSettings = toTaxSettings(values);
-    const items = resolveItemsForTaxMode(formItemsToInvoiceItems(values.items), taxSettings);
-    const discount = formDiscountToDiscount(values.discountType, values.discountValue);
-    const paidAmountCents = Math.round(values.paidAmount * 100);
-    const totals = computeInvoiceTotals(items, discount, paidAmountCents);
-
-    const invoice: Invoice = {
-      id: generateId(),
-      invoiceNumber: values.invoiceNumber,
-      createdDate: values.createdDate,
-      serviceDate: values.serviceDate ?? "",
-      dueDate: values.dueDate ?? "",
-      company: context.company,
-      client: toClientSnapshot(context.client),
-      items,
-      taxSettings,
-      discount,
-      currency: values.currency,
-      ...totals,
-      paidAmountCents,
-      note: values.note,
-      paymentDetails: {
-        method: values.paymentMethod,
-        bankDetails: values.paymentMethod === "bankTransfer" ? context.company.bankDetails : undefined,
-        paymentTermsText: values.paymentTermsText
-      },
-      status: values.status,
-      templateId: values.templateId,
-      pdfLanguage: values.pdfLanguage,
-      pdfVisibility: values.pdfVisibility,
-      createdAt: now,
-      updatedAt: now
-    };
+    const invoice = buildInvoiceFromForm(values, { id: generateId(), createdAt: now }, context.company, context.client, now);
 
     await invoiceRepository.save(invoice);
     await reserveInvoiceNumberIfMatchingSuggestion(values.invoiceNumber);
@@ -91,38 +44,13 @@ export const invoiceService = {
   },
 
   async update(existing: Invoice, values: InvoiceFormValues, context: InvoiceContext): Promise<Invoice> {
-    const taxSettings = toTaxSettings(values);
-    const items = resolveItemsForTaxMode(formItemsToInvoiceItems(values.items), taxSettings);
-    const discount = formDiscountToDiscount(values.discountType, values.discountValue);
-    const paidAmountCents = Math.round(values.paidAmount * 100);
-    const totals = computeInvoiceTotals(items, discount, paidAmountCents);
-
-    const invoice: Invoice = {
-      ...existing,
-      invoiceNumber: values.invoiceNumber,
-      createdDate: values.createdDate,
-      serviceDate: values.serviceDate ?? "",
-      dueDate: values.dueDate ?? "",
-      company: context.company,
-      client: toClientSnapshot(context.client),
-      items,
-      taxSettings,
-      discount,
-      currency: values.currency,
-      ...totals,
-      paidAmountCents,
-      note: values.note,
-      paymentDetails: {
-        method: values.paymentMethod,
-        bankDetails: values.paymentMethod === "bankTransfer" ? context.company.bankDetails : undefined,
-        paymentTermsText: values.paymentTermsText
-      },
-      status: values.status,
-      templateId: values.templateId,
-      pdfLanguage: values.pdfLanguage,
-      pdfVisibility: values.pdfVisibility,
-      updatedAt: nowIso()
-    };
+    const invoice = buildInvoiceFromForm(
+      values,
+      { id: existing.id, createdAt: existing.createdAt },
+      context.company,
+      context.client,
+      nowIso()
+    );
 
     await invoiceRepository.save(invoice);
     await rememberLastPdfVisibility(values.pdfVisibility);

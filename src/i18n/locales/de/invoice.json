@@ -98,7 +98,10 @@
     "notFound": "Rechnung nicht gefunden",
     "draftFound": "Nicht gespeicherter Entwurf vom {{date}}",
     "restoreDraft": "Wiederherstellen",
-    "discardDraft": "Verwerfen"
+    "discardDraft": "Verwerfen",
+    "editTab": "Rechnung bearbeiten",
+    "previewTab": "PDF-Vorschau",
+    "previewNeedsClient": "Wähle einen Kunden, um die PDF-Vorschau zu sehen"
   },
   "list": {
     "searchPlaceholder": "Suche nach Nummer oder Kunde…",

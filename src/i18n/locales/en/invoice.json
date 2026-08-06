@@ -98,7 +98,10 @@
     "notFound": "Invoice not found",
     "draftFound": "Unsaved draft from {{date}}",
     "restoreDraft": "Restore",
-    "discardDraft": "Discard"
+    "discardDraft": "Discard",
+    "editTab": "Edit Invoice",
+    "previewTab": "Preview PDF",
+    "previewNeedsClient": "Select a client to see the PDF preview"
   },
   "list": {
     "searchPlaceholder": "Search by number or client…",

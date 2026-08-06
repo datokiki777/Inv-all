@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { todayDateOnly, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
 import { defaultPdfVisibility } from "@/utils/invoicePdfVisibility";
@@ -21,6 +22,14 @@ import { CompanyPdfSummary } from "./CompanyPdfSummary";
 import { ClientPdfSummary } from "./ClientPdfSummary";
 import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
 import { InvoiceTotalsPreview } from "./InvoiceTotalsPreview";
+import { InvoiceFormTabs, type InvoiceFormTab } from "./InvoiceFormTabs";
+
+// @react-pdf/renderer + pdf.js are large — this keeps them out of the main
+// app bundle entirely. They only download once the Preview tab is actually
+// opened, exactly like the saved-invoice InvoicePreviewPage already does.
+const InvoiceLivePreview = lazy(() =>
+  import("./InvoiceLivePreview").then((m) => ({ default: m.InvoiceLivePreview }))
+);
 
 const TEMPLATES = ["classic", "modern", "compact", "minimal"] as const;
 const PAYMENT_METHODS = ["bankTransfer", "cash", "paypal", "other"] as const;
@@ -70,6 +79,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
   const { t, i18n } = useTranslation(["common", "invoice"]);
   const [clientList, setClientList] = useState(clients);
   const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
+  const [activeTab, setActiveTab] = useState<InvoiceFormTab>("edit");
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -119,29 +129,35 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
 
   return (
     <FormProvider {...methods}>
-      {draftFound ? (
-        <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent/10 p-3.5 text-sm">
-          <p className="text-ink">
-            {t("invoice:form.draftFound", { date: formatDate(draftFound.savedAt, i18n.language === "de" ? "de-DE" : "en-US") })}
-          </p>
-          <div className="flex shrink-0 gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={discardDraft}>
-              {t("invoice:form.discardDraft")}
-            </Button>
-            <Button type="button" size="sm" onClick={restoreDraft}>
-              {t("invoice:form.restoreDraft")}
-            </Button>
-          </div>
-        </div>
-      ) : null}
+      <div className="sticky top-0 z-30 -mx-4 mb-5 bg-surface px-4 pb-3 pt-1">
+        <InvoiceFormTabs active={activeTab} onChange={setActiveTab} />
+      </div>
 
-      <form
-        className="space-y-6 pb-4"
-        onSubmit={handleSubmit(async (values) => {
-          await onSubmit(values);
-          await clearInvoiceDraft(draftKey);
-        })}
-      >
+      {activeTab === "edit" ? (
+        <>
+          {draftFound ? (
+            <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent/10 p-3.5 text-sm">
+              <p className="text-ink">
+                {t("invoice:form.draftFound", { date: formatDate(draftFound.savedAt, i18n.language === "de" ? "de-DE" : "en-US") })}
+              </p>
+              <div className="flex shrink-0 gap-2">
+                <Button type="button" variant="ghost" size="sm" onClick={discardDraft}>
+                  {t("invoice:form.discardDraft")}
+                </Button>
+                <Button type="button" size="sm" onClick={restoreDraft}>
+                  {t("invoice:form.restoreDraft")}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          <form
+            className="space-y-6 pb-4"
+            onSubmit={handleSubmit(async (values) => {
+              await onSubmit(values);
+              await clearInvoiceDraft(draftKey);
+            })}
+          >
         <FormField label={t("invoice:fields.invoiceNumber", { ns: "invoice" })} htmlFor="invoiceNumber" required error={err("invoiceNumber")}>
           <Input id="invoiceNumber" invalid={!!errors.invoiceNumber} {...register("invoiceNumber")} />
         </FormField>
@@ -260,7 +276,13 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? t("actions.saving") : t("actions.save")}
         </Button>
-      </form>
+          </form>
+        </>
+      ) : (
+        <Suspense fallback={<LoadingSpinner />}>
+          <InvoiceLivePreview company={company} client={selectedClient} />
+        </Suspense>
+      )}
     </FormProvider>
   );
 }

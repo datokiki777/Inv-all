@@ -1,6 +1,8 @@
 import { generateId } from "@/utils/id";
 import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
-import type { Discount, Invoice, InvoiceItem, Unit } from "@/types";
+import { computeInvoiceTotals } from "@/utils/money";
+import { resolveItemsForTaxMode } from "@/utils/invoiceTax";
+import type { Client, ClientSnapshot, Company, Discount, Invoice, InvoiceItem, TaxSettings, Unit } from "@/types";
 import type { InvoiceFormValues, InvoiceItemFormValues } from "@/schemas";
 
 /**
@@ -102,5 +104,75 @@ export function blankInvoiceFormItem(defaultVatPercent = 19, defaultUnit: Unit =
     discountType: "none",
     discountValue: undefined,
     vatPercent: defaultVatPercent
+  };
+}
+
+function toClientSnapshot(client: Client): ClientSnapshot {
+  const { createdAt: _createdAt, updatedAt: _updatedAt, notes: _notes, ...snapshot } = client;
+  return snapshot;
+}
+
+function toTaxSettings(values: Pick<InvoiceFormValues, "taxMode" | "taxRatePercent" | "taxExplanationText">): TaxSettings {
+  return {
+    mode: values.taxMode,
+    ratePercent: values.taxMode === "reverseCharge" || values.taxMode === "taxFree" ? undefined : values.taxRatePercent,
+    explanationText: values.taxExplanationText
+  };
+}
+
+interface InvoiceIdentity {
+  id: string;
+  createdAt: string;
+}
+
+/**
+ * The single place that turns form values + the selected Company/Client
+ * into a fully-computed Invoice: resolves the client snapshot, converts
+ * decimal amounts to cents, applies the tax-mode rule
+ * (resolveItemsForTaxMode), and runs computeInvoiceTotals(). Used by
+ * invoiceService for the real save AND by the in-form live PDF preview
+ * (InvoiceLivePreview) for an unsaved draft — so what you see in the
+ * preview tab is guaranteed to match what actually gets saved, computed
+ * by the exact same function either way.
+ */
+export function buildInvoiceFromForm(
+  values: InvoiceFormValues,
+  identity: InvoiceIdentity,
+  company: Company,
+  client: Client,
+  updatedAt: string
+): Invoice {
+  const taxSettings = toTaxSettings(values);
+  const items = resolveItemsForTaxMode(formItemsToInvoiceItems(values.items), taxSettings);
+  const discount = formDiscountToDiscount(values.discountType, values.discountValue);
+  const paidAmountCents = Math.round((values.paidAmount || 0) * 100);
+  const totals = computeInvoiceTotals(items, discount, paidAmountCents);
+
+  return {
+    id: identity.id,
+    invoiceNumber: values.invoiceNumber,
+    createdDate: values.createdDate,
+    serviceDate: values.serviceDate ?? "",
+    dueDate: values.dueDate ?? "",
+    company,
+    client: toClientSnapshot(client),
+    items,
+    taxSettings,
+    discount,
+    currency: values.currency,
+    ...totals,
+    paidAmountCents,
+    note: values.note,
+    paymentDetails: {
+      method: values.paymentMethod,
+      bankDetails: values.paymentMethod === "bankTransfer" ? company.bankDetails : undefined,
+      paymentTermsText: values.paymentTermsText
+    },
+    status: values.status,
+    templateId: values.templateId,
+    pdfLanguage: values.pdfLanguage,
+    pdfVisibility: values.pdfVisibility,
+    createdAt: identity.createdAt,
+    updatedAt
   };
 }
