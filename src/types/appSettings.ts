@@ -17,5 +17,7 @@ export interface AppSettings {
    * in the Settings form; invoiceService updates it automatically on save.
    */
   lastInvoicePdfVisibility?: InvoicePdfVisibility;
+  /** Last note text used on a saved invoice — new invoices start from this so a recurring note doesn't need retyping. */
+  lastNoteText?: string;
   updatedAt: string;
 }

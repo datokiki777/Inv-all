@@ -10,10 +10,16 @@ export const appSettingsSchema = z.object({
   invoiceNumberFormat: z.string().min(1, "invoiceNumberFormatRequired"),
   nextInvoiceSequence: z.coerce.number().int().min(1, "sequenceMustBePositive"),
   lastInvoicePdfVisibility: pdfVisibilitySchema.optional(),
+  lastNoteText: z.string().optional(),
   updatedAt: z.string()
 });
 
-/** Input schema for the Settings form — everything except id/updatedAt/lastInvoicePdfVisibility, which the app owns automatically. */
-export const settingsFormSchema = appSettingsSchema.omit({ id: true, updatedAt: true, lastInvoicePdfVisibility: true });
+/** Input schema for the Settings form — everything except id/updatedAt/lastInvoicePdfVisibility/lastNoteText, which the app owns automatically. */
+export const settingsFormSchema = appSettingsSchema.omit({
+  id: true,
+  updatedAt: true,
+  lastInvoicePdfVisibility: true,
+  lastNoteText: true
+});
 
 export type AppSettingsFormValues = z.infer<typeof settingsFormSchema>;

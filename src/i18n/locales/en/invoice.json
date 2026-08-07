@@ -81,6 +81,14 @@
     },
     "paymentTermsText": "Payment terms",
     "note": "Note",
+    "insertTemplate": "Insert a template…",
+    "noteTemplates": {
+      "thankYou": "Thank you for your business!",
+      "thankYouFollowUp": "Thank you for your business. We look forward to working with you again.",
+      "paymentReference": "Please include the invoice number as your payment reference.",
+      "lateReminder": "This invoice is now past due. Please arrange payment as soon as possible.",
+      "partialPayment": "This invoice reflects a partial payment. The remaining balance will follow separately."
+    },
     "template": "PDF design",
     "templates": {
       "classic": "Classic",

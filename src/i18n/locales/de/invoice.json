@@ -81,6 +81,14 @@
     },
     "paymentTermsText": "Zahlungsbedingungen",
     "note": "Notiz",
+    "insertTemplate": "Vorlage einfügen…",
+    "noteTemplates": {
+      "thankYou": "Vielen Dank für Ihren Auftrag!",
+      "thankYouFollowUp": "Vielen Dank für Ihren Auftrag. Wir freuen uns auf die weitere Zusammenarbeit.",
+      "paymentReference": "Bitte geben Sie die Rechnungsnummer als Verwendungszweck an.",
+      "lateReminder": "Diese Rechnung ist überfällig. Bitte begleichen Sie den Betrag so bald wie möglich.",
+      "partialPayment": "Diese Rechnung entspricht einer Teilzahlung. Der Restbetrag folgt separat."
+    },
     "template": "PDF-Design",
     "templates": {
       "classic": "Classic",

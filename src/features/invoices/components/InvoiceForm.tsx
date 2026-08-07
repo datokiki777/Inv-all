@@ -21,6 +21,7 @@ import { DiscountEditor } from "./DiscountEditor";
 import { CompanyPdfSummary } from "./CompanyPdfSummary";
 import { ClientPdfSummary } from "./ClientPdfSummary";
 import { PdfVisibilitySwitch } from "./PdfVisibilitySwitch";
+import { NoteTemplatePicker } from "./NoteTemplatePicker";
 import { InvoiceTotalsPreview } from "./InvoiceTotalsPreview";
 import { InvoiceFormTabs, type InvoiceFormTab } from "./InvoiceFormTabs";
 
@@ -65,7 +66,7 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
     discountValue: undefined,
     currency: settings.defaultCurrency,
     paidAmount: 0,
-    note: "",
+    note: settings.lastNoteText ?? "",
     paymentMethod: "bankTransfer",
     paymentTermsText: "",
     status: "draft",
@@ -242,7 +243,10 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
           htmlFor="note"
           headerRight={<PdfVisibilitySwitch visKey="showNotes" />}
         >
-          <Textarea id="note" {...register("note")} />
+          <div className="space-y-2">
+            <Textarea id="note" {...register("note")} />
+            <NoteTemplatePicker />
+          </div>
         </FormField>
 
         <div className="grid grid-cols-2 gap-3">

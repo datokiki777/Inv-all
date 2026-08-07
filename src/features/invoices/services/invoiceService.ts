@@ -39,7 +39,7 @@ export const invoiceService = {
 
     await invoiceRepository.save(invoice);
     await reserveInvoiceNumberIfMatchingSuggestion(values.invoiceNumber);
-    await rememberLastPdfVisibility(values.pdfVisibility);
+    await rememberFormDefaults(values);
     return invoice;
   },
 
@@ -53,7 +53,7 @@ export const invoiceService = {
     );
 
     await invoiceRepository.save(invoice);
-    await rememberLastPdfVisibility(values.pdfVisibility);
+    await rememberFormDefaults(values);
     return invoice;
   },
 
@@ -139,11 +139,17 @@ async function reserveInvoiceNumberIfMatchingSuggestion(usedNumber: string): Pro
 }
 
 /**
- * Remembers the "Show in PDF" state as the starting point for the next new
- * invoice, so a preference (e.g. always hiding a phone number) sticks
- * instead of resetting to all-visible every time.
+ * Remembers the "Show in PDF" state and the Notes text as the starting
+ * point for the next new invoice, so preferences (hiding a phone number,
+ * a recurring note) stick instead of resetting every time. One write for
+ * both, rather than two separate settings saves per invoice save.
  */
-async function rememberLastPdfVisibility(pdfVisibility: InvoiceFormValues["pdfVisibility"]): Promise<void> {
+async function rememberFormDefaults(values: Pick<InvoiceFormValues, "pdfVisibility" | "note">): Promise<void> {
   const settings = await settingsRepository.get();
-  await settingsRepository.save({ ...settings, lastInvoicePdfVisibility: pdfVisibility, updatedAt: nowIso() });
+  await settingsRepository.save({
+    ...settings,
+    lastInvoicePdfVisibility: values.pdfVisibility,
+    lastNoteText: values.note,
+    updatedAt: nowIso()
+  });
 }
