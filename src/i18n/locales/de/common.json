@@ -45,7 +45,12 @@
     "overdue": "Überfällig",
     "draftCount": "{{count}} Entwurf noch nicht versendet",
     "draftCount_other": "{{count}} Entwürfe noch nicht versendet",
-    "recentInvoices": "Letzte Rechnungen"
+    "recentInvoices": "Letzte Rechnungen",
+    "statistics": "Statistik",
+    "paid": "Bezahlt",
+    "totalInvoiced": "Gesamt fakturiert",
+    "totalCount": "Rechnungen gesamt",
+    "draftCountLabel": "Entwürfe"
   },
   "company": {
     "logo": "Logo",

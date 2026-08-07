@@ -25,7 +25,7 @@ export function InvoiceHeader({ invoice, labels, accentColor }: Props) {
   return (
     <View style={styles.row}>
       <View>
-        {company.logoDataUrl ? <Image src={company.logoDataUrl} style={styles.logo} /> : null}
+        {visibility.showCompanyLogo && company.logoDataUrl ? <Image src={company.logoDataUrl} style={styles.logo} /> : null}
         <View style={styles.companyBlock}>
           <Text>{company.name}</Text>
           <Text>{company.addressLine1}</Text>

@@ -45,7 +45,12 @@
     "overdue": "Overdue",
     "draftCount": "{{count}} draft invoice not yet sent",
     "draftCount_other": "{{count}} draft invoices not yet sent",
-    "recentInvoices": "Recent invoices"
+    "recentInvoices": "Recent invoices",
+    "statistics": "Statistics",
+    "paid": "Paid",
+    "totalInvoiced": "Total invoiced",
+    "totalCount": "Total invoices",
+    "draftCountLabel": "Drafts"
   },
   "company": {
     "logo": "Logo",

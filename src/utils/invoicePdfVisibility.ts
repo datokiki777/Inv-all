@@ -7,6 +7,7 @@ export const defaultPdfVisibility: InvoicePdfVisibility = {
   showCompanyEmail: true,
   showCompanyPhone: true,
   showCompanyWebsite: true,
+  showCompanyLogo: true,
   showCompanyVatId: true,
   showCompanyTaxNumber: true,
   showClientEmail: true,

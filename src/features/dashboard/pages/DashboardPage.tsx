@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
+import { DashboardStatsCard } from "@/features/dashboard/components/DashboardStatsCard";
 import { useAppSettings, localeForLanguage } from "@/features/settings/hooks/useAppSettings";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -10,21 +11,7 @@ import { PartialPaymentDialog } from "@/features/invoices/components/PartialPaym
 import { useToast } from "@/components/ui/toast";
 import { formatMoney } from "@/utils/money";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
-import type { CurrencyAmount } from "@/utils/dashboardMetrics";
 import type { Invoice, InvoiceStatus } from "@/types";
-
-function AmountList({ amounts, locale, emptyLabel }: { amounts: CurrencyAmount[]; locale: string; emptyLabel: string }) {
-  if (amounts.length === 0) return <p className="font-display text-2xl text-ink">{emptyLabel}</p>;
-  return (
-    <div className="space-y-0.5">
-      {amounts.map((a) => (
-        <p key={a.currency} className="font-display text-2xl text-ink">
-          {formatMoney(a.cents, a.currency, locale)}
-        </p>
-      ))}
-    </div>
-  );
-}
 
 export function DashboardPage() {
   const { t } = useTranslation(["common", "invoice"]);
@@ -70,22 +57,7 @@ export function DashboardPage() {
 
       {status === "ready" && metrics ? (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-line bg-surface-raised p-4">
-              <p className="text-xs text-ink-muted">{t("dashboard.outstanding")}</p>
-              <div className="mt-1">
-                <AmountList amounts={metrics.outstanding} locale={locale} emptyLabel="—" />
-              </div>
-            </div>
-            <div className="rounded-lg border border-line bg-surface-raised p-4">
-              <p className="text-xs text-ink-muted">
-                {t("dashboard.overdue")} {metrics.overdueCount > 0 ? `(${metrics.overdueCount})` : ""}
-              </p>
-              <div className="mt-1">
-                <AmountList amounts={metrics.overdue} locale={locale} emptyLabel="—" />
-              </div>
-            </div>
-          </div>
+          <DashboardStatsCard metrics={metrics} locale={locale} />
 
           {metrics.draftCount > 0 ? (
             <Link

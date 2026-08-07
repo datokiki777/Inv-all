@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { invoiceService } from "@/features/invoices/services/invoiceService";
 import { matchesInvoiceFilters, defaultInvoiceFilters, type InvoiceFilters } from "@/utils/invoiceSearch";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
+import { compareInvoiceNumbers } from "@/utils/invoiceNumber";
 import type { Invoice } from "@/types";
 
 type Status = "loading" | "ready" | "error";
@@ -28,7 +29,10 @@ export function useInvoices() {
   }, [reload]);
 
   const filtered = useMemo(
-    () => invoices.filter((invoice) => matchesInvoiceFilters(invoice, filters)).sort((a, b) => b.createdDate.localeCompare(a.createdDate)),
+    () =>
+      invoices
+        .filter((invoice) => matchesInvoiceFilters(invoice, filters))
+        .sort((a, b) => compareInvoiceNumbers(b.invoiceNumber, a.invoiceNumber)),
     [invoices, filters]
   );
 

@@ -42,6 +42,7 @@
       "showCompanyEmail": "Email",
       "showCompanyPhone": "Phone",
       "showCompanyWebsite": "Website",
+      "showCompanyLogo": "Logo",
       "showCompanyVatId": "VAT ID",
       "showCompanyTaxNumber": "Tax number",
       "showClientEmail": "Email",
