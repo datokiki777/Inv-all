@@ -85,6 +85,7 @@
     "noteTemplates": {
       "thankYou": "Thank you for your business!",
       "thankYouFollowUp": "Thank you for your business. We look forward to working with you again.",
+      "paymentDue15Days": "Payment due within 15 days.",
       "paymentReference": "Please include the invoice number as your payment reference.",
       "lateReminder": "This invoice is now past due. Please arrange payment as soon as possible.",
       "partialPayment": "This invoice reflects a partial payment. The remaining balance will follow separately."

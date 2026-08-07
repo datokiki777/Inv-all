@@ -243,8 +243,8 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
           htmlFor="note"
           headerRight={<PdfVisibilitySwitch visKey="showNotes" />}
         >
-          <div className="space-y-2">
-            <Textarea id="note" {...register("note")} />
+          <div className="overflow-hidden rounded border border-line bg-surface-sunken focus-within:ring-1 focus-within:ring-accent">
+            <Textarea id="note" className="rounded-none border-0 bg-transparent focus:ring-0" {...register("note")} />
             <NoteTemplatePicker />
           </div>
         </FormField>

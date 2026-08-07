@@ -16,6 +16,8 @@ interface SelectProps {
   disabled?: boolean;
   id?: string;
   "aria-label"?: string;
+  /** Overrides the trigger's own border/rounded/bg — for embedding this picker inside another bordered container (e.g. NoteTemplatePicker) so the two read as one field instead of a box-in-a-box. */
+  triggerClassName?: string;
 }
 
 /**
@@ -26,7 +28,7 @@ interface SelectProps {
  * exception left native — the OS calendar is what people already know
  * how to use, and re-implementing it adds nothing.
  */
-export function Select({ value, onChange, options, placeholder, invalid, disabled, id, ...aria }: SelectProps) {
+export function Select({ value, onChange, options, placeholder, invalid, disabled, id, triggerClassName, ...aria }: SelectProps) {
   const selected = options.find((o) => o.value === value);
 
   return (
@@ -37,7 +39,8 @@ export function Select({ value, onChange, options, placeholder, invalid, disable
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded border bg-surface-sunken px-3 text-sm text-ink",
           "focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50",
-          invalid ? "border-danger" : "border-line"
+          invalid ? "border-danger" : "border-line",
+          triggerClassName
         )}
       >
         <RadixSelect.Value placeholder={placeholder}>{selected?.label}</RadixSelect.Value>
