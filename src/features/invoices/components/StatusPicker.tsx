@@ -44,7 +44,7 @@ export function StatusPicker({ status, onChange }: StatusPickerProps) {
           position="popper"
           sideOffset={4}
           onClick={(e) => e.stopPropagation()}
-          className="z-[70] overflow-hidden rounded-lg border border-line bg-surface-raised shadow-xl"
+          className="z-[70] overflow-hidden rounded-lg border border-line bg-surface-elevated shadow-xl"
         >
           <RadixSelect.Viewport className="p-1">
             {INVOICE_STATUSES.map((s) => (
@@ -53,7 +53,7 @@ export function StatusPicker({ status, onChange }: StatusPickerProps) {
                 value={s}
                 className={cn(
                   "relative flex h-10 cursor-pointer select-none items-center rounded px-3 pr-8 text-sm text-ink outline-none",
-                  "data-[highlighted]:bg-surface-sunken data-[state=checked]:text-accent"
+                  "data-[highlighted]:bg-surface-raised data-[state=checked]:text-accent"
                 )}
               >
                 <RadixSelect.ItemText>{t(`status.${s}`)}</RadixSelect.ItemText>

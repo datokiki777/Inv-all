@@ -12,7 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       className={cn(
         "h-11 w-full rounded border bg-surface-sunken px-3 text-sm text-ink placeholder:text-ink-faint",
         "focus:outline-none focus:ring-1 focus:ring-accent",
-        invalid ? "border-danger" : "border-line",
+        invalid ? "border-danger" : "border-line-input",
         className
       )}
       {...props}

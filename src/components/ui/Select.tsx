@@ -39,7 +39,7 @@ export function Select({ value, onChange, options, placeholder, invalid, disable
         className={cn(
           "flex h-11 w-full items-center justify-between gap-2 rounded border bg-surface-sunken px-3 text-sm text-ink",
           "focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50",
-          invalid ? "border-danger" : "border-line",
+          invalid ? "border-danger" : "border-line-input",
           triggerClassName
         )}
       >
@@ -53,7 +53,7 @@ export function Select({ value, onChange, options, placeholder, invalid, disable
         <RadixSelect.Content
           position="popper"
           sideOffset={4}
-          className="z-[70] max-h-[min(24rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-line bg-surface-raised shadow-xl"
+          className="z-[70] max-h-[min(24rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-line bg-surface-elevated shadow-xl"
         >
           <RadixSelect.Viewport className="p-1">
             {options.map((option) => (
@@ -62,7 +62,7 @@ export function Select({ value, onChange, options, placeholder, invalid, disable
                 value={option.value}
                 className={cn(
                   "relative flex h-11 cursor-pointer select-none items-center rounded px-3 pr-8 text-sm text-ink outline-none",
-                  "data-[highlighted]:bg-surface-sunken data-[state=checked]:text-accent"
+                  "data-[highlighted]:bg-surface-raised data-[state=checked]:text-accent"
                 )}
               >
                 <RadixSelect.ItemText>{option.label}</RadixSelect.ItemText>

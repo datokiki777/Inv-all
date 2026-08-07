@@ -24,7 +24,7 @@ export function Switch({ id, checked, onCheckedChange, label, disabled }: Switch
         disabled={disabled}
         className={cn(
           "relative h-4 w-7 shrink-0 rounded-full transition-colors",
-          checked ? "bg-accent" : "bg-surface-sunken border border-line"
+          checked ? "bg-accent" : "bg-switchOff"
         )}
       >
         <RadixSwitch.Thumb

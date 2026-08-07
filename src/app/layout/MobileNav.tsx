@@ -12,7 +12,7 @@ const items = [
 /** Bottom tab bar — primary navigation on a mobile-first, one-hand layout. */
 export function MobileNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md items-stretch border-t border-line bg-surface-raised safe-bottom">
+    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md items-stretch border-t border-line bg-surface-nav safe-bottom">
       {items.map(({ to, label, icon: Icon, end }) => (
         <NavLink
           key={to}
@@ -21,7 +21,7 @@ export function MobileNav() {
           className={({ isActive }) =>
             cn(
               "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px]",
-              isActive ? "text-accent" : "text-ink-faint"
+              isActive ? "text-accent" : "text-navInactive"
             )
           }
         >

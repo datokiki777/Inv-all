@@ -20,10 +20,10 @@ interface DialogContentProps {
 export function DialogContent({ title, children, className }: DialogContentProps) {
   return (
     <RadixDialog.Portal>
-      <RadixDialog.Overlay className="fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=open]:fade-in" />
+      <RadixDialog.Overlay className="fixed inset-0 z-50 bg-surface/85 data-[state=open]:animate-in data-[state=open]:fade-in" />
       <RadixDialog.Content
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-lg border-t border-line bg-surface-raised p-5 pb-8 safe-bottom",
+          "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-lg border-t border-line bg-surface-elevated p-5 pb-8 safe-bottom",
           className
         )}
       >
