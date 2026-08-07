@@ -30,7 +30,11 @@ export function CreateInvoicePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl text-ink">{t("pages.createInvoice")}</h1>
+      {/* Once InvoiceForm renders, its own fixed Edit/Preview tab bar takes over
+          as the page header — an h1 here would sit directly underneath it. */}
+      {status === "ready" && company && settings ? null : (
+        <h1 className="font-display text-2xl text-ink">{t("pages.createInvoice")}</h1>
+      )}
 
       {status === "loading" ? <LoadingSpinner label={t("invoice:form.loading")} /> : null}
 

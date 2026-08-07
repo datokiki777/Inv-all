@@ -20,6 +20,7 @@ export function CompanyPdfSummary({ company }: CompanyPdfSummaryProps) {
   const allRows: { key: keyof InvoicePdfVisibility; label: string; value?: string }[] = [
     { key: "showCompanyEmail", label: t("invoice:form.visibility.showCompanyEmail"), value: company.email },
     { key: "showCompanyPhone", label: t("invoice:form.visibility.showCompanyPhone"), value: company.phone },
+    { key: "showCompanyWebsite", label: t("invoice:form.visibility.showCompanyWebsite"), value: company.website },
     { key: "showCompanyVatId", label: t("invoice:form.visibility.showCompanyVatId"), value: company.vatId },
     { key: "showCompanyTaxNumber", label: t("invoice:form.visibility.showCompanyTaxNumber"), value: company.taxNumber }
   ];
@@ -30,7 +31,9 @@ export function CompanyPdfSummary({ company }: CompanyPdfSummaryProps) {
   return (
     <div className="rounded-lg border border-line p-3.5">
       <p className="mb-2 text-xs font-medium uppercase text-ink-faint">{t("invoice:form.pdfVisibilityCompany")}</p>
-      <div className="space-y-2.5">
+      {/* Scrolls internally once there are more rows than fit comfortably,
+          instead of pushing the rest of the form further down the page. */}
+      <div className="max-h-64 space-y-2.5 overflow-y-auto pr-1">
         {rows.map((row) => (
           <div key={row.key} className="flex items-center justify-between gap-3">
             <div className="min-w-0">

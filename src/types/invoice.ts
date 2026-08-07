@@ -49,6 +49,7 @@ export interface InvoicePdfVisibility {
   showDueDate: boolean;
   showCompanyEmail: boolean;
   showCompanyPhone: boolean;
+  showCompanyWebsite: boolean;
   showCompanyVatId: boolean;
   showCompanyTaxNumber: boolean;
   showClientEmail: boolean;

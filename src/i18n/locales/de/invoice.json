@@ -41,6 +41,7 @@
     "visibility": {
       "showCompanyEmail": "E-Mail",
       "showCompanyPhone": "Telefon",
+      "showCompanyWebsite": "Website",
       "showCompanyVatId": "USt-IdNr.",
       "showCompanyTaxNumber": "Steuernummer",
       "showClientEmail": "E-Mail",

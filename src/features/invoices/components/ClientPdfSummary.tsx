@@ -24,7 +24,7 @@ export function ClientPdfSummary({ client }: ClientPdfSummaryProps) {
   return (
     <div className="rounded-lg border border-line p-3.5">
       <p className="mb-2 text-xs font-medium uppercase text-ink-faint">{t("invoice:form.pdfVisibilityClient")}</p>
-      <div className="space-y-2.5">
+      <div className="max-h-64 space-y-2.5 overflow-y-auto pr-1">
         {rows.map((row) => (
           <div key={row.key} className="flex items-center justify-between gap-3">
             <div className="min-w-0">

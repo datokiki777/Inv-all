@@ -42,6 +42,7 @@ export function InvoiceHeader({ invoice, labels, accentColor }: Props) {
               {labels.phone}: {company.phone}
             </Text>
           ) : null}
+          {visibility.showCompanyWebsite && company.website ? <Text>{company.website}</Text> : null}
           {visibility.showCompanyVatId && company.vatId ? (
             <Text>
               {labels.vatId}: {company.vatId}

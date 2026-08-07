@@ -129,9 +129,17 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
 
   return (
     <FormProvider {...methods}>
-      <div className="sticky top-0 z-30 -mx-4 mb-5 bg-surface px-4 pb-3 pt-1">
+      {/* position: fixed instead of sticky — with CreateInvoicePage/EditInvoicePage
+          wrapping this in their own space-y-6 container above an <h1>, sticky's
+          "stuck" region depends on that ancestor's box and browser-specific
+          containing-block quirks with the -mx-4 bleed trick. Fixed sidesteps all
+          of that: it's pinned to the viewport unconditionally, like a native
+          header. The pt-[4.75rem] spacer below reserves exactly its height so
+          content never starts underneath it. */}
+      <div className="fixed inset-x-0 top-0 z-30 mx-auto max-w-md bg-surface px-4 pb-3 pt-4">
         <InvoiceFormTabs active={activeTab} onChange={setActiveTab} />
       </div>
+      <div className="pt-[4.75rem]" />
 
       {activeTab === "edit" ? (
         <>

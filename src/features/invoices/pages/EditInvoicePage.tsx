@@ -31,7 +31,9 @@ export function EditInvoicePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl text-ink">{t("pages.editInvoice")}</h1>
+      {status === "ready" && company && settings && invoice ? null : (
+        <h1 className="font-display text-2xl text-ink">{t("pages.editInvoice")}</h1>
+      )}
 
       {status === "loading" ? <LoadingSpinner label={t("invoice:form.loading")} /> : null}
 

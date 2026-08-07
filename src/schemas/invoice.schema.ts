@@ -35,6 +35,7 @@ export const pdfVisibilitySchema = z.object({
   showDueDate: z.boolean(),
   showCompanyEmail: z.boolean(),
   showCompanyPhone: z.boolean(),
+  showCompanyWebsite: z.boolean(),
   showCompanyVatId: z.boolean(),
   showCompanyTaxNumber: z.boolean(),
   showClientEmail: z.boolean(),
