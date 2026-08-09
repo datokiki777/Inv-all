@@ -15,6 +15,7 @@ import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMa
 import { defaultPdfVisibility } from "@/utils/invoicePdfVisibility";
 import { useInvoiceDraftAutosave, loadInvoiceDraft, clearInvoiceDraft, type InvoiceDraftSnapshot } from "@/features/invoices/hooks/useInvoiceDraft";
 import { ClientPicker } from "./ClientPicker";
+import { CompanyPicker } from "./CompanyPicker";
 import { InvoiceItemsEditor } from "./InvoiceItemsEditor";
 import { TaxSettingsEditor } from "./TaxSettingsEditor";
 import { DiscountEditor } from "./DiscountEditor";
@@ -39,16 +40,24 @@ interface InvoiceFormProps {
   /** "new" for the create page, the invoice id for the edit page — scopes autosave/restore to this form. */
   draftKey: string;
   invoice?: Invoice;
-  company: Company;
+  companies: Company[];
+  /** Which company a NEW invoice should start on (edit mode ignores this — invoiceToFormValues already carries the invoice's own companyId). */
+  activeCompanyId?: string;
   clients: Client[];
   products: ProductOrService[];
   settings: AppSettings;
   suggestedInvoiceNumber?: string;
   onSubmit: (values: InvoiceFormValues) => Promise<void>;
   onClientCreated: (client: Client) => void;
+  onCompanyCreated: (company: Company) => void;
 }
 
-function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, suggestedInvoiceNumber: string | undefined): InvoiceFormValues {
+function toDefaultValues(
+  invoice: Invoice | undefined,
+  settings: AppSettings,
+  suggestedInvoiceNumber: string | undefined,
+  activeCompanyId: string | undefined
+): InvoiceFormValues {
   if (invoice) return invoiceToFormValues(invoice);
 
   const today = todayDateOnly();
@@ -57,6 +66,7 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
     createdDate: today,
     serviceDate: "",
     dueDate: "",
+    companyId: activeCompanyId ?? "",
     clientId: "",
     items: [blankInvoiceFormItem(19)],
     taxMode: "standard",
@@ -76,15 +86,28 @@ function toDefaultValues(invoice: Invoice | undefined, settings: AppSettings, su
   };
 }
 
-export function InvoiceForm({ draftKey, invoice, company, clients, products, settings, suggestedInvoiceNumber, onSubmit, onClientCreated }: InvoiceFormProps) {
+export function InvoiceForm({
+  draftKey,
+  invoice,
+  companies,
+  activeCompanyId,
+  clients,
+  products,
+  settings,
+  suggestedInvoiceNumber,
+  onSubmit,
+  onClientCreated,
+  onCompanyCreated
+}: InvoiceFormProps) {
   const { t, i18n } = useTranslation(["common", "invoice"]);
   const [clientList, setClientList] = useState(clients);
+  const [companyList, setCompanyList] = useState(companies);
   const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
   const [activeTab, setActiveTab] = useState<InvoiceFormTab>("edit");
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
-    defaultValues: toDefaultValues(invoice, settings, suggestedInvoiceNumber)
+    defaultValues: toDefaultValues(invoice, settings, suggestedInvoiceNumber, activeCompanyId)
   });
   const {
     register,
@@ -97,6 +120,8 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
 
   const selectedClientId = watch("clientId");
   const selectedClient = clientList.find((c) => c.id === selectedClientId);
+  const selectedCompanyId = watch("companyId");
+  const selectedCompany = companyList.find((c) => c.id === selectedCompanyId) ?? companyList[0];
 
   // Offer to restore an autosaved draft once, right after mount.
   useEffect(() => {
@@ -193,7 +218,16 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
           <Input id="dueDate" type="date" {...register("dueDate")} />
         </FormField>
 
-        <CompanyPdfSummary company={company} />
+        <CompanyPicker
+          companies={companyList}
+          isNewInvoice={!invoice}
+          onCompanyCreated={(newCompany) => {
+            setCompanyList((prev) => [...prev, newCompany]);
+            onCompanyCreated(newCompany);
+          }}
+        />
+
+        <CompanyPdfSummary company={selectedCompany} />
 
         <ClientPicker
           clients={clientList}
@@ -217,7 +251,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         <div className="space-y-3 rounded-lg border border-line p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
-            {company.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" /> : null}
+            {selectedCompany?.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" /> : null}
           </div>
           <FormField label={t("invoice:form.paymentMethod")} htmlFor="paymentMethod">
             <Controller
@@ -292,7 +326,7 @@ export function InvoiceForm({ draftKey, invoice, company, clients, products, set
         </>
       ) : (
         <Suspense fallback={<LoadingSpinner />}>
-          <InvoiceLivePreview company={company} client={selectedClient} />
+          {selectedCompany ? <InvoiceLivePreview company={selectedCompany} client={selectedClient} /> : null}
         </Suspense>
       )}
     </FormProvider>

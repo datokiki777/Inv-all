@@ -4,7 +4,7 @@ import type { Company } from "@/types";
 import type { InvoicePdfVisibility } from "@/types";
 
 interface CompanyPdfSummaryProps {
-  company: Company;
+  company: Company | undefined;
 }
 
 /**
@@ -18,6 +18,7 @@ interface CompanyPdfSummaryProps {
  */
 export function CompanyPdfSummary({ company }: CompanyPdfSummaryProps) {
   const { t } = useTranslation(["common", "invoice"]);
+  if (!company) return null;
 
   const allTextRows: { key: keyof InvoicePdfVisibility; label: string; value?: string }[] = [
     { key: "showCompanyEmail", label: t("invoice:form.visibility.showCompanyEmail"), value: company.email },

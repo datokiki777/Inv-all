@@ -14,12 +14,13 @@ export function EditInvoicePage() {
   const { invoiceId } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const { status, company, clients, products, settings, invoice } = useInvoiceFormData(invoiceId);
+  const { status, companies, activeCompany, clients, products, settings, invoice } = useInvoiceFormData(invoiceId);
 
   async function handleSubmit(values: InvoiceFormValues) {
-    if (!company || !invoice) return;
+    if (!invoice) return;
+    const company = companies.find((c) => c.id === values.companyId);
     const client = clients.find((c) => c.id === values.clientId);
-    if (!client) return;
+    if (!company || !client) return;
     try {
       await invoiceService.update(invoice, values, { company, client });
       toast.success(t("invoice:form.saveSuccess"));
@@ -31,7 +32,7 @@ export function EditInvoicePage() {
 
   return (
     <div className="space-y-6">
-      {status === "ready" && company && settings && invoice ? null : (
+      {status === "ready" && companies.length > 0 && settings && invoice ? null : (
         <h1 className="font-display text-2xl text-ink">{t("pages.editInvoice")}</h1>
       )}
 
@@ -43,7 +44,7 @@ export function EditInvoicePage() {
 
       {status === "ready" && !invoice ? <EmptyState title={t("invoice:form.notFound")} /> : null}
 
-      {status === "ready" && !company ? (
+      {status === "ready" && invoice && companies.length === 0 ? (
         <EmptyState
           title={t("invoice:form.companyMissing")}
           description={t("invoice:form.companyMissingHint")}
@@ -55,16 +56,18 @@ export function EditInvoicePage() {
         />
       ) : null}
 
-      {status === "ready" && company && settings && invoice ? (
+      {status === "ready" && companies.length > 0 && settings && invoice ? (
         <InvoiceForm
           draftKey={invoice.id}
           invoice={invoice}
-          company={company}
+          companies={companies}
+          activeCompanyId={activeCompany?.id}
           clients={clients}
           products={products}
           settings={settings}
           onSubmit={handleSubmit}
           onClientCreated={() => {}}
+          onCompanyCreated={() => {}}
         />
       ) : null}
     </div>

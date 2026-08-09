@@ -7,7 +7,7 @@ import { InvoicesPage } from "@/features/invoices/pages/InvoicesPage";
 import { CreateInvoicePage } from "@/features/invoices/pages/CreateInvoicePage";
 import { EditInvoicePage } from "@/features/invoices/pages/EditInvoicePage";
 import { ClientsPage } from "@/features/clients/pages/ClientsPage";
-import { CompanyPage } from "@/features/company/pages/CompanyPage";
+import { CompaniesPage } from "@/features/company/pages/CompaniesPage";
 import { ProductsPage } from "@/features/products/pages/ProductsPage";
 import { SettingsPage } from "@/features/settings/pages/SettingsPage";
 import { BackupRestorePage } from "@/features/settings/pages/BackupRestorePage";
@@ -46,7 +46,7 @@ export function AppRouter() {
             }
           />
           <Route path="clients" element={<ClientsPage />} />
-          <Route path="company" element={<CompanyPage />} />
+          <Route path="company" element={<CompaniesPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="settings/backup" element={<BackupRestorePage />} />

@@ -12,7 +12,7 @@
     "editInvoice": "Rechnung bearbeiten",
     "invoicePreview": "Rechnungsvorschau",
     "clients": "Kunden",
-    "company": "Unternehmen",
+    "company": "Firmen",
     "products": "Produkte & Leistungen",
     "settings": "Einstellungen",
     "backupRestore": "Sicherung & Wiederherstellung"
@@ -36,7 +36,9 @@
     "invoices": "Noch keine Rechnungen",
     "invoicesHint": "Erstelle deine erste Rechnung, um sie hier zu sehen.",
     "clients": "Noch keine Kunden",
-    "products": "Noch keine Produkte oder Leistungen"
+    "products": "Noch keine Produkte oder Leistungen",
+    "company": "Noch keine Firma",
+    "companyHint": "Füge deine Firma hinzu, um mit dem Erstellen von Rechnungen zu beginnen."
   },
   "dashboard": {
     "loading": "Übersicht wird geladen…",
@@ -81,7 +83,19 @@
     "loadError": "Unternehmensdaten konnten nicht geladen werden",
     "loadErrorHint": "Lade die App neu und versuche es erneut.",
     "saveSuccess": "Unternehmensdaten gespeichert",
-    "saveError": "Unternehmensdaten konnten nicht gespeichert werden. Versuche es erneut."
+    "saveError": "Unternehmensdaten konnten nicht gespeichert werden. Versuche es erneut.",
+    "invoiceNumberFormat": "Rechnungsnummernformat",
+    "invoiceNumberFormatHint": "Verwende {{yyyy}}, {{mm}} und ein {{seq:4}}-Muster — z. B. INV-{{yyyy}}-{{seq:4}}.",
+    "nextInvoiceSequence": "Nächste Rechnungsnummer (laufend)",
+    "nextInvoiceSequenceHint": "Erhöht sich automatisch, sobald eine Rechnung mit der vorgeschlagenen Nummer gespeichert wird.",
+    "invoiceNumbering": "Rechnungsnummerierung",
+    "deleteTitle": "Firma löschen",
+    "deleteConfirm": "{{name}} löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteSuccess": "Firma gelöscht",
+    "deleteError": "Firma konnte nicht gelöscht werden. Versuche es erneut.",
+    "editTitle": "Firma bearbeiten",
+    "addTitle": "Firma hinzufügen",
+    "cannotDeleteLast": "Du brauchst mindestens eine Firma — füge eine weitere hinzu, bevor du diese löschst."
   },
   "clients": {
     "type": "Kundentyp",
@@ -133,6 +147,7 @@
     "invoiceNumberRequired": "Rechnungsnummer ist erforderlich.",
     "dateRequired": "Dieses Datum ist erforderlich.",
     "clientRequired": "Wähle einen Kunden aus.",
+    "companyRequired": "Wähle eine Firma aus.",
     "atLeastOneItemRequired": "Füge mindestens eine Position hinzu.",
     "invalidCurrencyCode": "Verwende einen 3-stelligen Währungscode, z. B. EUR.",
     "invoiceNumberFormatRequired": "Gib ein Rechnungsnummernformat ein.",
@@ -173,10 +188,6 @@
     "defaultInvoiceLanguage": "Standard-PDF-Sprache",
     "defaultCurrency": "Standardwährung",
     "defaultCurrencyHint": "3-stelliger Code, z. B. EUR, USD, GBP.",
-    "invoiceNumberFormat": "Rechnungsnummernformat",
-    "invoiceNumberFormatHint": "Verwende {{yyyy}}, {{mm}} und ein {{seq:4}}-Muster — z. B. INV-{{yyyy}}-{{seq:4}}.",
-    "nextInvoiceSequence": "Nächste Rechnungsnummer (laufend)",
-    "nextInvoiceSequenceHint": "Erhöht sich automatisch, sobald eine Rechnung mit der vorgeschlagenen Nummer gespeichert wird.",
     "loading": "Einstellungen werden geladen…",
     "loadError": "Einstellungen konnten nicht geladen werden",
     "loadErrorHint": "Lade die App neu und versuche es erneut.",

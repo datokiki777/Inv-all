@@ -13,12 +13,12 @@ export function CreateInvoicePage() {
   const { t } = useTranslation(["common", "invoice"]);
   const navigate = useNavigate();
   const toast = useToast();
-  const { status, company, clients, products, settings, suggestedInvoiceNumber } = useInvoiceFormData();
+  const { status, companies, activeCompany, clients, products, settings, suggestedInvoiceNumber } = useInvoiceFormData();
 
   async function handleSubmit(values: InvoiceFormValues) {
-    if (!company) return;
+    const company = companies.find((c) => c.id === values.companyId);
     const client = clients.find((c) => c.id === values.clientId);
-    if (!client) return;
+    if (!company || !client) return;
     try {
       await invoiceService.create(values, { company, client });
       toast.success(t("invoice:form.saveSuccess"));
@@ -32,7 +32,7 @@ export function CreateInvoicePage() {
     <div className="space-y-6">
       {/* Once InvoiceForm renders, its own fixed Edit/Preview tab bar takes over
           as the page header — an h1 here would sit directly underneath it. */}
-      {status === "ready" && company && settings ? null : (
+      {status === "ready" && companies.length > 0 && settings ? null : (
         <h1 className="font-display text-2xl text-ink">{t("pages.createInvoice")}</h1>
       )}
 
@@ -42,7 +42,7 @@ export function CreateInvoicePage() {
         <EmptyState title={t("invoice:form.loadError")} description={t("invoice:form.loadErrorHint")} />
       ) : null}
 
-      {status === "ready" && !company ? (
+      {status === "ready" && companies.length === 0 ? (
         <EmptyState
           title={t("invoice:form.companyMissing")}
           description={t("invoice:form.companyMissingHint")}
@@ -54,16 +54,18 @@ export function CreateInvoicePage() {
         />
       ) : null}
 
-      {status === "ready" && company && settings ? (
+      {status === "ready" && companies.length > 0 && settings ? (
         <InvoiceForm
           draftKey="new"
-          company={company}
+          companies={companies}
+          activeCompanyId={activeCompany?.id}
           clients={clients}
           products={products}
           settings={settings}
           suggestedInvoiceNumber={suggestedInvoiceNumber}
           onSubmit={handleSubmit}
           onClientCreated={() => {}}
+          onCompanyCreated={() => {}}
         />
       ) : null}
     </div>

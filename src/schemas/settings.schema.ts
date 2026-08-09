@@ -7,17 +7,17 @@ export const appSettingsSchema = z.object({
   defaultInvoiceTemplateId: z.enum(["classic", "modern", "compact", "minimal"]),
   defaultInvoiceLanguage: z.enum(["de", "en"]),
   defaultCurrency: z.string().length(3, "invalidCurrencyCode"),
-  invoiceNumberFormat: z.string().min(1, "invoiceNumberFormatRequired"),
-  nextInvoiceSequence: z.coerce.number().int().min(1, "sequenceMustBePositive"),
+  lastUsedCompanyId: z.string().optional(),
   lastInvoicePdfVisibility: pdfVisibilitySchema.optional(),
   lastNoteText: z.string().optional(),
   updatedAt: z.string()
 });
 
-/** Input schema for the Settings form — everything except id/updatedAt/lastInvoicePdfVisibility/lastNoteText, which the app owns automatically. */
+/** Input schema for the Settings form — everything except id/updatedAt/lastUsedCompanyId/lastInvoicePdfVisibility/lastNoteText, which the app owns automatically. */
 export const settingsFormSchema = appSettingsSchema.omit({
   id: true,
   updatedAt: true,
+  lastUsedCompanyId: true,
   lastInvoicePdfVisibility: true,
   lastNoteText: true
 });

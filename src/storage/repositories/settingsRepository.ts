@@ -9,8 +9,6 @@ export const defaultAppSettings: AppSettings = {
   defaultInvoiceTemplateId: "modern",
   defaultInvoiceLanguage: "en",
   defaultCurrency: "EUR",
-  invoiceNumberFormat: "INV-{YYYY}-{seq:4}",
-  nextInvoiceSequence: 1,
   updatedAt: new Date().toISOString()
 };
 

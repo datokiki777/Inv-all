@@ -7,6 +7,18 @@ import {
 } from "@/storage/repositories";
 import { backupSchema, CURRENT_BACKUP_VERSION, type Backup } from "@/schemas/backup.schema";
 import { nowIso } from "@/utils/date";
+import type { Company } from "@/types";
+
+const DEFAULT_INVOICE_NUMBER_FORMAT = "INV-{YYYY}-{seq:4}";
+
+/** Fills in invoiceNumberFormat/nextInvoiceSequence for a company snapshot from a pre-multi-company backup, so restoring an old export never writes an incomplete Company record. */
+function withNumberingDefaults(company: Omit<Company, "invoiceNumberFormat" | "nextInvoiceSequence"> & Partial<Pick<Company, "invoiceNumberFormat" | "nextInvoiceSequence">>): Company {
+  return {
+    ...company,
+    invoiceNumberFormat: company.invoiceNumberFormat || DEFAULT_INVOICE_NUMBER_FORMAT,
+    nextInvoiceSequence: company.nextInvoiceSequence || 1
+  };
+}
 
 export type ImportMode = "replace" | "merge";
 
@@ -81,10 +93,10 @@ export const backupService = {
     }
 
     await Promise.all([
-      ...backup.data.companies.map((c) => companyRepository.save(c)),
+      ...backup.data.companies.map((c) => companyRepository.save(withNumberingDefaults(c))),
       ...backup.data.clients.map((c) => clientRepository.save(c)),
       ...backup.data.products.map((p) => productRepository.save(p)),
-      ...backup.data.invoices.map((i) => invoiceRepository.save(i)),
+      ...backup.data.invoices.map((i) => invoiceRepository.save({ ...i, company: withNumberingDefaults(i.company) })),
       settingsRepository.save(backup.data.settings)
     ]);
 

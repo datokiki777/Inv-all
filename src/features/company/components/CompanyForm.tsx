@@ -12,6 +12,7 @@ import { LogoUploader } from "./LogoUploader";
 interface CompanyFormProps {
   company?: Company;
   onSubmit: (values: CompanyFormValues) => Promise<void>;
+  onCancel: () => void;
 }
 
 function toDefaultValues(company: Company | undefined): CompanyFormValues {
@@ -34,11 +35,14 @@ function toDefaultValues(company: Company | undefined): CompanyFormValues {
       iban: company?.bankDetails?.iban ?? "",
       bic: company?.bankDetails?.bic ?? ""
     },
-    defaultInvoiceLanguage: company?.defaultInvoiceLanguage ?? "en"
+    defaultInvoiceLanguage: company?.defaultInvoiceLanguage ?? "en",
+    invoiceNumberFormat: company?.invoiceNumberFormat ?? "INV-{YYYY}-{seq:4}",
+    nextInvoiceSequence: company?.nextInvoiceSequence ?? 1
   };
 }
 
-export function CompanyForm({ company, onSubmit }: CompanyFormProps) {
+/** Add/edit form for one company — rendered inside a Dialog by CompaniesPage, same pattern as ClientForm. */
+export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
   const { t } = useTranslation();
   const {
     register,
@@ -54,11 +58,17 @@ export function CompanyForm({ company, onSubmit }: CompanyFormProps) {
   const logoDataUrl = watch("logoDataUrl");
   const invoiceLanguage = watch("defaultInvoiceLanguage");
 
-  function fieldError(key: keyof CompanyFormValues | "bankDetails.iban" | "bankDetails.bic" | "bankDetails.bankName" | "bankDetails.accountHolder") {
-    const message =
-      key.startsWith("bankDetails.")
-        ? errors.bankDetails?.[key.split(".")[1] as "iban"]?.message
-        : errors[key as keyof CompanyFormValues]?.message;
+  function fieldError(
+    key:
+      | keyof CompanyFormValues
+      | "bankDetails.iban"
+      | "bankDetails.bic"
+      | "bankDetails.bankName"
+      | "bankDetails.accountHolder"
+  ) {
+    const message = key.startsWith("bankDetails.")
+      ? errors.bankDetails?.[key.split(".")[1] as "iban"]?.message
+      : errors[key as keyof CompanyFormValues]?.message;
     return message ? t(`validation.${message}`) : undefined;
   }
 
@@ -147,9 +157,40 @@ export function CompanyForm({ company, onSubmit }: CompanyFormProps) {
         />
       </FormField>
 
-      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("actions.saving") : t("actions.save")}
-      </Button>
+      <div className="space-y-3 rounded-lg border border-line p-4">
+        <p className="text-sm font-medium text-ink">{t("company.invoiceNumbering")}</p>
+        <FormField
+          label={t("company.invoiceNumberFormat")}
+          htmlFor="invoiceNumberFormat"
+          hint={t("company.invoiceNumberFormatHint")}
+          error={fieldError("invoiceNumberFormat")}
+        >
+          <Input id="invoiceNumberFormat" invalid={!!errors.invoiceNumberFormat} {...register("invoiceNumberFormat")} />
+        </FormField>
+        <FormField
+          label={t("company.nextInvoiceSequence")}
+          htmlFor="nextInvoiceSequence"
+          hint={t("company.nextInvoiceSequenceHint")}
+          error={fieldError("nextInvoiceSequence")}
+        >
+          <Input
+            id="nextInvoiceSequence"
+            type="number"
+            min="1"
+            invalid={!!errors.nextInvoiceSequence}
+            {...register("nextInvoiceSequence")}
+          />
+        </FormField>
+      </div>
+
+      <div className="flex gap-3 pt-1">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onCancel}>
+          {t("actions.cancel")}
+        </Button>
+        <Button type="submit" className="flex-1" disabled={isSubmitting}>
+          {isSubmitting ? t("actions.saving") : t("actions.save")}
+        </Button>
+      </div>
     </form>
   );
 }

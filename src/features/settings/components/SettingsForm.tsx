@@ -30,9 +30,7 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
       interfaceLanguage: settings.interfaceLanguage,
       defaultInvoiceTemplateId: settings.defaultInvoiceTemplateId,
       defaultInvoiceLanguage: settings.defaultInvoiceLanguage,
-      defaultCurrency: settings.defaultCurrency,
-      invoiceNumberFormat: settings.invoiceNumberFormat,
-      nextInvoiceSequence: settings.nextInvoiceSequence
+      defaultCurrency: settings.defaultCurrency
     }
   });
 
@@ -85,24 +83,6 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
 
       <FormField label={t("settings.defaultCurrency")} htmlFor="defaultCurrency" error={err("defaultCurrency")} hint={t("settings.defaultCurrencyHint")}>
         <Input id="defaultCurrency" maxLength={3} className="uppercase" invalid={!!errors.defaultCurrency} {...register("defaultCurrency")} />
-      </FormField>
-
-      <FormField
-        label={t("settings.invoiceNumberFormat")}
-        htmlFor="invoiceNumberFormat"
-        error={err("invoiceNumberFormat")}
-        hint={t("settings.invoiceNumberFormatHint")}
-      >
-        <Input id="invoiceNumberFormat" invalid={!!errors.invoiceNumberFormat} {...register("invoiceNumberFormat")} />
-      </FormField>
-
-      <FormField
-        label={t("settings.nextInvoiceSequence")}
-        htmlFor="nextInvoiceSequence"
-        error={err("nextInvoiceSequence")}
-        hint={t("settings.nextInvoiceSequenceHint")}
-      >
-        <Input id="nextInvoiceSequence" type="number" min="1" step="1" invalid={!!errors.nextInvoiceSequence} {...register("nextInvoiceSequence")} />
       </FormField>
 
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>

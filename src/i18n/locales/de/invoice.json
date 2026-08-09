@@ -26,6 +26,8 @@
   "form": {
     "client": "Kunde",
     "selectClient": "Kunde auswählen…",
+    "company": "Firma",
+    "selectCompany": "Firma auswählen…",
     "items": "Positionen",
     "itemName": "Bezeichnung",
     "itemDescription": "Beschreibung (optional)",

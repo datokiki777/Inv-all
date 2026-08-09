@@ -12,7 +12,7 @@
     "editInvoice": "Edit invoice",
     "invoicePreview": "Invoice preview",
     "clients": "Clients",
-    "company": "Company",
+    "company": "Companies",
     "products": "Products & services",
     "settings": "Settings",
     "backupRestore": "Backup & restore"
@@ -36,7 +36,9 @@
     "invoices": "No invoices yet",
     "invoicesHint": "Create your first invoice to see it here.",
     "clients": "No clients yet",
-    "products": "No products or services yet"
+    "products": "No products or services yet",
+    "company": "No company yet",
+    "companyHint": "Add your company so you can start creating invoices."
   },
   "dashboard": {
     "loading": "Loading dashboard…",
@@ -81,7 +83,19 @@
     "loadError": "Couldn't load company details",
     "loadErrorHint": "Reload the app and try again.",
     "saveSuccess": "Company details saved",
-    "saveError": "Couldn't save company details. Try again."
+    "saveError": "Couldn't save company details. Try again.",
+    "invoiceNumberFormat": "Invoice number format",
+    "invoiceNumberFormatHint": "Use {{yyyy}}, {{mm}}, and a {{seq:4}}-style pattern — e.g. INV-{{yyyy}}-{{seq:4}}.",
+    "nextInvoiceSequence": "Next invoice sequence number",
+    "nextInvoiceSequenceHint": "Advances automatically each time an invoice is saved with the suggested number.",
+    "invoiceNumbering": "Invoice numbering",
+    "deleteTitle": "Delete company",
+    "deleteConfirm": "Delete {{name}}? This can't be undone.",
+    "deleteSuccess": "Company deleted",
+    "deleteError": "Couldn't delete company. Try again.",
+    "editTitle": "Edit company",
+    "addTitle": "Add company",
+    "cannotDeleteLast": "You need at least one company — add another before deleting this one."
   },
   "clients": {
     "type": "Client type",
@@ -133,6 +147,7 @@
     "invoiceNumberRequired": "Invoice number is required.",
     "dateRequired": "This date is required.",
     "clientRequired": "Select a client.",
+    "companyRequired": "Select a company.",
     "atLeastOneItemRequired": "Add at least one item.",
     "invalidCurrencyCode": "Use a 3-letter currency code, e.g. EUR.",
     "invoiceNumberFormatRequired": "Enter an invoice number format.",
@@ -173,10 +188,6 @@
     "defaultInvoiceLanguage": "Default PDF language",
     "defaultCurrency": "Default currency",
     "defaultCurrencyHint": "3-letter code, e.g. EUR, USD, GBP.",
-    "invoiceNumberFormat": "Invoice number format",
-    "invoiceNumberFormatHint": "Use {{yyyy}}, {{mm}}, and a {{seq:4}}-style pattern — e.g. INV-{{yyyy}}-{{seq:4}}.",
-    "nextInvoiceSequence": "Next invoice sequence number",
-    "nextInvoiceSequenceHint": "Advances automatically each time an invoice is saved with the suggested number.",
     "loading": "Loading settings…",
     "loadError": "Couldn't load settings",
     "loadErrorHint": "Reload the app and try again.",

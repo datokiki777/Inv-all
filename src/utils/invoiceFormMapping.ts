@@ -74,6 +74,7 @@ export function invoiceToFormValues(invoice: Invoice): InvoiceFormValues {
     serviceDate: invoice.serviceDate,
     dueDate: invoice.dueDate,
     clientId: invoice.client.id,
+    companyId: invoice.company.id,
     items: invoice.items.map(invoiceItemToFormItem),
     taxMode: invoice.taxSettings.mode,
     taxRatePercent: invoice.taxSettings.ratePercent,

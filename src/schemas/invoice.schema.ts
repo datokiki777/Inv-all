@@ -122,6 +122,7 @@ export const invoiceFormSchema = z.object({
   createdDate: z.string().min(1, "dateRequired"),
   serviceDate: z.string().optional(),
   dueDate: z.string().optional(),
+  companyId: z.string().min(1, "companyRequired"),
   clientId: z.string().min(1, "clientRequired"),
   items: z.array(invoiceItemFormSchema).min(1, "atLeastOneItemRequired"),
   taxMode: z.enum(["standard", "reverseCharge", "taxFree", "custom"]),
