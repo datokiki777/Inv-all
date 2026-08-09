@@ -24,6 +24,12 @@ function AmountValue({ amounts, locale, emptyLabel }: { amounts: CurrencyAmount[
   );
 }
 
+function formatMonthLabel(month: string, locale: string): string {
+  // month is "YYYY-MM" — construct a date on the 1st so Intl can format it as a month/year label.
+  const date = new Date(`${month}-01T00:00:00`);
+  return new Intl.DateTimeFormat(locale, { year: "numeric", month: "long" }).format(date);
+}
+
 function StatRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 py-2.5">
@@ -78,6 +84,19 @@ export function DashboardStatsCard({ metrics, locale }: DashboardStatsCardProps)
           </StatRow>
           <StatRow label={t("dashboard.totalCount")}>{metrics.totalCount}</StatRow>
           <StatRow label={t("dashboard.draftCountLabel")}>{metrics.draftCount}</StatRow>
+        </div>
+      ) : null}
+
+      {expanded && metrics.paidVatByMonth.length > 0 ? (
+        <div className="border-t border-line px-4 py-3">
+          <p className="mb-1 text-xs font-medium uppercase text-ink-faint">{t("dashboard.paidVatByMonth")}</p>
+          <div className="divide-y divide-line">
+            {metrics.paidVatByMonth.map((entry) => (
+              <StatRow key={entry.month} label={formatMonthLabel(entry.month, locale)}>
+                <AmountValue amounts={entry.amounts} locale={locale} emptyLabel="—" />
+              </StatRow>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

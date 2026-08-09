@@ -6,6 +6,12 @@ export interface CurrencyAmount {
   cents: number;
 }
 
+export interface MonthlyAmount {
+  /** "YYYY-MM" */
+  month: string;
+  amounts: CurrencyAmount[];
+}
+
 export interface DashboardMetrics {
   /** Sum of remainingAmountCents for invoices that are sent/partiallyPaid/overdue, grouped by currency. */
   outstanding: CurrencyAmount[];
@@ -19,6 +25,8 @@ export interface DashboardMetrics {
   totalInvoiced: CurrencyAmount[];
   /** Count of every invoice regardless of status. */
   totalCount: number;
+  /** VAT collected on fully-paid invoices, grouped by the invoice's created month, most recent first. */
+  paidVatByMonth: MonthlyAmount[];
   /** Most recently created invoices, highest invoice number first. */
   recentInvoices: Invoice[];
 }
@@ -37,6 +45,20 @@ function groupByCurrency(invoices: Invoice[], amountOf: (invoice: Invoice) => nu
     totals.set(invoice.currency, (totals.get(invoice.currency) ?? 0) + amountOf(invoice));
   }
   return Array.from(totals.entries()).map(([currency, cents]) => ({ currency, cents }));
+}
+
+/** Groups paid invoices' VAT by their created month ("YYYY-MM"), most recent month first. */
+function groupPaidVatByMonth(paidInvoices: Invoice[]): MonthlyAmount[] {
+  const byMonth = new Map<string, Invoice[]>();
+  for (const invoice of paidInvoices) {
+    const month = invoice.createdDate.slice(0, 7); // "YYYY-MM-DD" -> "YYYY-MM"
+    const bucket = byMonth.get(month) ?? [];
+    bucket.push(invoice);
+    byMonth.set(month, bucket);
+  }
+  return Array.from(byMonth.entries())
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([month, monthInvoices]) => ({ month, amounts: groupByCurrency(monthInvoices, (i) => i.vatCents) }));
 }
 
 /**
@@ -62,6 +84,7 @@ export function computeDashboardMetrics(invoices: Invoice[], todayDateOnly: stri
     paid: groupByCurrency(activeInvoices, (i) => i.paidAmountCents),
     totalInvoiced: groupByCurrency(activeInvoices, (i) => i.totalCents),
     totalCount: invoices.length,
+    paidVatByMonth: groupPaidVatByMonth(invoices.filter((i) => i.status === "paid")),
     recentInvoices
   };
 }

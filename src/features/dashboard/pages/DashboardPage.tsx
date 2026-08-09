@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Trash2 } from "lucide-react";
 import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
 import { DashboardStatsCard } from "@/features/dashboard/components/DashboardStatsCard";
 import { useAppSettings, localeForLanguage } from "@/features/settings/hooks/useAppSettings";
@@ -8,6 +9,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { EmptyState } from "@/components/common/EmptyState";
 import { StatusPicker } from "@/features/invoices/components/StatusPicker";
 import { PartialPaymentDialog } from "@/features/invoices/components/PartialPaymentDialog";
+import { DeleteInvoiceDialog } from "@/features/invoices/components/DeleteInvoiceDialog";
 import { useToast } from "@/components/ui/toast";
 import { formatMoney } from "@/utils/money";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
@@ -16,10 +18,11 @@ import type { Invoice, InvoiceStatus } from "@/types";
 export function DashboardPage() {
   const { t } = useTranslation(["common", "invoice"]);
   const toast = useToast();
-  const { metrics, status, updateStatus } = useDashboardData();
+  const { metrics, status, updateStatus, remove } = useDashboardData();
   const settings = useAppSettings();
   const locale = localeForLanguage(settings?.interfaceLanguage);
   const [partialPaymentInvoice, setPartialPaymentInvoice] = useState<Invoice | null>(null);
+  const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
 
   async function handleStatusChange(invoice: Invoice, newStatus: InvoiceStatus) {
     // "Partially paid" needs a payment amount we don't have yet — the
@@ -45,6 +48,18 @@ export function DashboardPage() {
       toast.error(t("invoice:list.statusUpdateError"));
     } finally {
       setPartialPaymentInvoice(null);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deletingInvoice) return;
+    try {
+      await remove(deletingInvoice.id);
+      toast.success(t("invoice:list.deleteSuccess"));
+    } catch {
+      toast.error(t("invoice:list.deleteError"));
+    } finally {
+      setDeletingInvoice(null);
     }
   }
 
@@ -82,6 +97,14 @@ export function DashboardPage() {
                         <p className="truncate text-xs text-ink-muted">{getClientDisplayName(invoice.client)}</p>
                       </Link>
                       <StatusPicker status={invoice.status} onChange={(newStatus) => handleStatusChange(invoice, newStatus)} />
+                      <button
+                        type="button"
+                        onClick={() => setDeletingInvoice(invoice)}
+                        className="shrink-0 rounded p-1.5 text-ink-faint hover:text-danger"
+                        aria-label={t("actions.delete")}
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                     <Link to={`/invoices/${invoice.id}/preview`} className="mt-1.5 block text-right text-sm text-ink">
                       {formatMoney(invoice.totalCents, invoice.currency, locale)}
@@ -98,6 +121,12 @@ export function DashboardPage() {
         invoice={partialPaymentInvoice}
         onOpenChange={(open) => !open && setPartialPaymentInvoice(null)}
         onConfirm={handlePartialPaymentConfirm}
+      />
+
+      <DeleteInvoiceDialog
+        invoice={deletingInvoice}
+        onOpenChange={(open) => !open && setDeletingInvoice(null)}
+        onConfirm={handleDelete}
       />
     </div>
   );

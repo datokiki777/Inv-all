@@ -50,7 +50,8 @@
     "paid": "Paid",
     "totalInvoiced": "Total invoiced",
     "totalCount": "Total invoices",
-    "draftCountLabel": "Drafts"
+    "draftCountLabel": "Drafts",
+    "paidVatByMonth": "VAT collected by month (paid invoices)"
   },
   "company": {
     "logo": "Logo",

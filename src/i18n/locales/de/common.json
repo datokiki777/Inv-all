@@ -50,7 +50,8 @@
     "paid": "Bezahlt",
     "totalInvoiced": "Gesamt fakturiert",
     "totalCount": "Rechnungen gesamt",
-    "draftCountLabel": "Entwürfe"
+    "draftCountLabel": "Entwürfe",
+    "paidVatByMonth": "Erhaltene MwSt. pro Monat (bezahlte Rechnungen)"
   },
   "company": {
     "logo": "Logo",

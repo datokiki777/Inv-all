@@ -36,5 +36,10 @@ export function useDashboardData() {
     return updated;
   }, []);
 
-  return { metrics, status, updateStatus };
+  const remove = useCallback(async (id: string) => {
+    await invoiceService.remove(id);
+    setInvoices((prev) => prev.filter((i) => i.id !== id));
+  }, []);
+
+  return { metrics, status, updateStatus, remove };
 }
