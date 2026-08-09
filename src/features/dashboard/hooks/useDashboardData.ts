@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { invoiceService } from "@/features/invoices/services/invoiceService";
 import { computeDashboardMetrics } from "@/utils/dashboardMetrics";
 import { todayDateOnly } from "@/utils/date";
+import { loadLastCompanyFilterId, saveLastCompanyFilterId } from "@/utils/companyFilterPersistence";
 import type { Invoice, InvoiceStatus } from "@/types";
 
 type Status = "loading" | "ready" | "error";
@@ -9,7 +10,7 @@ type Status = "loading" | "ready" | "error";
 export function useDashboardData() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [status, setStatus] = useState<Status>("loading");
-  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [companyFilter, setCompanyFilterState] = useState<string>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -21,9 +22,15 @@ export function useDashboardData() {
         setStatus("ready");
       })
       .catch(() => !cancelled && setStatus("error"));
+    loadLastCompanyFilterId().then((id) => !cancelled && setCompanyFilterState(id));
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  const setCompanyFilter = useCallback((companyId: string) => {
+    setCompanyFilterState(companyId);
+    saveLastCompanyFilterId(companyId);
   }, []);
 
   // Every company an invoice currently exists for — the "jump to a

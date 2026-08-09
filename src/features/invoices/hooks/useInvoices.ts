@@ -3,6 +3,7 @@ import { invoiceService } from "@/features/invoices/services/invoiceService";
 import { matchesInvoiceFilters, defaultInvoiceFilters, type InvoiceFilters } from "@/utils/invoiceSearch";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
 import { compareInvoiceNumbers } from "@/utils/invoiceNumber";
+import { loadLastCompanyFilterId, saveLastCompanyFilterId } from "@/utils/companyFilterPersistence";
 import type { Invoice } from "@/types";
 
 type Status = "loading" | "ready" | "error";
@@ -11,7 +12,7 @@ type Status = "loading" | "ready" | "error";
 export function useInvoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [status, setStatus] = useState<Status>("loading");
-  const [filters, setFilters] = useState<InvoiceFilters>(defaultInvoiceFilters);
+  const [filters, setFiltersState] = useState<InvoiceFilters>(defaultInvoiceFilters);
 
   const reload = useCallback(async () => {
     setStatus("loading");
@@ -26,7 +27,18 @@ export function useInvoices() {
 
   useEffect(() => {
     reload();
+    loadLastCompanyFilterId().then((companyId) => setFiltersState((prev) => ({ ...prev, companyId })));
   }, [reload]);
+
+  // Only persists when the company chip actually changes — search text,
+  // status, and date range stay session-only, so typing in the search box
+  // doesn't hit storage on every keystroke.
+  const setFilters = useCallback((next: InvoiceFilters) => {
+    setFiltersState((prev) => {
+      if (next.companyId !== prev.companyId) saveLastCompanyFilterId(next.companyId);
+      return next;
+    });
+  }, []);
 
   const filtered = useMemo(
     () =>

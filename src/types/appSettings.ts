@@ -15,6 +15,14 @@ export interface AppSettings {
    */
   lastUsedCompanyId?: string;
   /**
+   * The company chip currently selected in the Dashboard/Invoices list
+   * filter — "all" or a specific company id. Shared between both screens
+   * (switching it on either one moves the other) and persists across app
+   * restarts, so you stay on the company you were looking at instead of
+   * resetting to "All" every time.
+   */
+  lastCompanyFilterId?: string;
+  /**
    * The "Show in PDF" switch state last used on any saved invoice — new
    * invoices start from this instead of always resetting to all-visible,
    * so a preference like "hide my phone number" sticks around. Not shown
