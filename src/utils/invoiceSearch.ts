@@ -5,6 +5,7 @@ export interface InvoiceFilters {
   query: string;
   status: InvoiceStatus | "all";
   clientId: string | "all";
+  companyId: string | "all";
   dateFrom: string;
   dateTo: string;
 }
@@ -13,6 +14,7 @@ export const defaultInvoiceFilters: InvoiceFilters = {
   query: "",
   status: "all",
   clientId: "all",
+  companyId: "all",
   dateFrom: "",
   dateTo: ""
 };
@@ -26,6 +28,7 @@ export function matchesInvoiceFilters(invoice: Invoice, filters: InvoiceFilters)
   }
   if (filters.status !== "all" && invoice.status !== filters.status) return false;
   if (filters.clientId !== "all" && invoice.client.id !== filters.clientId) return false;
+  if (filters.companyId !== "all" && invoice.company.id !== filters.companyId) return false;
   if (filters.dateFrom && invoice.createdDate < filters.dateFrom) return false;
   if (filters.dateTo && invoice.createdDate > filters.dateTo) return false;
   return true;

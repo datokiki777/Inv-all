@@ -7,6 +7,7 @@ import { DashboardStatsCard } from "@/features/dashboard/components/DashboardSta
 import { useAppSettings, localeForLanguage } from "@/features/settings/hooks/useAppSettings";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { EmptyState } from "@/components/common/EmptyState";
+import { CompanyFilterChips } from "@/components/common/CompanyFilterChips";
 import { StatusPicker } from "@/features/invoices/components/StatusPicker";
 import { PartialPaymentDialog } from "@/features/invoices/components/PartialPaymentDialog";
 import { DeleteInvoiceDialog } from "@/features/invoices/components/DeleteInvoiceDialog";
@@ -18,7 +19,7 @@ import type { Invoice, InvoiceStatus } from "@/types";
 export function DashboardPage() {
   const { t } = useTranslation(["common", "invoice"]);
   const toast = useToast();
-  const { metrics, status, updateStatus, remove } = useDashboardData();
+  const { metrics, status, updateStatus, remove, companyOptions, companyFilter, setCompanyFilter } = useDashboardData();
   const settings = useAppSettings();
   const locale = localeForLanguage(settings?.interfaceLanguage);
   const [partialPaymentInvoice, setPartialPaymentInvoice] = useState<Invoice | null>(null);
@@ -67,6 +68,8 @@ export function DashboardPage() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl text-ink">{t("pages.dashboard")}</h1>
 
+      <CompanyFilterChips companies={companyOptions} value={companyFilter} onChange={setCompanyFilter} />
+
       {status === "loading" ? <LoadingSpinner label={t("dashboard.loading")} /> : null}
       {status === "error" ? <EmptyState title={t("dashboard.loadError")} /> : null}
 
@@ -95,6 +98,9 @@ export function DashboardPage() {
                       <Link to={`/invoices/${invoice.id}/preview`} className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-ink">{invoice.invoiceNumber}</p>
                         <p className="truncate text-xs text-ink-muted">{getClientDisplayName(invoice.client)}</p>
+                        {companyOptions.length > 1 ? (
+                          <p className="truncate text-[11px] text-ink-faint">{invoice.company.name}</p>
+                        ) : null}
                       </Link>
                       <StatusPicker status={invoice.status} onChange={(newStatus) => handleStatusChange(invoice, newStatus)} />
                       <button

@@ -44,6 +44,14 @@ export function useInvoices() {
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [invoices]);
 
+  const companyOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const invoice of invoices) {
+      if (!map.has(invoice.company.id)) map.set(invoice.company.id, invoice.company.name);
+    }
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [invoices]);
+
   const duplicate = useCallback(async (invoice: Invoice) => {
     const created = await invoiceService.duplicate(invoice);
     setInvoices((prev) => [...prev, created]);
@@ -68,6 +76,7 @@ export function useInvoices() {
     filters,
     setFilters,
     clientOptions,
+    companyOptions,
     duplicate,
     remove,
     updateStatus

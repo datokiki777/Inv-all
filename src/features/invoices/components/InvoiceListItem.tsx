@@ -9,12 +9,13 @@ import { StatusPicker } from "./StatusPicker";
 
 interface InvoiceListItemProps {
   invoice: Invoice;
+  showCompany?: boolean;
   onDuplicate: () => void;
   onDelete: () => void;
   onStatusChange: (status: InvoiceStatus) => void;
 }
 
-export function InvoiceListItem({ invoice, onDuplicate, onDelete, onStatusChange }: InvoiceListItemProps) {
+export function InvoiceListItem({ invoice, showCompany, onDuplicate, onDelete, onStatusChange }: InvoiceListItemProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const locale = localeForLanguage(invoice.pdfLanguage);
 
@@ -24,6 +25,7 @@ export function InvoiceListItem({ invoice, onDuplicate, onDelete, onStatusChange
         <Link to={`/invoices/${invoice.id}/preview`} className="min-w-0 flex-1">
           <p className="text-sm font-medium text-ink">{invoice.invoiceNumber}</p>
           <p className="mt-0.5 truncate text-xs text-ink-muted">{getClientDisplayName(invoice.client)}</p>
+          {showCompany ? <p className="mt-0.5 truncate text-[11px] text-ink-faint">{invoice.company.name}</p> : null}
         </Link>
         {/* Outside the Link on purpose — a <select> nested inside an anchor can still trigger navigation on some mobile browsers. */}
         <StatusPicker status={invoice.status} onChange={onStatusChange} />

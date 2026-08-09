@@ -121,6 +121,7 @@
     "filters": "Filters",
     "allStatuses": "All statuses",
     "allClients": "All clients",
+    "allCompanies": "All companies",
     "dateFrom": "From",
     "dateTo": "To",
     "clearFilters": "Clear filters",

@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { CompanyFilterChips } from "@/components/common/CompanyFilterChips";
 import { useToast } from "@/components/ui/toast";
 import { useInvoices } from "@/features/invoices/hooks/useInvoices";
 import { InvoiceListItem } from "@/features/invoices/components/InvoiceListItem";
@@ -16,7 +17,8 @@ import type { Invoice, InvoiceStatus } from "@/types";
 export function InvoicesPage() {
   const { t } = useTranslation(["common", "invoice"]);
   const toast = useToast();
-  const { invoices, allCount, status, filters, setFilters, clientOptions, duplicate, remove, updateStatus } = useInvoices();
+  const { invoices, allCount, status, filters, setFilters, clientOptions, companyOptions, duplicate, remove, updateStatus } =
+    useInvoices();
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
   const [partialPaymentInvoice, setPartialPaymentInvoice] = useState<Invoice | null>(null);
 
@@ -77,6 +79,14 @@ export function InvoicesPage() {
         </Link>
       </div>
 
+      {allCount > 0 ? (
+        <CompanyFilterChips
+          companies={companyOptions}
+          value={filters.companyId}
+          onChange={(companyId) => setFilters({ ...filters, companyId })}
+        />
+      ) : null}
+
       {allCount > 0 ? <InvoiceFilters filters={filters} onChange={setFilters} clientOptions={clientOptions} /> : null}
 
       {status === "loading" ? <LoadingSpinner label={t("invoice:list.loading")} /> : null}
@@ -107,6 +117,7 @@ export function InvoicesPage() {
             <InvoiceListItem
               key={invoice.id}
               invoice={invoice}
+              showCompany={companyOptions.length > 1}
               onDuplicate={() => handleDuplicate(invoice)}
               onDelete={() => setDeletingInvoice(invoice)}
               onStatusChange={(newStatus) => handleStatusChange(invoice, newStatus)}

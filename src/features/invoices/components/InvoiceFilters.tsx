@@ -20,7 +20,13 @@ export function InvoiceFilters({ filters, onChange, clientOptions }: InvoiceFilt
   const { t } = useTranslation(["common", "invoice"]);
   const [expanded, setExpanded] = useState(false);
 
-  const activeCount = [filters.status !== "all", filters.clientId !== "all", filters.dateFrom, filters.dateTo].filter(Boolean).length;
+  const activeCount = [
+    filters.status !== "all",
+    filters.clientId !== "all",
+    filters.companyId !== "all",
+    filters.dateFrom,
+    filters.dateTo
+  ].filter(Boolean).length;
 
   return (
     <div className="space-y-2">
