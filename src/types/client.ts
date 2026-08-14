@@ -1,4 +1,21 @@
+import type { Unit } from "./product";
+
 export type ClientType = "company" | "individual";
+
+/**
+ * One line-item's worth of reusable data, saved from an Invoice's Items
+ * section onto a Client (see ClientItemTemplatePicker) — deliberately just
+ * the item fields (name, description, quantity, unit, price). No
+ * discount/VAT: those are invoice-level settings now, not per-item, so
+ * they'd have nothing meaningful to store here.
+ */
+export interface ClientItemTemplateRow {
+  name: string;
+  description?: string;
+  quantity: number;
+  unit: Unit;
+  unitPrice: number;
+}
 
 /**
  * Flat shape (not a discriminated union) on purpose: which fields are
@@ -24,6 +41,13 @@ export interface Client {
   vatId?: string;
   taxNumber?: string;
   notes?: string;
+  /**
+   * Two reusable line-item sets for this client — saved directly from the
+   * Invoice form's Items section (never edited on the Client form itself).
+   * Picking one on a later invoice replaces the current items with these.
+   */
+  itemTemplate1?: ClientItemTemplateRow[];
+  itemTemplate2?: ClientItemTemplateRow[];
   createdAt: string;
   updatedAt: string;
 }

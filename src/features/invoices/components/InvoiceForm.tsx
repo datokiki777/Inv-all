@@ -239,7 +239,11 @@ export function InvoiceForm({
 
         <ClientPdfSummary client={selectedClient} />
 
-        <InvoiceItemsEditor products={products} />
+        <InvoiceItemsEditor
+          products={products}
+          client={selectedClient}
+          onClientUpdated={(updated) => setClientList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))}
+        />
 
         <TaxSettingsEditor />
         <DiscountEditor />

@@ -23,6 +23,14 @@ function refineClientNameByType(
   }
 }
 
+const clientItemTemplateRowSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  quantity: z.number(),
+  unit: z.enum(["hour", "day", "piece", "kg", "unit", "flatRate"]),
+  unitPrice: z.number()
+});
+
 const clientBaseObject = z.object({
   id: z.string().uuid(),
   type: z.enum(["company", "individual"]),
@@ -39,22 +47,31 @@ const clientBaseObject = z.object({
   vatId: z.string().optional(),
   taxNumber: z.string().optional(),
   notes: z.string().optional(),
+  itemTemplate1: z.array(clientItemTemplateRowSchema).optional(),
+  itemTemplate2: z.array(clientItemTemplateRowSchema).optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
 
 export const clientSchema = clientBaseObject.superRefine(refineClientNameByType);
 
-/** Same shape as the Client entity, minus createdAt/updatedAt/notes — used to type ClientSnapshot. */
+/** Same shape as the Client entity, minus createdAt/updatedAt/notes/itemTemplate1/itemTemplate2 — used to type ClientSnapshot. */
 export const clientSnapshotBaseSchema = clientBaseObject.omit({
   createdAt: true,
   updatedAt: true,
-  notes: true
+  notes: true,
+  itemTemplate1: true,
+  itemTemplate2: true
 });
 
-/** Input schema used by the Client form (no id/createdAt/updatedAt). */
+/**
+ * Input schema used by the Client form (no id/createdAt/updatedAt). Also
+ * excludes itemTemplate1/itemTemplate2 — those are never edited on the
+ * Client form, only saved directly from the Invoice form's Items section
+ * (see clientService.saveItemTemplate).
+ */
 export const clientFormSchema = clientBaseObject
-  .omit({ id: true, createdAt: true, updatedAt: true })
+  .omit({ id: true, createdAt: true, updatedAt: true, itemTemplate1: true, itemTemplate2: true })
   .superRefine(refineClientNameByType);
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>;

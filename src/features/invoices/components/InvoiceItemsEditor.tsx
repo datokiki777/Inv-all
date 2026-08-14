@@ -5,11 +5,14 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { blankInvoiceFormItem } from "@/utils/invoiceFormMapping";
 import { InvoiceItemRow } from "./InvoiceItemRow";
+import { ClientItemTemplatePicker } from "./ClientItemTemplatePicker";
 import type { InvoiceFormValues } from "@/schemas";
-import type { ProductOrService } from "@/types";
+import type { Client, ProductOrService } from "@/types";
 
 interface InvoiceItemsEditorProps {
   products: ProductOrService[];
+  client: Client | undefined;
+  onClientUpdated: (client: Client) => void;
 }
 
 /**
@@ -19,7 +22,7 @@ interface InvoiceItemsEditorProps {
  * so every item's vatPercent is kept in lockstep with it here — there's
  * no per-item VAT input.
  */
-export function InvoiceItemsEditor({ products }: InvoiceItemsEditorProps) {
+export function InvoiceItemsEditor({ products, client, onClientUpdated }: InvoiceItemsEditorProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const {
     control,
@@ -27,7 +30,7 @@ export function InvoiceItemsEditor({ products }: InvoiceItemsEditorProps) {
     getValues,
     formState: { errors }
   } = useFormContext<InvoiceFormValues>();
-  const { fields, append, remove } = useFieldArray({ control, name: "items" });
+  const { fields, append, remove, replace } = useFieldArray({ control, name: "items" });
   const taxRatePercent = useWatch({ control, name: "taxRatePercent" });
   const taxMode = useWatch({ control, name: "taxMode" });
   const hasVatRate = taxMode === "standard" || taxMode === "custom";
@@ -51,6 +54,8 @@ export function InvoiceItemsEditor({ products }: InvoiceItemsEditorProps) {
         <p className="text-sm font-medium text-ink">{t("invoice:form.items")}</p>
       </div>
       {itemsError ? <p className="text-xs text-danger">{itemsError}</p> : null}
+
+      <ClientItemTemplatePicker client={client} replace={replace} onClientUpdated={onClientUpdated} />
 
       <div className="space-y-3">
         {fields.map((field, index) => (
