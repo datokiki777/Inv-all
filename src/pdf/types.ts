@@ -41,6 +41,7 @@ export interface InvoicePdfLabels {
   page: string;
   of: string;
   reverseChargeNote: string;
+  taxFreeNote: string;
   email: string;
   phone: string;
   vatId: string;

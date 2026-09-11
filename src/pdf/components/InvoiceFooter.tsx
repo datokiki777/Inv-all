@@ -30,6 +30,14 @@ const styles = StyleSheet.create({
   pageNumber: { position: "absolute", bottom: 24, right: 32, fontSize: 8, color: "#888" }
 });
 
+/** Text for the non-standard-VAT note box: the invoice's own explanation if typed, else a sensible default for Reverse Charge / Tax-free. "custom" has no default — with nothing typed, there's nothing meaningful to show automatically. */
+function taxModeNoteText(invoice: Invoice, labels: InvoicePdfLabels): string {
+  if (invoice.taxSettings.explanationText) return invoice.taxSettings.explanationText;
+  if (invoice.taxSettings.mode === "reverseCharge") return labels.reverseChargeNote;
+  if (invoice.taxSettings.mode === "taxFree") return labels.taxFreeNote;
+  return "";
+}
+
 /**
  * Payment details, notes, the optional Reverse Charge note, and the
  * page-number stamp. Page numbers use react-pdf's render-prop so they stay
@@ -39,6 +47,7 @@ export function InvoiceFooter({ invoice, labels }: Props) {
   const visibility = resolvePdfVisibility(invoice.pdfVisibility);
   const hasPaymentTerms = !!invoice.paymentDetails.paymentTermsText;
   const hasBankBlock = visibility.showBankDetails && invoice.paymentDetails.bankDetails;
+  const taxModeNote = invoice.taxSettings.mode !== "standard" ? taxModeNoteText(invoice, labels) : "";
 
   return (
     <>
@@ -78,9 +87,7 @@ export function InvoiceFooter({ invoice, labels }: Props) {
             <Text>{invoice.note}</Text>
           </View>
         ) : null}
-        {invoice.taxSettings.mode === "reverseCharge" ? (
-          <Text style={styles.reverseCharge}>{invoice.taxSettings.explanationText || labels.reverseChargeNote}</Text>
-        ) : null}
+        {taxModeNote ? <Text style={styles.reverseCharge}>{taxModeNote}</Text> : null}
       </View>
       <Text
         style={styles.pageNumber}
