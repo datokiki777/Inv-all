@@ -12,7 +12,21 @@ const styles = StyleSheet.create({
   footer: { position: "absolute", bottom: 24, left: 32, right: 32, fontSize: 8, color: "#888" },
   notes: { fontSize: 9, marginTop: 14, color: "#333" },
   payment: { fontSize: 9, marginTop: 10, color: "#333" },
-  reverseCharge: { fontSize: 8, marginTop: 8, color: "#555", fontStyle: "italic" },
+  // No fontStyle: "italic" here — @react-pdf/renderer can't synthesize
+  // italics, it requires an actual registered italic font variant, and we
+  // only ever registered NotoSansGeorgian's regular (upright) weight. Using
+  // "italic" here without that variant registered crashed PDF generation
+  // outright for every Reverse Charge invoice (this was a real, reproduced
+  // bug — italic is now done with a border+background treatment instead).
+  reverseCharge: {
+    fontSize: 8,
+    marginTop: 8,
+    color: "#555",
+    padding: 6,
+    backgroundColor: "#f7f7f7",
+    borderLeftWidth: 2,
+    borderColor: "#ccc"
+  },
   pageNumber: { position: "absolute", bottom: 24, right: 32, fontSize: 8, color: "#888" }
 });
 
