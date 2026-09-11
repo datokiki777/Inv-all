@@ -13,7 +13,7 @@ const MODES: TaxMode[] = ["standard", "reverseCharge", "taxFree", "custom"];
 /** Country-agnostic tax mode picker: standard rate, reverse charge, tax-free, or a custom free-text explanation. */
 export function TaxSettingsEditor() {
   const { t } = useTranslation(["common", "invoice"]);
-  const { register, control } = useFormContext<InvoiceFormValues>();
+  const { register, control, setValue } = useFormContext<InvoiceFormValues>();
   const taxMode = useWatch({ control, name: "taxMode" });
   const hasVatRate = taxMode !== "reverseCharge" && taxMode !== "taxFree";
 
@@ -32,7 +32,21 @@ export function TaxSettingsEditor() {
             <Select
               id="taxMode"
               value={field.value}
-              onChange={field.onChange}
+              onChange={(newMode) => {
+                field.onChange(newMode);
+                // The explanation textarea is only shown for reverseCharge/custom
+                // — leaving whatever was typed there sitting in the form's
+                // hidden state after switching to standard/taxFree meant it
+                // could resurface later (e.g. re-appear as the VAT summary's
+                // label text for Tax-free) even though it no longer applies
+                // to the newly-selected mode. Clearing it here makes each
+                // mode's display fully determined by ITS OWN inputs, not by
+                // whatever a previous mode left behind.
+                const explanationStillApplies = newMode === "reverseCharge" || newMode === "custom";
+                if (!explanationStillApplies) {
+                  setValue("taxExplanationText", "", { shouldDirty: true });
+                }
+              }}
               options={MODES.map((mode) => ({ value: mode, label: t(`invoice:form.taxModes.${mode}`) }))}
             />
           )}
