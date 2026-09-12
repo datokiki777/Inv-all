@@ -15,13 +15,16 @@ export function TaxSettingsEditor() {
   const { t } = useTranslation(["common", "invoice"]);
   const { register, control, setValue } = useFormContext<InvoiceFormValues>();
   const taxMode = useWatch({ control, name: "taxMode" });
-  const hasVatRate = taxMode !== "reverseCharge" && taxMode !== "taxFree";
 
   return (
     <div className="space-y-3 rounded-lg border border-line p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
-        {hasVatRate ? <PdfVisibilitySwitch visKey="showVatSummaryTable" /> : null}
+        {/* Shown for every mode now — the VAT Summary table always renders
+            on the PDF (a percentage for Standard/Custom, the tax
+            treatment itself for Reverse Charge/Tax-free), so whether to
+            show it is a real choice regardless of which mode is active. */}
+        <PdfVisibilitySwitch visKey="showVatSummaryTable" />
       </div>
 
       <FormField label={t("invoice:form.taxMode")} htmlFor="taxMode">
@@ -34,6 +37,7 @@ export function TaxSettingsEditor() {
               value={field.value}
               onChange={(newMode) => {
                 field.onChange(newMode);
+
                 // The explanation textarea is only shown for reverseCharge/custom
                 // — leaving whatever was typed there sitting in the form's
                 // hidden state after switching to standard/taxFree meant it
@@ -46,6 +50,16 @@ export function TaxSettingsEditor() {
                 if (!explanationStillApplies) {
                   setValue("taxExplanationText", "", { shouldDirty: true });
                 }
+
+                // Standard and Custom share the same taxRatePercent input,
+                // but they're different VAT options — a rate typed while on
+                // Standard silently carrying over to Custom (or vice versa)
+                // made the two modes look identical whenever the number
+                // happened to match. Reset it to the same default every
+                // time the mode changes, so neither mode "inherits" a value
+                // that was really entered for the other one.
+                const rateApplies = newMode === "standard" || newMode === "custom";
+                setValue("taxRatePercent", rateApplies ? 19 : undefined, { shouldDirty: true });
               }}
               options={MODES.map((mode) => ({ value: mode, label: t(`invoice:form.taxModes.${mode}`) }))}
             />
