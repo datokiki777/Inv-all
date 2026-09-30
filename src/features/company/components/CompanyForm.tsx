@@ -1,13 +1,15 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { companyFormSchema, type CompanyFormValues } from "@/schemas";
 import type { Company } from "@/types";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { LogoUploader } from "./LogoUploader";
+import { CURRENCIES } from "@/utils/currencies";
 
 interface CompanyFormProps {
   company?: Company;
@@ -37,7 +39,8 @@ function toDefaultValues(company: Company | undefined): CompanyFormValues {
     },
     defaultInvoiceLanguage: company?.defaultInvoiceLanguage ?? "en",
     invoiceNumberFormat: company?.invoiceNumberFormat ?? "INV-{YYYY}-{seq:4}",
-    nextInvoiceSequence: company?.nextInvoiceSequence ?? 1
+    nextInvoiceSequence: company?.nextInvoiceSequence ?? 1,
+    defaultCurrency: company?.defaultCurrency ?? "EUR"
   };
 }
 
@@ -46,6 +49,7 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
   const { t } = useTranslation();
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setValue,
@@ -154,6 +158,22 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
             { value: "de", label: t("languages.de") },
             { value: "en", label: t("languages.en") }
           ]}
+        />
+      </FormField>
+
+      <FormField label={t("company.defaultCurrency")} htmlFor="defaultCurrency" error={fieldError("defaultCurrency")}>
+        <Controller
+          control={control}
+          name="defaultCurrency"
+          render={({ field }) => (
+            <Select
+              id="defaultCurrency"
+              invalid={!!errors.defaultCurrency}
+              value={field.value}
+              onChange={field.onChange}
+              options={CURRENCIES.map((currency) => ({ value: currency.code, label: `${currency.code} — ${currency.name}` }))}
+            />
+          )}
         />
       </FormField>
 

@@ -10,13 +10,18 @@ import { nowIso } from "@/utils/date";
 import type { Company } from "@/types";
 
 const DEFAULT_INVOICE_NUMBER_FORMAT = "INV-{YYYY}-{seq:4}";
+const DEFAULT_CURRENCY = "EUR";
 
-/** Fills in invoiceNumberFormat/nextInvoiceSequence for a company snapshot from a pre-multi-company backup, so restoring an old export never writes an incomplete Company record. */
-function withNumberingDefaults(company: Omit<Company, "invoiceNumberFormat" | "nextInvoiceSequence"> & Partial<Pick<Company, "invoiceNumberFormat" | "nextInvoiceSequence">>): Company {
+/** Fills in invoiceNumberFormat/nextInvoiceSequence/defaultCurrency for a company snapshot from a pre-multi-company backup, so restoring an old export never writes an incomplete Company record. */
+function withNumberingDefaults(
+  company: Omit<Company, "invoiceNumberFormat" | "nextInvoiceSequence" | "defaultCurrency"> &
+    Partial<Pick<Company, "invoiceNumberFormat" | "nextInvoiceSequence" | "defaultCurrency">>
+): Company {
   return {
     ...company,
     invoiceNumberFormat: company.invoiceNumberFormat || DEFAULT_INVOICE_NUMBER_FORMAT,
-    nextInvoiceSequence: company.nextInvoiceSequence || 1
+    nextInvoiceSequence: company.nextInvoiceSequence || 1,
+    defaultCurrency: company.defaultCurrency || DEFAULT_CURRENCY
   };
 }
 

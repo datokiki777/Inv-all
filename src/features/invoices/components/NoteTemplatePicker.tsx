@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Select } from "@/components/ui/Select";
@@ -12,6 +12,8 @@ const TEMPLATE_IDS = [
   "lateReminder",
   "partialPayment"
 ] as const;
+
+const NOTE_LANGUAGES = ["en", "de"] as const;
 
 /**
  * Quick-insert dropdown for common Notes wording (thank-you, payment
@@ -36,11 +38,38 @@ const TEMPLATE_IDS = [
  */
 export function NoteTemplatePicker() {
   const { t, i18n } = useTranslation(["common", "invoice"]);
-  const { control, setValue } = useFormContext<InvoiceFormValues>();
+  const { control, setValue, getValues } = useFormContext<InvoiceFormValues>();
   const [picked, setPicked] = useState("");
 
   const pdfLanguage = useWatch({ control, name: "pdfLanguage" }) || "en";
   const tPdf = i18n.getFixedT(pdfLanguage, "invoice");
+  const previousLanguageRef = useRef(pdfLanguage);
+
+  // If the Notes field currently holds one of OUR OWN templates verbatim
+  // (inserted via this picker, in either language — not something the
+  // person typed themselves), switching the invoice's PDF language
+  // re-translates it in place instead of leaving it in the old language.
+  // A match requires the text to be byte-identical to a known template in
+  // SOME language, so free-typed text (including text a person edited
+  // after inserting a template) is never touched — only an unmodified
+  // template swap is safe to do automatically.
+  useEffect(() => {
+    if (previousLanguageRef.current === pdfLanguage) return;
+    previousLanguageRef.current = pdfLanguage;
+
+    const currentNote = getValues("note");
+    if (!currentNote) return;
+
+    for (const templateId of TEMPLATE_IDS) {
+      for (const lang of NOTE_LANGUAGES) {
+        const textInThatLanguage = i18n.getFixedT(lang, "invoice")(`form.noteTemplates.${templateId}`);
+        if (currentNote === textInThatLanguage) {
+          setValue("note", tPdf(`form.noteTemplates.${templateId}`), { shouldDirty: true });
+          return;
+        }
+      }
+    }
+  }, [pdfLanguage, getValues, setValue, i18n, tPdf]);
 
   return (
     <Select

@@ -25,7 +25,9 @@ export function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<ProductOrService | undefined>();
   const [deletingProduct, setDeletingProduct] = useState<ProductOrService | null>(null);
 
-  const currency = settings?.defaultCurrency ?? "EUR";
+  // Products aren't tied to any one company/currency — this is purely a
+  // display choice for formatting prices on this list, not stored data.
+  const currency = "EUR";
   const locale = localeForLanguage(settings?.interfaceLanguage);
 
   function openCreate() {

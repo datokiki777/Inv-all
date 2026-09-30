@@ -13,6 +13,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { todayDateOnly, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
 import { defaultPdfVisibility } from "@/utils/invoicePdfVisibility";
+import { CURRENCIES } from "@/utils/currencies";
 import { useInvoiceDraftAutosave, loadInvoiceDraft, clearInvoiceDraft, type InvoiceDraftSnapshot } from "@/features/invoices/hooks/useInvoiceDraft";
 import { ClientPicker } from "./ClientPicker";
 import { CompanyPicker } from "./CompanyPicker";
@@ -56,7 +57,7 @@ function toDefaultValues(
   invoice: Invoice | undefined,
   settings: AppSettings,
   suggestedInvoiceNumber: string | undefined,
-  activeCompanyId: string | undefined
+  activeCompany: Company | undefined
 ): InvoiceFormValues {
   if (invoice) return invoiceToFormValues(invoice);
 
@@ -66,7 +67,7 @@ function toDefaultValues(
     createdDate: today,
     serviceDate: "",
     dueDate: "",
-    companyId: activeCompanyId ?? "",
+    companyId: activeCompany?.id ?? "",
     clientId: "",
     items: [blankInvoiceFormItem(19)],
     taxMode: "standard",
@@ -74,7 +75,7 @@ function toDefaultValues(
     taxExplanationText: "",
     discountType: "none",
     discountValue: undefined,
-    currency: settings.defaultCurrency,
+    currency: activeCompany?.defaultCurrency ?? "EUR",
     paidAmount: 0,
     note: settings.lastNoteText ?? "",
     paymentMethod: "bankTransfer",
@@ -107,7 +108,7 @@ export function InvoiceForm({
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
-    defaultValues: toDefaultValues(invoice, settings, suggestedInvoiceNumber, activeCompanyId)
+    defaultValues: toDefaultValues(invoice, settings, suggestedInvoiceNumber, companies.find((c) => c.id === activeCompanyId))
   });
   const {
     register,
@@ -249,7 +250,19 @@ export function InvoiceForm({
         <DiscountEditor />
 
         <FormField label={t("invoice:form.currency")} htmlFor="currency" error={err("currency")}>
-          <Input id="currency" maxLength={3} className="uppercase" {...register("currency")} />
+          <Controller
+            control={control}
+            name="currency"
+            render={({ field }) => (
+              <Select
+                id="currency"
+                invalid={!!errors.currency}
+                value={field.value}
+                onChange={field.onChange}
+                options={CURRENCIES.map((currency) => ({ value: currency.code, label: `${currency.code} — ${currency.name}` }))}
+              />
+            )}
+          />
         </FormField>
 
         <div className="space-y-3 rounded-lg border border-line p-4">

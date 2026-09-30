@@ -8,7 +8,6 @@ export const defaultAppSettings: AppSettings = {
   interfaceLanguage: "en",
   defaultInvoiceTemplateId: "modern",
   defaultInvoiceLanguage: "en",
-  defaultCurrency: "EUR",
   updatedAt: new Date().toISOString()
 };
 

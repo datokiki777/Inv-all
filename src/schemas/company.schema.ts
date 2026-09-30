@@ -25,13 +25,14 @@ export const companySchema = z.object({
   bankDetails: bankDetailsSchema.optional(),
   defaultInvoiceLanguage: z.enum(["de", "en"]),
   // Optional here (not on companyFormSchema below) specifically so that a
-  // backup file exported before per-company invoice numbering existed —
-  // whose companies (and every invoice's frozen company snapshot) predate
-  // these two fields — still validates and can be restored.
+  // backup file exported before per-company invoice numbering/currency
+  // existed — whose companies (and every invoice's frozen company
+  // snapshot) predate these fields — still validates and can be restored.
   // companyService's one-time migration backfills them from the old
   // shared settings the first time such a company is loaded.
   invoiceNumberFormat: z.string().optional(),
   nextInvoiceSequence: z.coerce.number().int().min(1, "sequenceMustBePositive").optional(),
+  defaultCurrency: z.string().length(3, "invalidCurrencyCode").optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -40,9 +41,9 @@ export const companySchema = z.object({
  * Input schema used by the Company form. Excludes id/createdAt/updatedAt,
  * which are assigned by companyService, never typed by the user — and,
  * unlike companySchema above, requires invoiceNumberFormat/
- * nextInvoiceSequence: the form always has real values for both (defaulted
- * in CompanyForm's toDefaultValues), so there's no backward-compat reason
- * to allow them empty here.
+ * nextInvoiceSequence/defaultCurrency: the form always has real values for
+ * all three (defaulted in CompanyForm's toDefaultValues), so there's no
+ * backward-compat reason to allow them empty here.
  */
 export const companyFormSchema = companySchema
   .omit({
@@ -52,7 +53,8 @@ export const companyFormSchema = companySchema
   })
   .extend({
     invoiceNumberFormat: z.string().min(1, "invoiceNumberFormatRequired"),
-    nextInvoiceSequence: z.coerce.number().int().min(1, "sequenceMustBePositive")
+    nextInvoiceSequence: z.coerce.number().int().min(1, "sequenceMustBePositive"),
+    defaultCurrency: z.string().length(3, "invalidCurrencyCode")
   });
 
 export type CompanyFormValues = z.infer<typeof companyFormSchema>;

@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { settingsFormSchema, type AppSettingsFormValues } from "@/schemas";
 import type { AppSettings } from "@/types";
-import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
@@ -19,29 +18,22 @@ interface SettingsFormProps {
 export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
   const { t } = useTranslation(["common", "invoice"]);
   const {
-    register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting }
+    formState: { isSubmitting }
   } = useForm<AppSettingsFormValues>({
     resolver: zodResolver(settingsFormSchema),
     defaultValues: {
       interfaceLanguage: settings.interfaceLanguage,
       defaultInvoiceTemplateId: settings.defaultInvoiceTemplateId,
-      defaultInvoiceLanguage: settings.defaultInvoiceLanguage,
-      defaultCurrency: settings.defaultCurrency
+      defaultInvoiceLanguage: settings.defaultInvoiceLanguage
     }
   });
 
   const interfaceLanguage = watch("interfaceLanguage");
   const defaultInvoiceLanguage = watch("defaultInvoiceLanguage");
   const defaultInvoiceTemplateId = watch("defaultInvoiceTemplateId");
-
-  function err(key: keyof AppSettingsFormValues) {
-    const message = errors[key]?.message;
-    return message ? t(`validation.${message}`) : undefined;
-  }
 
   return (
     <form
@@ -79,10 +71,6 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
             { value: "en", label: t("languages.en") }
           ]}
         />
-      </FormField>
-
-      <FormField label={t("settings.defaultCurrency")} htmlFor="defaultCurrency" error={err("defaultCurrency")} hint={t("settings.defaultCurrencyHint")}>
-        <Input id="defaultCurrency" maxLength={3} className="uppercase" invalid={!!errors.defaultCurrency} {...register("defaultCurrency")} />
       </FormField>
 
       <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>

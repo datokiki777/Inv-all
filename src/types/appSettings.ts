@@ -6,7 +6,6 @@ export interface AppSettings {
   interfaceLanguage: InvoiceLanguage;
   defaultInvoiceTemplateId: InvoiceTemplateId;
   defaultInvoiceLanguage: InvoiceLanguage;
-  defaultCurrency: string;
   /**
    * The most recently used company — new invoices default to this one
    * instead of always falling back to "the first company", so multi-company

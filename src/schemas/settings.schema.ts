@@ -6,7 +6,6 @@ export const appSettingsSchema = z.object({
   interfaceLanguage: z.enum(["de", "en"]),
   defaultInvoiceTemplateId: z.enum(["classic", "modern", "compact", "minimal", "new"]),
   defaultInvoiceLanguage: z.enum(["de", "en"]),
-  defaultCurrency: z.string().length(3, "invalidCurrencyCode"),
   lastUsedCompanyId: z.string().optional(),
   lastCompanyFilterId: z.string().optional(),
   lastInvoicePdfVisibility: pdfVisibilitySchema.optional(),

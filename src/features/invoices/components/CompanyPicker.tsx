@@ -43,12 +43,25 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
     setValue("invoiceNumber", suggested, { shouldDirty: true });
   }
 
+  // Same reasoning as the invoice number: each company can bill in its own
+  // default currency now, so switching companies on a NEW invoice should
+  // switch to that company's currency too — otherwise it would silently
+  // keep whichever company was selected first. An already-saved invoice
+  // being edited never has its currency changed just by looking at it
+  // under a different company.
+  function applyCompanyCurrency(companyId: string) {
+    if (!isNewInvoice) return;
+    const company = companies.find((c) => c.id === companyId);
+    if (company?.defaultCurrency) setValue("currency", company.defaultCurrency, { shouldDirty: true });
+  }
+
   async function handleQuickAdd(values: CompanyFormValues) {
     try {
       const created = await companyService.create(values);
       onCompanyCreated(created);
       setValue("companyId", created.id, { shouldValidate: true, shouldDirty: true });
       await resuggestInvoiceNumber(created.id);
+      applyCompanyCurrency(created.id);
       setAddOpen(false);
       toast.success(t("company.saveSuccess"));
     } catch {
@@ -74,6 +87,7 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
                   onChange={(companyId) => {
                     field.onChange(companyId);
                     resuggestInvoiceNumber(companyId);
+                    applyCompanyCurrency(companyId);
                   }}
                   placeholder={t("invoice:form.selectCompany")}
                   options={companies.map((company) => ({ value: company.id, label: company.name }))}
