@@ -51,7 +51,7 @@ export function InvoiceItemsEditor({ products, client, onClientUpdated }: Invoic
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-ink">{t("invoice:form.items")}</p>
+        <p className="min-w-0 truncate text-sm font-medium text-ink">{t("invoice:form.items")}</p>
       </div>
       {itemsError ? <p className="text-xs text-danger">{itemsError}</p> : null}
 

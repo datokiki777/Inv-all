@@ -99,8 +99,8 @@ export function InvoiceItemRow({ index, products, showVisibilityToggles, onRemov
       </div>
 
       <div>
-        <div className="mb-1 flex items-center justify-between">
-          <p className="text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-[10px] uppercase text-ink-faint">{t("invoice:fields.unit", { ns: "invoice" })}</p>
           {showVisibilityToggles ? <PdfVisibilitySwitch visKey="showItemUnitColumn" /> : null}
         </div>
         <Controller

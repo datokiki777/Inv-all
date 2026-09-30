@@ -19,7 +19,7 @@ export function TaxSettingsEditor() {
   return (
     <div className="space-y-3 rounded-lg border border-line p-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
+        <p className="min-w-0 truncate text-sm font-medium text-ink">{t("invoice:form.taxSettings")}</p>
         {/* Shown for every mode now — the VAT Summary table always renders
             on the PDF (a percentage for Standard/Custom, the tax
             treatment itself for Reverse Charge/Tax-free), so whether to

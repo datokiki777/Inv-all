@@ -14,9 +14,9 @@ export function Switch({ id, checked, onCheckedChange, label, disabled }: Switch
   return (
     <label
       htmlFor={id}
-      className={cn("flex items-center gap-1.5", disabled ? "opacity-40" : "cursor-pointer")}
+      className={cn("flex shrink-0 items-center gap-1.5", disabled ? "opacity-40" : "cursor-pointer")}
     >
-      <span className="text-[11px] text-ink-muted">{label}</span>
+      <span className="whitespace-nowrap text-[11px] text-ink-muted">{label}</span>
       <RadixSwitch.Root
         id={id}
         checked={checked}

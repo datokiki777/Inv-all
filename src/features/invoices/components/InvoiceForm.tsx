@@ -254,7 +254,7 @@ export function InvoiceForm({
 
         <div className="space-y-3 rounded-lg border border-line p-4">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
+            <p className="min-w-0 truncate text-sm font-medium text-ink">{t("invoice:form.paymentDetails")}</p>
             {selectedCompany?.bankDetails ? <PdfVisibilitySwitch visKey="showBankDetails" /> : null}
           </div>
           <FormField label={t("invoice:form.paymentMethod")} htmlFor="paymentMethod">
