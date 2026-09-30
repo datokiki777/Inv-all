@@ -33,7 +33,7 @@ const InvoiceLivePreview = lazy(() =>
   import("./InvoiceLivePreview").then((m) => ({ default: m.InvoiceLivePreview }))
 );
 
-const TEMPLATES = ["classic", "modern", "compact", "minimal"] as const;
+const TEMPLATES = ["classic", "modern", "compact", "minimal", "new"] as const;
 const PAYMENT_METHODS = ["bankTransfer", "cash", "paypal", "other"] as const;
 
 interface InvoiceFormProps {

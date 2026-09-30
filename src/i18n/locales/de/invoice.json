@@ -104,7 +104,8 @@
       "classic": "Classic",
       "modern": "Modern",
       "compact": "Compact",
-      "minimal": "Minimal"
+      "minimal": "Minimal",
+      "new": "Neu"
     },
     "pdfLanguage": "Rechnungssprache",
     "status": "Status",

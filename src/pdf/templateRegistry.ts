@@ -7,6 +7,7 @@ import { ClassicInvoiceTemplate } from "./templates/ClassicInvoiceTemplate";
 import { ModernInvoiceTemplate } from "./templates/ModernInvoiceTemplate";
 import { CompactInvoiceTemplate } from "./templates/CompactInvoiceTemplate";
 import { MinimalInvoiceTemplate } from "./templates/MinimalInvoiceTemplate";
+import { NewInvoiceTemplate } from "./templates/NewInvoiceTemplate";
 
 interface TemplateRegistryEntry {
   meta: InvoiceTemplateMeta;
@@ -50,6 +51,14 @@ export const templateRegistry: Record<InvoiceTemplateId, TemplateRegistryEntry> 
       description: "Light, decoration-free layout for short, simple invoices."
     },
     Component: MinimalInvoiceTemplate
+  },
+  new: {
+    meta: {
+      id: "new",
+      name: "New",
+      description: "Navy banner header with a bold gold total, card-based layout."
+    },
+    Component: NewInvoiceTemplate
   }
 };
 

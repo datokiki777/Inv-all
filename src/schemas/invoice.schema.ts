@@ -83,7 +83,7 @@ export const invoiceSchema = z.object({
   note: z.string().optional(),
   paymentDetails: paymentDetailsSchema,
   status: z.enum(["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"]),
-  templateId: z.enum(["classic", "modern", "compact", "minimal"]),
+  templateId: z.enum(["classic", "modern", "compact", "minimal", "new"]),
   pdfLanguage: z.enum(["de", "en"]),
   pdfVisibility: pdfVisibilitySchema.optional(),
   createdAt: z.string(),
@@ -137,7 +137,7 @@ export const invoiceFormSchema = z.object({
   paymentMethod: z.enum(["bankTransfer", "cash", "paypal", "other"]),
   paymentTermsText: z.string().optional(),
   status: z.enum(["draft", "sent", "paid", "partiallyPaid", "overdue", "cancelled"]),
-  templateId: z.enum(["classic", "modern", "compact", "minimal"]),
+  templateId: z.enum(["classic", "modern", "compact", "minimal", "new"]),
   pdfLanguage: z.enum(["de", "en"]),
   pdfVisibility: pdfVisibilitySchema
 });

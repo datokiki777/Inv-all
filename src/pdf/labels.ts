@@ -58,7 +58,11 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
       kg: "kg",
       unit: "unit",
       flatRate: "flat rate"
-    }
+    },
+    invoiceTitle: "INVOICE",
+    invoiceDetails: "Invoice details",
+    bankDetails: "Bank details",
+    terms: "Terms"
   },
   de: {
     invoiceNumber: "Rechnungsnr.",
@@ -111,7 +115,11 @@ const dictionaries: Record<InvoiceLanguage, InvoicePdfLabels> = {
       kg: "Kilogramm",
       unit: "Einheit",
       flatRate: "Pauschale"
-    }
+    },
+    invoiceTitle: "RECHNUNG",
+    invoiceDetails: "Rechnungsdetails",
+    bankDetails: "Bankverbindung",
+    terms: "Bedingungen"
   }
 };
 

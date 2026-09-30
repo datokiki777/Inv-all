@@ -9,7 +9,7 @@ import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
-const TEMPLATES = ["classic", "modern", "compact", "minimal"] as const;
+const TEMPLATES = ["classic", "modern", "compact", "minimal", "new"] as const;
 
 interface SettingsFormProps {
   settings: AppSettings;

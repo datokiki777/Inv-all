@@ -52,6 +52,11 @@ export interface InvoicePdfLabels {
   vatSummaryVat: string;
   vatSummaryTotal: string;
   units: Record<Unit, string>;
+  /** Used only by the "New" template's banner heading. */
+  invoiceTitle: string;
+  invoiceDetails: string;
+  bankDetails: string;
+  terms: string;
 }
 
 export type InvoicePdfTemplateComponent = (props: InvoicePdfTemplateProps) => JSX.Element;

@@ -1,5 +1,5 @@
 /** IDs of built-in PDF templates. New designs extend this union + the registry — nothing else. */
-export type InvoiceTemplateId = "classic" | "modern" | "compact" | "minimal";
+export type InvoiceTemplateId = "classic" | "modern" | "compact" | "minimal" | "new";
 
 export interface InvoiceTemplateMeta {
   id: InvoiceTemplateId;
