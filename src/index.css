@@ -27,6 +27,25 @@
     background-color: theme("colors.accent.DEFAULT");
     color: theme("colors.accent.contrast");
   }
+
+  /* iOS Safari/WKWebView applies its own native theming
+     (RenderThemeIOS) to input[type="date"] that forces
+     box-sizing: content-box on it specifically, ignoring the
+     border-box every other element on the page gets — so width: 100%
+     only sizes the CONTENT box, and the input's own padding + border
+     get added ON TOP of that, overflowing its container by exactly
+     that amount. This is a confirmed, well-documented iOS-only bug
+     (not present on Android/Chrome, which is why the date fields
+     looked fine there while visibly running off the right edge on
+     iPhone). appearance: none turns off that native theming so our
+     own border-box sizing applies instead; max-width is a hard cap
+     as a second line of defense. */
+  input[type="date"] {
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    max-width: 100%;
+  }
 }
 
 @layer utilities {
