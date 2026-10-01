@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ChevronRight, Building2, DatabaseBackup } from "lucide-react";
+import { ChevronRight, DatabaseBackup } from "lucide-react";
 import i18n from "@/i18n";
 import { useSettingsForm } from "@/features/settings/hooks/useSettingsForm";
 import { SettingsForm } from "@/features/settings/components/SettingsForm";
@@ -37,16 +37,9 @@ export function SettingsPage() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl text-ink">{t("pages.settings")}</h1>
 
+      {/* Company now has its own bottom-nav tab — this page only links to
+          things that don't (Backup & restore), rather than duplicating it here. */}
       <div className="space-y-2">
-        <Link
-          to="/company"
-          className="flex items-center gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3.5 text-sm text-ink"
-        >
-          <Building2 size={18} className="shrink-0 text-ink-faint" />
-          <span className="flex-1">{t("pages.company")}</span>
-          <ChevronRight size={18} className="text-ink-faint" />
-        </Link>
-
         <Link
           to="/settings/backup"
           className="flex items-center gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3.5 text-sm text-ink"

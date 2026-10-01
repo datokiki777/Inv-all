@@ -1,19 +1,23 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, FileText, Users, Settings } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LayoutDashboard, FileText, Users, Building2, Settings } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 const items = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/invoices", label: "Invoices", icon: FileText, end: false },
-  { to: "/clients", label: "Clients", icon: Users, end: false },
-  { to: "/settings", label: "Settings", icon: Settings, end: false }
+  { to: "/", labelKey: "pages.dashboard", icon: LayoutDashboard, end: true },
+  { to: "/invoices", labelKey: "pages.invoices", icon: FileText, end: false },
+  { to: "/clients", labelKey: "pages.clients", icon: Users, end: false },
+  { to: "/settings", labelKey: "pages.settings", icon: Settings, end: false },
+  { to: "/company", labelKey: "pages.company", icon: Building2, end: false }
 ];
 
 /** Bottom tab bar — primary navigation on a mobile-first, one-hand layout. */
 export function MobileNav() {
+  const { t } = useTranslation();
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-md items-stretch border-t border-line bg-surface-nav safe-bottom">
-      {items.map(({ to, label, icon: Icon, end }) => (
+      {items.map(({ to, labelKey, icon: Icon, end }) => (
         <NavLink
           key={to}
           to={to}
@@ -26,7 +30,7 @@ export function MobileNav() {
           }
         >
           <Icon size={22} strokeWidth={1.75} />
-          {label}
+          {t(labelKey)}
         </NavLink>
       ))}
     </nav>
