@@ -52,4 +52,21 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  /* Hides the scrollbar on a horizontally-scrollable element (e.g. the
+     company filter chip row) without disabling scrolling itself — touch/
+     swipe and programmatic scroll both keep working exactly the same.
+     Android WebView/Chrome shows a persistent (not auto-hide-on-idle)
+     thin gray scrollbar on overflow-x: auto content by default, which
+     reads as "always there" rather than a transient scroll hint; hiding
+     it is the standard, cross-browser-reliable fix — there's no CSS-only
+     way to get a true fade-after-scroll indicator consistently across
+     browsers/WebView versions, so "nothing visible" beats "always visible". */
+  .no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* old Edge/IE */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Android WebView */
+  }
 }

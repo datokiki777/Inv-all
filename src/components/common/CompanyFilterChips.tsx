@@ -26,7 +26,7 @@ export function CompanyFilterChips({ companies, value, onChange }: CompanyFilter
   if (companies.length <= 1) return null;
 
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-3">
+    <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-3">
       <button
         type="button"
         onClick={() => onChange("all")}
