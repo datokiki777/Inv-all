@@ -7,8 +7,8 @@ const items = [
   { to: "/", labelKey: "pages.dashboard", icon: LayoutDashboard, end: true },
   { to: "/invoices", labelKey: "pages.invoices", icon: FileText, end: false },
   { to: "/clients", labelKey: "pages.clients", icon: Users, end: false },
-  { to: "/settings", labelKey: "pages.settings", icon: Settings, end: false },
-  { to: "/company", labelKey: "pages.company", icon: Building2, end: false }
+  { to: "/company", labelKey: "pages.company", icon: Building2, end: false },
+  { to: "/settings", labelKey: "pages.settings", icon: Settings, end: false }
 ];
 
 /** Bottom tab bar — primary navigation on a mobile-first, one-hand layout. */
