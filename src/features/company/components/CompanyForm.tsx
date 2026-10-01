@@ -11,6 +11,8 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { LogoUploader } from "./LogoUploader";
 import { CURRENCIES } from "@/utils/currencies";
 
+const TEMPLATES = ["classic", "modern", "compact", "minimal", "new"] as const;
+
 interface CompanyFormProps {
   company?: Company;
   onSubmit: (values: CompanyFormValues) => Promise<void>;
@@ -40,13 +42,14 @@ function toDefaultValues(company: Company | undefined): CompanyFormValues {
     defaultInvoiceLanguage: company?.defaultInvoiceLanguage ?? "en",
     invoiceNumberFormat: company?.invoiceNumberFormat ?? "INV-{YYYY}-{seq:4}",
     nextInvoiceSequence: company?.nextInvoiceSequence ?? 1,
-    defaultCurrency: company?.defaultCurrency ?? "EUR"
+    defaultCurrency: company?.defaultCurrency ?? "EUR",
+    defaultInvoiceTemplateId: company?.defaultInvoiceTemplateId ?? "modern"
   };
 }
 
 /** Add/edit form for one company — rendered inside a Dialog by CompaniesPage, same pattern as ClientForm. */
 export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "invoice"]);
   const {
     register,
     control,
@@ -158,6 +161,21 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
             { value: "de", label: t("languages.de") },
             { value: "en", label: t("languages.en") }
           ]}
+        />
+      </FormField>
+
+      <FormField label={t("company.defaultInvoiceTemplateId")} htmlFor="defaultInvoiceTemplateId">
+        <Controller
+          control={control}
+          name="defaultInvoiceTemplateId"
+          render={({ field }) => (
+            <Select
+              id="defaultInvoiceTemplateId"
+              value={field.value}
+              onChange={field.onChange}
+              options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
+            />
+          )}
         />
       </FormField>
 

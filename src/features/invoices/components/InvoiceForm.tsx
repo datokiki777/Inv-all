@@ -81,8 +81,8 @@ function toDefaultValues(
     paymentMethod: "bankTransfer",
     paymentTermsText: "",
     status: "draft",
-    templateId: settings.defaultInvoiceTemplateId,
-    pdfLanguage: settings.defaultInvoiceLanguage,
+    templateId: activeCompany?.defaultInvoiceTemplateId ?? "modern",
+    pdfLanguage: activeCompany?.defaultInvoiceLanguage ?? "en",
     pdfVisibility: settings.lastInvoicePdfVisibility ?? defaultPdfVisibility
   };
 }

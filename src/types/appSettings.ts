@@ -1,11 +1,8 @@
-import type { InvoiceTemplateId } from "./invoiceTemplate";
 import type { InvoiceLanguage, InvoicePdfVisibility } from "./invoice";
 
 export interface AppSettings {
   id: "app-settings";
   interfaceLanguage: InvoiceLanguage;
-  defaultInvoiceTemplateId: InvoiceTemplateId;
-  defaultInvoiceLanguage: InvoiceLanguage;
   /**
    * The most recently used company — new invoices default to this one
    * instead of always falling back to "the first company", so multi-company

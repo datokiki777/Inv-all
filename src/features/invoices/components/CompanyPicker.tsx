@@ -44,15 +44,18 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
   }
 
   // Same reasoning as the invoice number: each company can bill in its own
-  // default currency now, so switching companies on a NEW invoice should
-  // switch to that company's currency too — otherwise it would silently
-  // keep whichever company was selected first. An already-saved invoice
-  // being edited never has its currency changed just by looking at it
-  // under a different company.
-  function applyCompanyCurrency(companyId: string) {
+  // default currency, PDF design, and PDF language now, so switching
+  // companies on a NEW invoice should switch to all three — otherwise
+  // they'd silently keep whichever company was selected first. An
+  // already-saved invoice being edited never has these changed just by
+  // looking at it under a different company.
+  function applyCompanyDefaults(companyId: string) {
     if (!isNewInvoice) return;
     const company = companies.find((c) => c.id === companyId);
-    if (company?.defaultCurrency) setValue("currency", company.defaultCurrency, { shouldDirty: true });
+    if (!company) return;
+    if (company.defaultCurrency) setValue("currency", company.defaultCurrency, { shouldDirty: true });
+    if (company.defaultInvoiceTemplateId) setValue("templateId", company.defaultInvoiceTemplateId, { shouldDirty: true });
+    if (company.defaultInvoiceLanguage) setValue("pdfLanguage", company.defaultInvoiceLanguage, { shouldDirty: true });
   }
 
   async function handleQuickAdd(values: CompanyFormValues) {
@@ -61,7 +64,7 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
       onCompanyCreated(created);
       setValue("companyId", created.id, { shouldValidate: true, shouldDirty: true });
       await resuggestInvoiceNumber(created.id);
-      applyCompanyCurrency(created.id);
+      applyCompanyDefaults(created.id);
       setAddOpen(false);
       toast.success(t("company.saveSuccess"));
     } catch {
@@ -87,7 +90,7 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
                   onChange={(companyId) => {
                     field.onChange(companyId);
                     resuggestInvoiceNumber(companyId);
-                    applyCompanyCurrency(companyId);
+                    applyCompanyDefaults(companyId);
                   }}
                   placeholder={t("invoice:form.selectCompany")}
                   options={companies.map((company) => ({ value: company.id, label: company.name }))}

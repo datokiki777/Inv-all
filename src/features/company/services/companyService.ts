@@ -6,19 +6,22 @@ import type { CompanyFormValues } from "@/schemas";
 
 const DEFAULT_INVOICE_NUMBER_FORMAT = "INV-{YYYY}-{seq:4}";
 const DEFAULT_CURRENCY = "EUR";
+const DEFAULT_TEMPLATE_ID = "modern";
 
 /**
  * Backward-compat, one-time: companies created before per-company invoice
- * numbering/currency existed don't have invoiceNumberFormat/
- * nextInvoiceSequence/defaultCurrency in storage at all. The very first
- * time such a company is loaded, backfill those fields from the old
- * shared AppSettings values (so an existing user's in-progress sequence —
- * "I'm already at #6" — and their prior default currency carry over
- * exactly, instead of silently resetting) and persist the fix so this
- * only ever runs once per company.
+ * numbering/currency/template existed don't have invoiceNumberFormat/
+ * nextInvoiceSequence/defaultCurrency/defaultInvoiceTemplateId in storage
+ * at all. The very first time such a company is loaded, backfill those
+ * fields from the old shared AppSettings values (so an existing user's
+ * in-progress sequence — "I'm already at #6" — and their prior default
+ * currency/template carry over exactly, instead of silently resetting)
+ * and persist the fix so this only ever runs once per company.
  */
 async function migrateLegacyNumbering(company: Company): Promise<Company> {
-  if (company.invoiceNumberFormat && company.nextInvoiceSequence && company.defaultCurrency) return company;
+  if (company.invoiceNumberFormat && company.nextInvoiceSequence && company.defaultCurrency && company.defaultInvoiceTemplateId) {
+    return company;
+  }
 
   // Old settings records may still physically have these fields even though
   // the current AppSettings type no longer declares them.
@@ -26,6 +29,7 @@ async function migrateLegacyNumbering(company: Company): Promise<Company> {
     invoiceNumberFormat?: string;
     nextInvoiceSequence?: number;
     defaultCurrency?: string;
+    defaultInvoiceTemplateId?: Company["defaultInvoiceTemplateId"];
   };
 
   const migrated: Company = {
@@ -33,6 +37,7 @@ async function migrateLegacyNumbering(company: Company): Promise<Company> {
     invoiceNumberFormat: company.invoiceNumberFormat ?? legacySettings.invoiceNumberFormat ?? DEFAULT_INVOICE_NUMBER_FORMAT,
     nextInvoiceSequence: company.nextInvoiceSequence ?? legacySettings.nextInvoiceSequence ?? 1,
     defaultCurrency: company.defaultCurrency ?? legacySettings.defaultCurrency ?? DEFAULT_CURRENCY,
+    defaultInvoiceTemplateId: company.defaultInvoiceTemplateId ?? legacySettings.defaultInvoiceTemplateId ?? DEFAULT_TEMPLATE_ID,
     updatedAt: nowIso()
   };
   await companyRepository.save(migrated);

@@ -1,4 +1,5 @@
 import type { BankDetails } from "./bankDetails";
+import type { InvoiceTemplateId } from "./invoiceTemplate";
 
 export interface Company {
   id: string;
@@ -15,8 +16,10 @@ export interface Company {
   taxNumber?: string;
   logoDataUrl?: string;
   bankDetails?: BankDetails;
-  /** ISO code, e.g. "de" | "en". Used as the default PDF language for new invoices. */
+  /** ISO code, e.g. "de" | "en". Used as the default PDF language for new invoices issued by this company. */
   defaultInvoiceLanguage: "de" | "en";
+  /** Used as the default PDF design for new invoices issued by this company — each company can have its own look. */
+  defaultInvoiceTemplateId: InvoiceTemplateId;
   /** ISO 4217 code, e.g. "EUR" | "USD" | "GEL". Used as the default currency for new invoices issued by this company — each company can bill in its own currency. */
   defaultCurrency: string;
   /**

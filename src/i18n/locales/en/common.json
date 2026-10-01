@@ -80,6 +80,7 @@
     "bic": "BIC",
     "defaultInvoiceLanguage": "Default invoice language",
     "defaultCurrency": "Default currency",
+    "defaultInvoiceTemplateId": "Default PDF design",
     "loading": "Loading company details…",
     "loadError": "Couldn't load company details",
     "loadErrorHint": "Reload the app and try again.",
@@ -185,8 +186,6 @@
   },
   "settings": {
     "interfaceLanguage": "Interface language",
-    "defaultInvoiceTemplateId": "Default PDF design",
-    "defaultInvoiceLanguage": "Default PDF language",
     "loading": "Loading settings…",
     "loadError": "Couldn't load settings",
     "loadErrorHint": "Reload the app and try again.",

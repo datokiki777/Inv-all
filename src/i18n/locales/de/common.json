@@ -80,6 +80,7 @@
     "bic": "BIC",
     "defaultInvoiceLanguage": "Standard-Rechnungssprache",
     "defaultCurrency": "Standardwährung",
+    "defaultInvoiceTemplateId": "Standard-PDF-Design",
     "loading": "Unternehmensdaten werden geladen…",
     "loadError": "Unternehmensdaten konnten nicht geladen werden",
     "loadErrorHint": "Lade die App neu und versuche es erneut.",
@@ -185,8 +186,6 @@
   },
   "settings": {
     "interfaceLanguage": "Sprache der Oberfläche",
-    "defaultInvoiceTemplateId": "Standard-PDF-Design",
-    "defaultInvoiceLanguage": "Standard-PDF-Sprache",
     "loading": "Einstellungen werden geladen…",
     "loadError": "Einstellungen konnten nicht geladen werden",
     "loadErrorHint": "Lade die App neu und versuche es erneut.",

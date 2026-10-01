@@ -6,8 +6,6 @@ const SETTINGS_ID = "app-settings" as const;
 export const defaultAppSettings: AppSettings = {
   id: SETTINGS_ID,
   interfaceLanguage: "en",
-  defaultInvoiceTemplateId: "modern",
-  defaultInvoiceLanguage: "en",
   updatedAt: new Date().toISOString()
 };
 
