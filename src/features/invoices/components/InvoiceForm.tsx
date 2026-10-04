@@ -1,9 +1,9 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { invoiceFormSchema, type InvoiceFormValues } from "@/schemas";
-import type { AppSettings, Client, Company, Invoice, ProductOrService } from "@/types";
+import type { AppSettings, Client, Company, Invoice, ProductOrService, TaxSettings } from "@/types";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
@@ -48,6 +48,8 @@ interface InvoiceFormProps {
   products: ProductOrService[];
   settings: AppSettings;
   suggestedInvoiceNumber?: string;
+  /** activeCompany's own last-used tax settings (if it has prior invoices) — a new invoice starts from these instead of always Standard 19%. */
+  lastTaxSettings?: TaxSettings;
   onSubmit: (values: InvoiceFormValues) => Promise<void>;
   onClientCreated: (client: Client) => void;
   onCompanyCreated: (company: Company) => void;
@@ -57,11 +59,14 @@ function toDefaultValues(
   invoice: Invoice | undefined,
   settings: AppSettings,
   suggestedInvoiceNumber: string | undefined,
-  activeCompany: Company | undefined
+  activeCompany: Company | undefined,
+  lastTaxSettings: TaxSettings | undefined
 ): InvoiceFormValues {
   if (invoice) return invoiceToFormValues(invoice);
 
   const today = todayDateOnly();
+  const taxMode = lastTaxSettings?.mode ?? "standard";
+  const taxRatePercent = taxMode === "standard" || taxMode === "custom" ? (lastTaxSettings?.ratePercent ?? 19) : undefined;
   return {
     invoiceNumber: suggestedInvoiceNumber ?? "",
     createdDate: today,
@@ -69,10 +74,10 @@ function toDefaultValues(
     dueDate: "",
     companyId: activeCompany?.id ?? "",
     clientId: "",
-    items: [blankInvoiceFormItem(19)],
-    taxMode: "standard",
-    taxRatePercent: 19,
-    taxExplanationText: "",
+    items: [blankInvoiceFormItem(taxRatePercent ?? 19)],
+    taxMode,
+    taxRatePercent,
+    taxExplanationText: lastTaxSettings?.explanationText ?? "",
     discountType: "none",
     discountValue: undefined,
     currency: activeCompany?.defaultCurrency ?? "EUR",
@@ -96,6 +101,7 @@ export function InvoiceForm({
   products,
   settings,
   suggestedInvoiceNumber,
+  lastTaxSettings,
   onSubmit,
   onClientCreated,
   onCompanyCreated
@@ -105,10 +111,33 @@ export function InvoiceForm({
   const [companyList, setCompanyList] = useState(companies);
   const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
   const [activeTab, setActiveTab] = useState<InvoiceFormTab>("edit");
+  // Remembers how far down each tab was scrolled, so switching Edit <->
+  // Preview restores where you were instead of always jumping back to the
+  // top — <main> (in AppLayout) is the app's one actual scroll container,
+  // this component doesn't own it directly, so it's read/written via the
+  // DOM rather than a prop-drilled ref.
+  const scrollPositions = useRef<Record<InvoiceFormTab, number>>({ edit: 0, preview: 0 });
+
+  function handleTabChange(nextTab: InvoiceFormTab) {
+    const mainEl = document.querySelector("main");
+    if (mainEl) scrollPositions.current[activeTab] = mainEl.scrollTop;
+    setActiveTab(nextTab);
+  }
+
+  useEffect(() => {
+    const mainEl = document.querySelector("main");
+    if (mainEl) mainEl.scrollTop = scrollPositions.current[activeTab];
+  }, [activeTab]);
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
-    defaultValues: toDefaultValues(invoice, settings, suggestedInvoiceNumber, companies.find((c) => c.id === activeCompanyId))
+    defaultValues: toDefaultValues(
+      invoice,
+      settings,
+      suggestedInvoiceNumber,
+      companies.find((c) => c.id === activeCompanyId),
+      lastTaxSettings
+    )
   });
   const {
     register,
@@ -164,7 +193,7 @@ export function InvoiceForm({
           header. The pt-[4.75rem] spacer below reserves exactly its height so
           content never starts underneath it. */}
       <div className="fixed inset-x-0 top-0 z-30 mx-auto max-w-md bg-surface px-4 pb-3 pt-4">
-        <InvoiceFormTabs active={activeTab} onChange={setActiveTab} />
+        <InvoiceFormTabs active={activeTab} onChange={handleTabChange} />
       </div>
       <div className="pt-[4.75rem]" />
 

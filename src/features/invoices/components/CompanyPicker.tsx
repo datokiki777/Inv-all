@@ -44,18 +44,29 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
   }
 
   // Same reasoning as the invoice number: each company can bill in its own
-  // default currency, PDF design, and PDF language now, so switching
-  // companies on a NEW invoice should switch to all three — otherwise
-  // they'd silently keep whichever company was selected first. An
-  // already-saved invoice being edited never has these changed just by
-  // looking at it under a different company.
-  function applyCompanyDefaults(companyId: string) {
+  // default currency, PDF design, PDF language, and (now) its own usual
+  // VAT setup, so switching companies on a NEW invoice should switch to
+  // all of them — otherwise they'd silently keep whichever company was
+  // selected first. An already-saved invoice being edited never has these
+  // changed just by looking at it under a different company.
+  async function applyCompanyDefaults(companyId: string) {
     if (!isNewInvoice) return;
     const company = companies.find((c) => c.id === companyId);
     if (!company) return;
     if (company.defaultCurrency) setValue("currency", company.defaultCurrency, { shouldDirty: true });
     if (company.defaultInvoiceTemplateId) setValue("templateId", company.defaultInvoiceTemplateId, { shouldDirty: true });
     if (company.defaultInvoiceLanguage) setValue("pdfLanguage", company.defaultInvoiceLanguage, { shouldDirty: true });
+
+    const lastTaxSettings = await invoiceService.getLastTaxSettingsForCompany(companyId);
+    if (lastTaxSettings) {
+      setValue("taxMode", lastTaxSettings.mode, { shouldDirty: true });
+      setValue(
+        "taxRatePercent",
+        lastTaxSettings.mode === "standard" || lastTaxSettings.mode === "custom" ? lastTaxSettings.ratePercent : undefined,
+        { shouldDirty: true }
+      );
+      setValue("taxExplanationText", lastTaxSettings.explanationText ?? "", { shouldDirty: true });
+    }
   }
 
   async function handleQuickAdd(values: CompanyFormValues) {
@@ -64,7 +75,7 @@ export function CompanyPicker({ companies, isNewInvoice, onCompanyCreated }: Com
       onCompanyCreated(created);
       setValue("companyId", created.id, { shouldValidate: true, shouldDirty: true });
       await resuggestInvoiceNumber(created.id);
-      applyCompanyDefaults(created.id);
+      await applyCompanyDefaults(created.id);
       setAddOpen(false);
       toast.success(t("company.saveSuccess"));
     } catch {

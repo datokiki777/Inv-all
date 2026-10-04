@@ -3,7 +3,7 @@ import { generateId } from "@/utils/id";
 import { nowIso, todayDateOnly, addDays } from "@/utils/date";
 import { generateInvoiceNumber } from "@/utils/invoiceNumber";
 import { buildInvoiceFromForm } from "@/utils/invoiceFormMapping";
-import type { Invoice, Company, Client } from "@/types";
+import type { Invoice, Company, Client, TaxSettings } from "@/types";
 import type { InvoiceFormValues } from "@/schemas";
 
 interface InvoiceContext {
@@ -30,6 +30,24 @@ export const invoiceService = {
 
   async getById(id: string): Promise<Invoice | undefined> {
     return invoiceRepository.getById(id);
+  },
+
+  /**
+   * This company's own most-recently-created invoice's tax settings
+   * (mode + rate + explanation), or undefined if it has no invoices yet.
+   * Used to default a NEW invoice's VAT setup to "whatever this company
+   * usually uses" instead of always resetting to Standard 19% — a
+   * company that's always Reverse Charge, or always on a different rate,
+   * shouldn't need that retyped every time. Sorted by createdAt (the
+   * actual save timestamp), not createdDate (the invoice's own,
+   * user-editable date field, which can be backdated).
+   */
+  async getLastTaxSettingsForCompany(companyId: string): Promise<TaxSettings | undefined> {
+    const invoices = await invoiceRepository.getAll();
+    const companyInvoices = invoices
+      .filter((i) => i.company.id === companyId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return companyInvoices[0]?.taxSettings;
   },
 
   /** Suggested next number for this company, WITHOUT reserving it — used only to prefill the form. */

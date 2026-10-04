@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import type { InvoicePdfTemplateProps } from "../types";
 import { InvoiceItemsTable } from "../components/InvoiceItemsTable";
 import { taxModeLabel } from "../taxModeLabel";
@@ -30,6 +30,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start"
   },
+  bannerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  // White backing behind the logo — on a dark navy banner, a logo with a
+  // transparent background (common) or dark artwork would otherwise be
+  // partly or fully invisible, since we can't know the logo's own color
+  // scheme in advance. A white chip guarantees it reads correctly either way.
+  logoChip: { backgroundColor: "#FFFFFF", borderRadius: 4, padding: 4 },
+  logo: { width: 44, height: 44, objectFit: "contain" },
   companyName: { color: "#FFFFFF", fontSize: 16, letterSpacing: 0.4, marginBottom: 7 },
   companyLine: { color: "#C7D2E6", fontSize: 8.5, marginBottom: 2 },
   invoiceTitle: { color: "#FFFFFF", fontSize: 24, letterSpacing: 3.5 },
@@ -96,18 +103,25 @@ export function NewInvoiceTemplate({ invoice, labels }: InvoicePdfTemplateProps)
     <Document>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.banner} fixed>
-          <View>
-            <Text style={styles.companyName}>{company.name}</Text>
-            <Text style={styles.companyLine}>
-              {company.addressLine1}, {company.postalCode} {company.city}
-            </Text>
-            {visibility.showCompanyPhone && company.phone ? <Text style={styles.companyLine}>{company.phone}</Text> : null}
-            {visibility.showCompanyEmail && company.email ? <Text style={styles.companyLine}>{company.email}</Text> : null}
-            {visibility.showCompanyVatId && company.vatId ? (
-              <Text style={styles.companyLine}>
-                {labels.vatId}: {company.vatId}
-              </Text>
+          <View style={styles.bannerLeft}>
+            {visibility.showCompanyLogo && company.logoDataUrl ? (
+              <View style={styles.logoChip}>
+                <Image src={company.logoDataUrl} style={styles.logo} />
+              </View>
             ) : null}
+            <View>
+              <Text style={styles.companyName}>{company.name}</Text>
+              <Text style={styles.companyLine}>
+                {company.addressLine1}, {company.postalCode} {company.city}
+              </Text>
+              {visibility.showCompanyPhone && company.phone ? <Text style={styles.companyLine}>{company.phone}</Text> : null}
+              {visibility.showCompanyEmail && company.email ? <Text style={styles.companyLine}>{company.email}</Text> : null}
+              {visibility.showCompanyVatId && company.vatId ? (
+                <Text style={styles.companyLine}>
+                  {labels.vatId}: {company.vatId}
+                </Text>
+              ) : null}
+            </View>
           </View>
           <Text style={styles.invoiceTitle}>{labels.invoiceTitle}</Text>
         </View>

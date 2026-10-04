@@ -4,7 +4,7 @@ import { clientService } from "@/features/clients/services/clientService";
 import { productService } from "@/features/products/services/productService";
 import { invoiceService } from "@/features/invoices/services/invoiceService";
 import { settingsRepository } from "@/storage/repositories";
-import type { Company, Client, ProductOrService, Invoice, AppSettings } from "@/types";
+import type { Company, Client, ProductOrService, Invoice, AppSettings, TaxSettings } from "@/types";
 
 type Status = "loading" | "ready" | "error";
 
@@ -20,6 +20,8 @@ interface InvoiceFormData {
   invoice?: Invoice;
   /** Only populated in create mode (non-reserved, prefill only) — suggested against activeCompany. */
   suggestedInvoiceNumber?: string;
+  /** Only populated in create mode — activeCompany's own last-used tax settings, if it has any prior invoices. */
+  lastTaxSettings?: TaxSettings;
   refreshClients: () => Promise<void>;
 }
 
@@ -38,6 +40,7 @@ export function useInvoiceFormData(invoiceId?: string): InvoiceFormData {
   const [settings, setSettings] = useState<AppSettings | undefined>();
   const [invoice, setInvoice] = useState<Invoice | undefined>();
   const [suggestedInvoiceNumber, setSuggestedInvoiceNumber] = useState<string | undefined>();
+  const [lastTaxSettings, setLastTaxSettings] = useState<TaxSettings | undefined>();
 
   async function refreshClients() {
     setClients(await clientService.list());
@@ -78,7 +81,13 @@ export function useInvoiceFormData(invoiceId?: string): InvoiceFormData {
         setInvoice(loadedInvoice);
 
         if (!invoiceId && resolvedActive) {
-          setSuggestedInvoiceNumber(await invoiceService.suggestNextInvoiceNumber(resolvedActive.id));
+          const [suggested, taxSettings] = await Promise.all([
+            invoiceService.suggestNextInvoiceNumber(resolvedActive.id),
+            invoiceService.getLastTaxSettingsForCompany(resolvedActive.id)
+          ]);
+          if (cancelled) return;
+          setSuggestedInvoiceNumber(suggested);
+          setLastTaxSettings(taxSettings);
         }
 
         setStatus("ready");
@@ -93,5 +102,16 @@ export function useInvoiceFormData(invoiceId?: string): InvoiceFormData {
     };
   }, [invoiceId]);
 
-  return { status, companies, activeCompany, clients, products, settings, invoice, suggestedInvoiceNumber, refreshClients };
+  return {
+    status,
+    companies,
+    activeCompany,
+    clients,
+    products,
+    settings,
+    invoice,
+    suggestedInvoiceNumber,
+    lastTaxSettings,
+    refreshClients
+  };
 }
