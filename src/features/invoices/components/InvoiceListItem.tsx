@@ -32,7 +32,19 @@ export function InvoiceListItem({ invoice, showCompany, onDuplicate, onDelete, o
       </div>
       <Link to={`/invoices/${invoice.id}/preview`} className="mt-2 flex items-baseline justify-between">
         <p className="text-xs text-ink-faint">{invoice.createdDate}</p>
-        <p className="font-display text-lg text-ink">{formatMoney(invoice.totalCents, invoice.currency, locale)}</p>
+        <div className="text-right">
+          {/* Net amount (pre-VAT, post-discount) is the headline figure now
+              — the old totalCents-only display conflated the two, which
+              read as "the price" when VAT is actually a separate add-on.
+              VAT itself (when non-zero — Reverse Charge/Tax-free are
+              always 0) is shown as a small secondary line underneath. */}
+          <p className="font-display text-lg text-ink">{formatMoney(invoice.taxableAmountCents, invoice.currency, locale)}</p>
+          {invoice.vatCents > 0 ? (
+            <p className="text-[11px] text-ink-faint">
+              + {t("invoice:fields.vat")}: {formatMoney(invoice.vatCents, invoice.currency, locale)}
+            </p>
+          ) : null}
+        </div>
       </Link>
       <div className="mt-3 flex justify-end gap-1 border-t border-line pt-2.5">
         <Link

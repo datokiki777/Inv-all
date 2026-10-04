@@ -116,8 +116,16 @@ export function DashboardPage() {
                         <Trash2 size={16} />
                       </button>
                     </div>
-                    <Link to={`/invoices/${invoice.id}/preview`} className="mt-1.5 block text-right text-sm text-ink">
-                      {formatMoney(invoice.totalCents, invoice.currency, locale)}
+                    <Link to={`/invoices/${invoice.id}/preview`} className="mt-1.5 block text-right">
+                      {/* Net (pre-VAT) amount as the headline figure, VAT
+                          itself as a small secondary line — see
+                          InvoiceListItem for the same change and why. */}
+                      <p className="text-sm text-ink">{formatMoney(invoice.taxableAmountCents, invoice.currency, locale)}</p>
+                      {invoice.vatCents > 0 ? (
+                        <p className="text-[10px] text-ink-faint">
+                          + {t("invoice:fields.vat")}: {formatMoney(invoice.vatCents, invoice.currency, locale)}
+                        </p>
+                      ) : null}
                     </Link>
                   </div>
                 ))}
