@@ -126,7 +126,18 @@ export function InvoiceForm({
 
   useEffect(() => {
     const mainEl = document.querySelector("main");
-    if (mainEl) mainEl.scrollTop = scrollPositions.current[activeTab];
+    if (!mainEl) return;
+    const targetScrollTop = scrollPositions.current[activeTab];
+    // Deferred to the next animation frame (after the browser's next
+    // paint) rather than set immediately: right when this effect first
+    // runs, the newly-active tab's content may not have its full layout
+    // height yet (a long edit form vs. a lazy-loaded PDF preview differ a
+    // lot), so scrollTop can get silently clamped back toward 0 if
+    // scrollHeight hasn't caught up. By the next frame, layout has settled.
+    const raf = requestAnimationFrame(() => {
+      mainEl.scrollTop = targetScrollTop;
+    });
+    return () => cancelAnimationFrame(raf);
   }, [activeTab]);
 
   const methods = useForm<InvoiceFormValues>({

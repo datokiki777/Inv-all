@@ -54,7 +54,12 @@ export function useDashboardData() {
   // outstanding/overdue totals and the recent-invoices badges without a
   // full page reload, and switching the company filter instantly narrows
   // every number to that company alone.
-  const metrics = useMemo(() => computeDashboardMetrics(filteredInvoices, todayDateOnly()), [filteredInvoices]);
+  // Infinity for recentCount — "Recent invoices" used to cap at 5, but the
+  // list is now its own internally-scrollable box (see DashboardPage), so
+  // there's no longer a reason to hide anything past the first 5; showing
+  // every invoice for the current company/filter is both more useful and
+  // no longer a layout problem.
+  const metrics = useMemo(() => computeDashboardMetrics(filteredInvoices, todayDateOnly(), Infinity), [filteredInvoices]);
 
   const updateStatus = useCallback(async (id: string, newStatus: InvoiceStatus, paidAmountCents?: number) => {
     const updated = await invoiceService.updateStatus(id, newStatus, paidAmountCents);

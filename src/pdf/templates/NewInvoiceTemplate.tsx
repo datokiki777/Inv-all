@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, Svg, Defs, LinearGradient, Stop, Rect, StyleSheet } from "@react-pdf/renderer";
 import type { InvoicePdfTemplateProps } from "../types";
 import { InvoiceItemsTable } from "../components/InvoiceItemsTable";
 import { taxModeLabel } from "../taxModeLabel";
@@ -8,7 +8,9 @@ import { resolvePdfVisibility } from "@/utils/invoicePdfVisibility";
 import { PDF_FONT_FAMILY } from "../fonts";
 
 const NAVY = "#1E3A6E";
+const NAVY_LIGHT = "#5D7FB0"; // right-hand end of the banner's gradient — navy easing toward a lighter blue-white
 const GOLD = "#F2B134";
+const CARD_BG = "#F6F8FB"; // subtle blue-gray tint distinguishing cards from the page's white background
 
 // IMPORTANT: only the regular (400, upright) weight of NotoSansGeorgian is
 // ever registered (see ../fonts.ts) — @react-pdf/renderer can't synthesize
@@ -21,11 +23,16 @@ const GOLD = "#F2B134";
 const styles = StyleSheet.create({
   page: { fontFamily: PDF_FONT_FAMILY, fontSize: 9.5, color: "#242424" },
   content: { paddingHorizontal: 32, paddingBottom: 32 },
+  // The gradient itself is drawn by an absolutely-positioned <Svg> sibling
+  // (bannerGradient below) sized to match this wrapper — react-pdf's
+  // StyleSheet has no CSS linear-gradient equivalent, only solid
+  // backgroundColor, so the gradient has to be an actual SVG shape layered
+  // behind the text content rather than a style property.
+  bannerWrapper: { position: "relative", marginBottom: 22 },
+  bannerGradient: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
   banner: {
-    backgroundColor: NAVY,
     paddingHorizontal: 32,
     paddingVertical: 22,
-    marginBottom: 22,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start"
@@ -35,13 +42,13 @@ const styles = StyleSheet.create({
   // transparent background (common) or dark artwork would otherwise be
   // partly or fully invisible, since we can't know the logo's own color
   // scheme in advance. A white chip guarantees it reads correctly either way.
-  logoChip: { backgroundColor: "#FFFFFF", borderRadius: 4, padding: 4 },
-  logo: { width: 44, height: 44, objectFit: "contain" },
+  logoChip: { backgroundColor: "#FFFFFF", borderRadius: 4, padding: 5 },
+  logo: { width: 62, height: 62, objectFit: "contain" },
   companyName: { color: "#FFFFFF", fontSize: 16, letterSpacing: 0.4, marginBottom: 7 },
   companyLine: { color: "#C7D2E6", fontSize: 8.5, marginBottom: 2 },
   invoiceTitle: { color: "#FFFFFF", fontSize: 24, letterSpacing: 3.5 },
   cardRow: { flexDirection: "row", gap: 12, marginBottom: 18 },
-  card: { flex: 1, borderWidth: 1, borderColor: "#D9E0EC", borderRadius: 4, padding: 13 },
+  card: { flex: 1, backgroundColor: CARD_BG, borderWidth: 1, borderColor: "#D9E0EC", borderRadius: 4, padding: 13 },
   cardTitle: { fontSize: 8, color: NAVY, letterSpacing: 0.6, textTransform: "uppercase", marginBottom: 9 },
   clientName: { fontSize: 12, marginBottom: 3 },
   clientLine: { fontSize: 9, color: "#555", marginBottom: 1 },
@@ -102,28 +109,39 @@ export function NewInvoiceTemplate({ invoice, labels }: InvoicePdfTemplateProps)
   return (
     <Document>
       <Page size="A4" style={styles.page} wrap>
-        <View style={styles.banner} fixed>
-          <View style={styles.bannerLeft}>
-            {visibility.showCompanyLogo && company.logoDataUrl ? (
-              <View style={styles.logoChip}>
-                <Image src={company.logoDataUrl} style={styles.logo} />
-              </View>
-            ) : null}
-            <View>
-              <Text style={styles.companyName}>{company.name}</Text>
-              <Text style={styles.companyLine}>
-                {company.addressLine1}, {company.postalCode} {company.city}
-              </Text>
-              {visibility.showCompanyPhone && company.phone ? <Text style={styles.companyLine}>{company.phone}</Text> : null}
-              {visibility.showCompanyEmail && company.email ? <Text style={styles.companyLine}>{company.email}</Text> : null}
-              {visibility.showCompanyVatId && company.vatId ? (
-                <Text style={styles.companyLine}>
-                  {labels.vatId}: {company.vatId}
-                </Text>
+        <View style={styles.bannerWrapper} fixed>
+          <Svg style={styles.bannerGradient} viewBox="0 0 1 1" preserveAspectRatio="none">
+            <Defs>
+              <LinearGradient id="bannerGradient" x1="0" y1="0" x2="1" y2="0">
+                <Stop offset="0" stopColor={NAVY} />
+                <Stop offset="1" stopColor={NAVY_LIGHT} />
+              </LinearGradient>
+            </Defs>
+            <Rect x={0} y={0} width={1} height={1} fill="url(#bannerGradient)" />
+          </Svg>
+          <View style={styles.banner}>
+            <View style={styles.bannerLeft}>
+              {visibility.showCompanyLogo && company.logoDataUrl ? (
+                <View style={styles.logoChip}>
+                  <Image src={company.logoDataUrl} style={styles.logo} />
+                </View>
               ) : null}
+              <View>
+                <Text style={styles.companyName}>{company.name}</Text>
+                <Text style={styles.companyLine}>
+                  {company.addressLine1}, {company.postalCode} {company.city}
+                </Text>
+                {visibility.showCompanyPhone && company.phone ? <Text style={styles.companyLine}>{company.phone}</Text> : null}
+                {visibility.showCompanyEmail && company.email ? <Text style={styles.companyLine}>{company.email}</Text> : null}
+                {visibility.showCompanyVatId && company.vatId ? (
+                  <Text style={styles.companyLine}>
+                    {labels.vatId}: {company.vatId}
+                  </Text>
+                ) : null}
+              </View>
             </View>
+            <Text style={styles.invoiceTitle}>{labels.invoiceTitle}</Text>
           </View>
-          <Text style={styles.invoiceTitle}>{labels.invoiceTitle}</Text>
         </View>
 
         <View style={styles.content}>

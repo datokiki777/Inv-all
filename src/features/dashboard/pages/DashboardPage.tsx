@@ -91,7 +91,11 @@ export function DashboardPage() {
             {metrics.recentInvoices.length === 0 ? (
               <EmptyState title={t("empty.invoices")} description={t("empty.invoicesHint")} />
             ) : (
-              <div className="space-y-2">
+              // Internally scrollable (not the whole page) now that this
+              // shows every invoice for the current filter instead of
+              // capping at 5 — a fixed max-height keeps the Dashboard
+              // itself compact regardless of how many there are.
+              <div className="max-h-[28rem] space-y-2 overflow-y-auto pr-0.5">
                 {metrics.recentInvoices.map((invoice) => (
                   <div key={invoice.id} className="rounded-lg border border-line bg-surface-raised px-4 py-3">
                     <div className="flex items-center justify-between gap-2">
