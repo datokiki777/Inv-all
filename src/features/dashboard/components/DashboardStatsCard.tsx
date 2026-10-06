@@ -90,7 +90,13 @@ export function DashboardStatsCard({ metrics, locale }: DashboardStatsCardProps)
       {expanded && metrics.paidVatByMonth.length > 0 ? (
         <div className="border-t border-line px-4 py-3">
           <p className="mb-1 text-xs font-medium uppercase text-ink-faint">{t("dashboard.paidVatByMonth")}</p>
-          <div className="divide-y divide-line">
+          {/* Internally scrollable with a fixed cap, not unbounded — a
+              long-running business can accumulate many months of paid
+              invoices here, and without this the card (and the whole
+              Dashboard under it) would just keep stretching taller the
+              more months there are. max-h-64 shows roughly 6 rows before
+              it starts scrolling on its own. */}
+          <div className="max-h-64 divide-y divide-line overflow-y-auto">
             {metrics.paidVatByMonth.map((entry) => (
               <StatRow key={entry.month} label={formatMonthLabel(entry.month, locale)}>
                 <AmountValue amounts={entry.amounts} locale={locale} emptyLabel="—" />
