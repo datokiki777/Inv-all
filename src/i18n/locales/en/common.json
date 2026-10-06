@@ -30,7 +30,8 @@
   },
   "languages": {
     "de": "German",
-    "en": "English"
+    "en": "English",
+    "ka": "Georgian"
   },
   "empty": {
     "invoices": "No invoices yet",

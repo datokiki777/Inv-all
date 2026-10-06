@@ -47,7 +47,8 @@ export function SettingsForm({ settings, onSubmit }: SettingsFormProps) {
           onChange={(v) => setValue("interfaceLanguage", v, { shouldDirty: true })}
           options={[
             { value: "de", label: t("languages.de") },
-            { value: "en", label: t("languages.en") }
+            { value: "en", label: t("languages.en") },
+            { value: "ka", label: t("languages.ka") }
           ]}
         />
       </FormField>

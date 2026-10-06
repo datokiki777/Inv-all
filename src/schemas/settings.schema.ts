@@ -3,7 +3,7 @@ import { pdfVisibilitySchema } from "./invoice.schema";
 
 export const appSettingsSchema = z.object({
   id: z.literal("app-settings"),
-  interfaceLanguage: z.enum(["de", "en"]),
+  interfaceLanguage: z.enum(["de", "en", "ka"]),
   lastUsedCompanyId: z.string().optional(),
   lastCompanyFilterId: z.string().optional(),
   lastInvoicePdfVisibility: pdfVisibilitySchema.optional(),

@@ -1,8 +1,17 @@
-import type { InvoiceLanguage, InvoicePdfVisibility } from "./invoice";
+import type { InvoicePdfVisibility } from "./invoice";
+
+/**
+ * The app's own UI language — deliberately a separate type from
+ * InvoiceLanguage (PDF text), which stays "de" | "en" only. A PDF is a
+ * business document with its own convention; the app's UI is free to
+ * support more languages (Georgian) without that implying anything about
+ * what languages invoices themselves can be written in.
+ */
+export type UiLanguage = "de" | "en" | "ka";
 
 export interface AppSettings {
   id: "app-settings";
-  interfaceLanguage: InvoiceLanguage;
+  interfaceLanguage: UiLanguage;
   /**
    * The most recently used company — new invoices default to this one
    * instead of always falling back to "the first company", so multi-company

@@ -23,6 +23,15 @@ export function useAppSettings() {
   return settings;
 }
 
-export function localeForLanguage(language: "de" | "en" | undefined): string {
-  return language === "de" ? "de-DE" : "en-US";
+/**
+ * Widened to accept "ka" too (not just invoice.pdfLanguage's "de" | "en")
+ * since this is also used for UI-level date/number formatting driven by
+ * interfaceLanguage (e.g. the Dashboard), which now has a third option.
+ * Every existing caller passing "de" | "en" (PDF language) remains valid
+ * — a narrower-typed value fits a wider-typed parameter just fine.
+ */
+export function localeForLanguage(language: "de" | "en" | "ka" | undefined): string {
+  if (language === "de") return "de-DE";
+  if (language === "ka") return "ka-GE";
+  return "en-US";
 }
