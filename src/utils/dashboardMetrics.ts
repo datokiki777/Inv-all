@@ -21,7 +21,7 @@ export interface DashboardMetrics {
   draftCount: number;
   /** Sum of paidAmountCents across every non-cancelled invoice — actual money collected, including partial payments. */
   paid: CurrencyAmount[];
-  /** Sum of totalCents across every non-cancelled invoice — everything ever issued, paid or not. */
+  /** Sum of taxableAmountCents (net, pre-VAT) across every non-cancelled invoice — everything ever issued, paid or not. */
   totalInvoiced: CurrencyAmount[];
   /** Count of every invoice regardless of status. */
   totalCount: number;
@@ -82,7 +82,10 @@ export function computeDashboardMetrics(invoices: Invoice[], todayDateOnly: stri
     overdueCount: overdueInvoices.length,
     draftCount: invoices.filter((i) => i.status === "draft").length,
     paid: groupByCurrency(activeInvoices, (i) => i.paidAmountCents),
-    totalInvoiced: groupByCurrency(activeInvoices, (i) => i.totalCents),
+    // Net (pre-VAT), matching the invoice cards on Dashboard/Invoices list
+    // — VAT is a pass-through, not revenue, so a "how much have I
+    // invoiced" figure reads more naturally as the net amount.
+    totalInvoiced: groupByCurrency(activeInvoices, (i) => i.taxableAmountCents),
     totalCount: invoices.length,
     paidVatByMonth: groupPaidVatByMonth(invoices.filter((i) => i.status === "paid")),
     recentInvoices
