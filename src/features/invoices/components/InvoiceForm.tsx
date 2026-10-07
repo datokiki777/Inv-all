@@ -136,16 +136,52 @@ export function InvoiceForm({
     const mainEl = document.querySelector("main");
     if (!mainEl) return;
     const targetScrollTop = scrollPositions.current[activeTab];
-    // Deferred to the next animation frame (after the browser's next
-    // paint) rather than set immediately: right when this effect first
-    // runs, the newly-active tab's content may not have its full layout
-    // height yet (a long edit form vs. a lazy-loaded PDF preview differ a
-    // lot), so scrollTop can get silently clamped back toward 0 if
-    // scrollHeight hasn't caught up. By the next frame, layout has settled.
-    const raf = requestAnimationFrame(() => {
-      mainEl.scrollTop = targetScrollTop;
-    });
-    return () => cancelAnimationFrame(raf);
+
+    // A single requestAnimationFrame wasn't actually reliable on real
+    // devices (confirmed by testing on an actual phone) — there's no way
+    // to test the real timing from here, since jsdom doesn't run genuine
+    // CSS layout at all, so it can't reproduce or validate this race
+    // condition. Instead of guessing how many frames are "enough", this
+    // polls scrollHeight across frames and only restores scrollTop once
+    // it has stopped changing for a few consecutive frames in a row —
+    // i.e. once layout has demonstrably settled, whatever that actually
+    // takes on this device. A capped retry count (30 frames, ~0.5s)
+    // prevents polling forever if something keeps the height oscillating.
+    let cancelled = false;
+    let rafId = 0;
+    let lastHeight = -1;
+    let stableFrames = 0;
+    let framesChecked = 0;
+
+    function tryRestore() {
+      if (cancelled) return;
+      const currentHeight = mainEl!.scrollHeight;
+      if (currentHeight === lastHeight) {
+        stableFrames++;
+      } else {
+        stableFrames = 0;
+        lastHeight = currentHeight;
+      }
+      framesChecked++;
+
+      if (stableFrames >= 3 || framesChecked >= 30) {
+        mainEl!.scrollTop = targetScrollTop;
+        // Re-apply once more shortly after, as a trailing safety net in
+        // case anything else (focus handling, a late-settling child
+        // component) nudges the scroll position right after this.
+        setTimeout(() => {
+          if (!cancelled) mainEl!.scrollTop = targetScrollTop;
+        }, 100);
+        return;
+      }
+      rafId = requestAnimationFrame(tryRestore);
+    }
+
+    rafId = requestAnimationFrame(tryRestore);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+    };
   }, [activeTab]);
 
   const methods = useForm<InvoiceFormValues>({
