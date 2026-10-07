@@ -36,7 +36,7 @@ export function CompanyPdfSummary({ company }: CompanyPdfSummaryProps) {
   return (
     <div className="rounded-lg border border-line p-3.5">
       <p className="mb-2 text-xs font-medium uppercase text-ink-faint">{t("invoice:form.pdfVisibilityCompany")}</p>
-      <div className="max-h-64 space-y-2.5 overflow-y-auto pr-1">
+      <div className="max-h-40 space-y-2.5 overflow-y-auto pr-1">
         {hasLogo ? (
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">

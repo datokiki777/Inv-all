@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { invoiceFormSchema, type InvoiceFormValues } from "@/schemas";
+import { cn } from "@/utils/cn";
 import type { AppSettings, Client, Company, Invoice, ProductOrService, TaxSettings } from "@/types";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -113,129 +114,28 @@ export function InvoiceForm({
   const [activeTab, setActiveTab] = useState<InvoiceFormTab>("edit");
   // Preview is lazy-mounted on its FIRST visit only (so a session that
   // never opens it never pays for generating/rendering the PDF at all),
-  // but once shown, it then stays mounted for the rest of the session —
-  // see the real root cause explained below.
+  // but once shown, it then stays mounted for the rest of the session.
   const [previewEverShown, setPreviewEverShown] = useState(false);
   useEffect(() => {
     if (activeTab === "preview") setPreviewEverShown(true);
   }, [activeTab]);
-  // Remembers how far down each tab was scrolled, so switching Edit <->
-  // Preview restores where you were instead of always jumping back to the
-  // top — <main> (in AppLayout) is normally the app's scroll container,
-  // this component doesn't own it directly, so it's read/written via the
-  // DOM rather than a prop-drilled ref.
-  //
-  // Every fix tried here so far (single rAF, poll-for-stable-height,
-  // ResizeObserver) assumed <main> itself is genuinely the element the
-  // browser scrolls, and all of them kept failing on a real device —
-  // including the ResizeObserver one, which should have been robust
-  // against any layout-timing race, since it reacts to the browser's own
-  // verified resize signal rather than guessing. That it STILL failed
-  // points at a different explanation entirely: <main> may simply not be
-  // the actual scrolling element on this device/browser in the first
-  // place, in which case no amount of correctly-timed scrollTop writes to
-  // <main> would ever produce a visible effect, because the real scroll
-  // position lives somewhere else (document.scrollingElement — the
-  // standards-defined "whatever element the document actually scrolls
-  // through", normally <html>, or document.body on older engines).
-  // getScrollTargets() below returns every plausible candidate so the
-  // capture/restore logic applies to all of them at once; whichever one
-  // turns out to be real on this device is covered.
-  function getScrollTargets(): Element[] {
-    const targets = new Set<Element>();
-    const mainEl = document.querySelector("main");
-    if (mainEl) targets.add(mainEl);
-    if (document.scrollingElement) targets.add(document.scrollingElement);
-    if (document.documentElement) targets.add(document.documentElement);
-    if (document.body) targets.add(document.body);
-    return Array.from(targets);
-  }
 
-  const scrollPositions = useRef<Record<InvoiceFormTab, number>>({ edit: 0, preview: 0 });
-
+  // Three increasingly careful attempts at sharing ONE scroll position
+  // between Edit and Preview (a single requestAnimationFrame, then
+  // polling for a stable scrollHeight, then a ResizeObserver covering
+  // every plausible scroll root — main/documentElement/body/
+  // scrollingElement) all still failed on a real device. That last one
+  // should have been robust against any timing or target-identification
+  // problem, which means the premise itself — moving one shared scroll
+  // position between two different pieces of content — was the fragile
+  // part, not the mechanism used to do it. Each tab now has its own
+  // permanent, independently-scrolling box instead (see the fixed-
+  // position wrappers below), so there is nothing left to capture or
+  // restore: neither box is ever unmounted, so the browser's own,
+  // completely ordinary per-element scroll memory just handles it.
   function handleTabChange(nextTab: InvoiceFormTab) {
-    // Whichever target actually has a non-zero scrollTop is the real one
-    // on this device — record that. If more than one happens to be
-    // non-zero, the largest wins (the real container's scrollTop is
-    // never smaller than a merely-along-for-the-ride element's).
-    const captured = Math.max(0, ...getScrollTargets().map((el) => el.scrollTop));
-    scrollPositions.current[activeTab] = captured;
     setActiveTab(nextTab);
   }
-
-  useEffect(() => {
-    const targets = getScrollTargets();
-    if (targets.length === 0) return;
-    const targetScrollTop = scrollPositions.current[activeTab];
-
-    function applyToAll() {
-      for (const el of targets) el.scrollTop = targetScrollTop;
-    }
-
-    // Two earlier approaches here (a single requestAnimationFrame, then
-    // polling scrollHeight across frames with a guessed "3 stable frames"
-    // threshold) both still failed on a real device — there's no way to
-    // validate real CSS layout timing from this environment, since jsdom
-    // doesn't run genuine layout at all, so neither could actually be
-    // tested against the real race condition they were meant to fix.
-    // ResizeObserver sidesteps the whole "how many frames is enough"
-    // guessing game: it's the browser's own, verified signal for "this
-    // element's size has actually changed," firing exactly when layout
-    // has genuinely settled — not a fixed number of frames later. Every
-    // time it fires, scrollTop is re-applied; by definition the LAST
-    // firing corresponds to the truly final size, so the final
-    // application is always correct regardless of how many resize events
-    // it took to get there. Disconnects after a grace window once
-    // resizing is expected to be done.
-    let settled = false;
-    const observer = new ResizeObserver(() => {
-      if (!settled) applyToAll();
-    });
-    for (const el of targets) observer.observe(el);
-    // Apply once immediately too, in case this tab's content is already
-    // exactly its final size (no resize event will fire at all then).
-    applyToAll();
-
-    // ResizeObserver only catches size-driven scroll clamping. If
-    // something else entirely nudges the scroll during this same window
-    // — a focused input's native scroll-into-view being the likeliest
-    // culprit on mobile — this corrects it straight back for as long as
-    // we're still in the settling period, independent of whether a
-    // resize happened at all.
-    function correctDrift() {
-      if (settled) return;
-      for (const el of targets) if (el.scrollTop !== targetScrollTop) el.scrollTop = targetScrollTop;
-    }
-    for (const el of targets) el.addEventListener("scroll", correctDrift);
-    window.addEventListener("scroll", correctDrift);
-
-    // The person's own touch/scroll input must always win immediately —
-    // without this, correctDrift would otherwise fight a deliberate
-    // manual scroll for the rest of the settling window.
-    function stopCorrecting() {
-      settled = true;
-    }
-    for (const el of targets) {
-      el.addEventListener("touchstart", stopCorrecting, { passive: true });
-      el.addEventListener("wheel", stopCorrecting, { passive: true });
-    }
-
-    const settleTimer = setTimeout(() => {
-      settled = true;
-    }, 700);
-
-    return () => {
-      settled = true;
-      observer.disconnect();
-      for (const el of targets) {
-        el.removeEventListener("scroll", correctDrift);
-        el.removeEventListener("touchstart", stopCorrecting);
-        el.removeEventListener("wheel", stopCorrecting);
-      }
-      window.removeEventListener("scroll", correctDrift);
-      clearTimeout(settleTimer);
-    };
-  }, [activeTab]);
 
   const methods = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -303,24 +203,33 @@ export function InvoiceForm({
       <div className="fixed inset-x-0 top-0 z-30 mx-auto max-w-md bg-surface px-4 pb-3 pt-4">
         <InvoiceFormTabs active={activeTab} onChange={handleTabChange} />
       </div>
-      <div className="pt-[4.75rem]" />
 
-      {/* Both tabs are always mounted now, toggled via `hidden` rather
-          than the previous `activeTab === "edit" ? (...) : (...)`
-          ternary, which fully UNMOUNTED and REBUILT this entire form's
-          DOM on every single switch. That remount was the actual root
-          cause of the scroll-position bug surviving an earlier fix
-          (requestAnimationFrame deferral): on a long form, a freshly
-          remounted subtree — Radix dropdowns running their own
-          ResizeObserver/positioning effects, web font metrics settling,
-          etc. — can take MORE than one animation frame to reach its true
-          final height, so restoring scrollTop too early still got
-          silently clamped back toward 0 by the browser. With the DOM
-          simply hidden/shown instead of destroyed/recreated, there's no
-          remount, no incomplete layout to race against, and the existing
-          scrollTop restore logic above now has stable content to work
-          with on the very first frame. */}
-      <div className={activeTab === "edit" ? "" : "hidden"}>
+      {/* Each tab now owns its own independent, self-contained scroll
+          region (position: fixed, its own overflow-y-auto) instead of
+          both sharing <main>'s scroll and relying on JS to capture/
+          restore a single shared scrollTop across the switch. Three
+          increasingly careful attempts at that shared-scroll approach —
+          a single requestAnimationFrame, then polling for a stable
+          scrollHeight, then a ResizeObserver reacting to the browser's
+          own verified resize signal, even covering every plausible
+          alternate scroll root (documentElement/body/scrollingElement)
+          — all still failed on a real device. That ResizeObserver
+          version in particular should have been robust against any
+          timing or target-identification problem, so its failure
+          pointed at the premise itself being wrong: trying to move ONE
+          shared scroll position between two different pieces of content
+          is inherently fragile. Giving each tab its own permanent,
+          independently-scrolling box sidesteps the whole problem — since
+          neither box is ever unmounted (still just hidden/shown via
+          `hidden`), the browser's own, completely ordinary per-element
+          scroll memory does this for free, with no custom restore logic
+          of any kind needed. */}
+      <div
+        className={cn(
+          "fixed inset-x-0 bottom-0 top-[4.75rem] z-20 mx-auto max-w-md overflow-y-auto px-4 pb-24",
+          activeTab === "edit" ? "" : "hidden"
+        )}
+      >
         <>
           {draftFound ? (
             <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent/10 p-3.5 text-sm">
@@ -495,7 +404,12 @@ export function InvoiceForm({
         </>
       </div>
       {previewEverShown ? (
-        <div className={activeTab === "preview" ? "" : "hidden"}>
+        <div
+          className={cn(
+            "fixed inset-x-0 bottom-0 top-[4.75rem] z-20 mx-auto max-w-md overflow-y-auto px-4 pb-24",
+            activeTab === "preview" ? "" : "hidden"
+          )}
+        >
           <Suspense fallback={<LoadingSpinner />}>
             {selectedCompany ? <InvoiceLivePreview company={selectedCompany} client={selectedClient} /> : null}
           </Suspense>
