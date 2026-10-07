@@ -111,6 +111,14 @@ export function InvoiceForm({
   const [companyList, setCompanyList] = useState(companies);
   const [draftFound, setDraftFound] = useState<InvoiceDraftSnapshot | null>(null);
   const [activeTab, setActiveTab] = useState<InvoiceFormTab>("edit");
+  // Preview is lazy-mounted on its FIRST visit only (so a session that
+  // never opens it never pays for generating/rendering the PDF at all),
+  // but once shown, it then stays mounted for the rest of the session —
+  // see the real root cause explained below.
+  const [previewEverShown, setPreviewEverShown] = useState(false);
+  useEffect(() => {
+    if (activeTab === "preview") setPreviewEverShown(true);
+  }, [activeTab]);
   // Remembers how far down each tab was scrolled, so switching Edit <->
   // Preview restores where you were instead of always jumping back to the
   // top — <main> (in AppLayout) is the app's one actual scroll container,
@@ -208,7 +216,22 @@ export function InvoiceForm({
       </div>
       <div className="pt-[4.75rem]" />
 
-      {activeTab === "edit" ? (
+      {/* Both tabs are always mounted now, toggled via `hidden` rather
+          than the previous `activeTab === "edit" ? (...) : (...)`
+          ternary, which fully UNMOUNTED and REBUILT this entire form's
+          DOM on every single switch. That remount was the actual root
+          cause of the scroll-position bug surviving an earlier fix
+          (requestAnimationFrame deferral): on a long form, a freshly
+          remounted subtree — Radix dropdowns running their own
+          ResizeObserver/positioning effects, web font metrics settling,
+          etc. — can take MORE than one animation frame to reach its true
+          final height, so restoring scrollTop too early still got
+          silently clamped back toward 0 by the browser. With the DOM
+          simply hidden/shown instead of destroyed/recreated, there's no
+          remount, no incomplete layout to race against, and the existing
+          scrollTop restore logic above now has stable content to work
+          with on the very first frame. */}
+      <div className={activeTab === "edit" ? "" : "hidden"}>
         <>
           {draftFound ? (
             <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent/10 p-3.5 text-sm">
@@ -381,11 +404,14 @@ export function InvoiceForm({
         </Button>
           </form>
         </>
-      ) : (
-        <Suspense fallback={<LoadingSpinner />}>
-          {selectedCompany ? <InvoiceLivePreview company={selectedCompany} client={selectedClient} /> : null}
-        </Suspense>
-      )}
+      </div>
+      {previewEverShown ? (
+        <div className={activeTab === "preview" ? "" : "hidden"}>
+          <Suspense fallback={<LoadingSpinner />}>
+            {selectedCompany ? <InvoiceLivePreview company={selectedCompany} client={selectedClient} /> : null}
+          </Suspense>
+        </div>
+      ) : null}
     </FormProvider>
   );
 }
