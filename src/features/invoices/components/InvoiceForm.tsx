@@ -137,50 +137,61 @@ export function InvoiceForm({
     if (!mainEl) return;
     const targetScrollTop = scrollPositions.current[activeTab];
 
-    // A single requestAnimationFrame wasn't actually reliable on real
-    // devices (confirmed by testing on an actual phone) — there's no way
-    // to test the real timing from here, since jsdom doesn't run genuine
-    // CSS layout at all, so it can't reproduce or validate this race
-    // condition. Instead of guessing how many frames are "enough", this
-    // polls scrollHeight across frames and only restores scrollTop once
-    // it has stopped changing for a few consecutive frames in a row —
-    // i.e. once layout has demonstrably settled, whatever that actually
-    // takes on this device. A capped retry count (30 frames, ~0.5s)
-    // prevents polling forever if something keeps the height oscillating.
-    let cancelled = false;
-    let rafId = 0;
-    let lastHeight = -1;
-    let stableFrames = 0;
-    let framesChecked = 0;
+    // Two earlier approaches here (a single requestAnimationFrame, then
+    // polling scrollHeight across frames with a guessed "3 stable frames"
+    // threshold) both still failed on a real device — there's no way to
+    // validate real CSS layout timing from this environment, since jsdom
+    // doesn't run genuine layout at all, so neither could actually be
+    // tested against the real race condition they were meant to fix.
+    // ResizeObserver sidesteps the whole "how many frames is enough"
+    // guessing game: it's the browser's own, verified signal for "this
+    // element's size has actually changed," firing exactly when layout
+    // has genuinely settled — not a fixed number of frames later. Every
+    // time it fires, scrollTop is re-applied; by definition the LAST
+    // firing corresponds to the truly final size, so the final
+    // application is always correct regardless of how many resize events
+    // it took to get there. Disconnects after a grace window once
+    // resizing is expected to be done.
+    let settled = false;
+    const observer = new ResizeObserver(() => {
+      if (!settled) mainEl!.scrollTop = targetScrollTop;
+    });
+    observer.observe(mainEl);
+    // Apply once immediately too, in case this tab's content is already
+    // exactly its final size (no resize event will fire at all then).
+    mainEl.scrollTop = targetScrollTop;
 
-    function tryRestore() {
-      if (cancelled) return;
-      const currentHeight = mainEl!.scrollHeight;
-      if (currentHeight === lastHeight) {
-        stableFrames++;
-      } else {
-        stableFrames = 0;
-        lastHeight = currentHeight;
-      }
-      framesChecked++;
-
-      if (stableFrames >= 3 || framesChecked >= 30) {
-        mainEl!.scrollTop = targetScrollTop;
-        // Re-apply once more shortly after, as a trailing safety net in
-        // case anything else (focus handling, a late-settling child
-        // component) nudges the scroll position right after this.
-        setTimeout(() => {
-          if (!cancelled) mainEl!.scrollTop = targetScrollTop;
-        }, 100);
-        return;
-      }
-      rafId = requestAnimationFrame(tryRestore);
+    // ResizeObserver only catches size-driven scroll clamping. If
+    // something else entirely nudges the scroll during this same window
+    // — a focused input's native scroll-into-view being the likeliest
+    // culprit on mobile — this corrects it straight back for as long as
+    // we're still in the settling period, independent of whether a
+    // resize happened at all.
+    function correctDrift() {
+      if (!settled && mainEl!.scrollTop !== targetScrollTop) mainEl!.scrollTop = targetScrollTop;
     }
+    mainEl.addEventListener("scroll", correctDrift);
 
-    rafId = requestAnimationFrame(tryRestore);
+    // The person's own touch/scroll input must always win immediately —
+    // without this, correctDrift would otherwise fight a deliberate
+    // manual scroll for the rest of the settling window.
+    function stopCorrecting() {
+      settled = true;
+    }
+    mainEl.addEventListener("touchstart", stopCorrecting, { passive: true });
+    mainEl.addEventListener("wheel", stopCorrecting, { passive: true });
+
+    const settleTimer = setTimeout(() => {
+      settled = true;
+    }, 700);
+
     return () => {
-      cancelled = true;
-      cancelAnimationFrame(rafId);
+      settled = true;
+      observer.disconnect();
+      mainEl.removeEventListener("scroll", correctDrift);
+      mainEl.removeEventListener("touchstart", stopCorrecting);
+      mainEl.removeEventListener("wheel", stopCorrecting);
+      clearTimeout(settleTimer);
     };
   }, [activeTab]);
 
