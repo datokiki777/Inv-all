@@ -58,7 +58,19 @@ export function PWAUpdatePrompt() {
   if (!needRefresh) return null;
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-50 flex items-center justify-between gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3 shadow-lg safe-bottom">
+    // bottom-4 (1rem) used to sit almost entirely behind/under MobileNav's
+    // own ~60-90px fixed bar (plus its own safe-area inset) — the banner
+    // was technically in front by z-index, but positioned so low it
+    // rendered squeezed against or overlapping the nav icons, easy to
+    // never notice at all. This was very likely why updates seemed to
+    // "never arrive": the prompt WAS showing, just not visibly/tappably.
+    // calc() clears the nav bar's height plus its own safe-area inset,
+    // rather than guessing a single fixed value that might not fit every
+    // device.
+    <div
+      className="fixed inset-x-4 z-50 flex items-center justify-between gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3 shadow-lg"
+      style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}
+    >
       <p className="text-sm text-ink">A new version is ready.</p>
       <div className="flex gap-2">
         <Button variant="ghost" size="sm" onClick={() => setNeedRefresh(false)}>
