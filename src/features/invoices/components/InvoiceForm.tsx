@@ -121,21 +121,56 @@ export function InvoiceForm({
   }, [activeTab]);
   // Remembers how far down each tab was scrolled, so switching Edit <->
   // Preview restores where you were instead of always jumping back to the
-  // top — <main> (in AppLayout) is the app's one actual scroll container,
+  // top — <main> (in AppLayout) is normally the app's scroll container,
   // this component doesn't own it directly, so it's read/written via the
   // DOM rather than a prop-drilled ref.
+  //
+  // Every fix tried here so far (single rAF, poll-for-stable-height,
+  // ResizeObserver) assumed <main> itself is genuinely the element the
+  // browser scrolls, and all of them kept failing on a real device —
+  // including the ResizeObserver one, which should have been robust
+  // against any layout-timing race, since it reacts to the browser's own
+  // verified resize signal rather than guessing. That it STILL failed
+  // points at a different explanation entirely: <main> may simply not be
+  // the actual scrolling element on this device/browser in the first
+  // place, in which case no amount of correctly-timed scrollTop writes to
+  // <main> would ever produce a visible effect, because the real scroll
+  // position lives somewhere else (document.scrollingElement — the
+  // standards-defined "whatever element the document actually scrolls
+  // through", normally <html>, or document.body on older engines).
+  // getScrollTargets() below returns every plausible candidate so the
+  // capture/restore logic applies to all of them at once; whichever one
+  // turns out to be real on this device is covered.
+  function getScrollTargets(): Element[] {
+    const targets = new Set<Element>();
+    const mainEl = document.querySelector("main");
+    if (mainEl) targets.add(mainEl);
+    if (document.scrollingElement) targets.add(document.scrollingElement);
+    if (document.documentElement) targets.add(document.documentElement);
+    if (document.body) targets.add(document.body);
+    return Array.from(targets);
+  }
+
   const scrollPositions = useRef<Record<InvoiceFormTab, number>>({ edit: 0, preview: 0 });
 
   function handleTabChange(nextTab: InvoiceFormTab) {
-    const mainEl = document.querySelector("main");
-    if (mainEl) scrollPositions.current[activeTab] = mainEl.scrollTop;
+    // Whichever target actually has a non-zero scrollTop is the real one
+    // on this device — record that. If more than one happens to be
+    // non-zero, the largest wins (the real container's scrollTop is
+    // never smaller than a merely-along-for-the-ride element's).
+    const captured = Math.max(0, ...getScrollTargets().map((el) => el.scrollTop));
+    scrollPositions.current[activeTab] = captured;
     setActiveTab(nextTab);
   }
 
   useEffect(() => {
-    const mainEl = document.querySelector("main");
-    if (!mainEl) return;
+    const targets = getScrollTargets();
+    if (targets.length === 0) return;
     const targetScrollTop = scrollPositions.current[activeTab];
+
+    function applyToAll() {
+      for (const el of targets) el.scrollTop = targetScrollTop;
+    }
 
     // Two earlier approaches here (a single requestAnimationFrame, then
     // polling scrollHeight across frames with a guessed "3 stable frames"
@@ -154,12 +189,12 @@ export function InvoiceForm({
     // resizing is expected to be done.
     let settled = false;
     const observer = new ResizeObserver(() => {
-      if (!settled) mainEl!.scrollTop = targetScrollTop;
+      if (!settled) applyToAll();
     });
-    observer.observe(mainEl);
+    for (const el of targets) observer.observe(el);
     // Apply once immediately too, in case this tab's content is already
     // exactly its final size (no resize event will fire at all then).
-    mainEl.scrollTop = targetScrollTop;
+    applyToAll();
 
     // ResizeObserver only catches size-driven scroll clamping. If
     // something else entirely nudges the scroll during this same window
@@ -168,9 +203,11 @@ export function InvoiceForm({
     // we're still in the settling period, independent of whether a
     // resize happened at all.
     function correctDrift() {
-      if (!settled && mainEl!.scrollTop !== targetScrollTop) mainEl!.scrollTop = targetScrollTop;
+      if (settled) return;
+      for (const el of targets) if (el.scrollTop !== targetScrollTop) el.scrollTop = targetScrollTop;
     }
-    mainEl.addEventListener("scroll", correctDrift);
+    for (const el of targets) el.addEventListener("scroll", correctDrift);
+    window.addEventListener("scroll", correctDrift);
 
     // The person's own touch/scroll input must always win immediately —
     // without this, correctDrift would otherwise fight a deliberate
@@ -178,8 +215,10 @@ export function InvoiceForm({
     function stopCorrecting() {
       settled = true;
     }
-    mainEl.addEventListener("touchstart", stopCorrecting, { passive: true });
-    mainEl.addEventListener("wheel", stopCorrecting, { passive: true });
+    for (const el of targets) {
+      el.addEventListener("touchstart", stopCorrecting, { passive: true });
+      el.addEventListener("wheel", stopCorrecting, { passive: true });
+    }
 
     const settleTimer = setTimeout(() => {
       settled = true;
@@ -188,9 +227,12 @@ export function InvoiceForm({
     return () => {
       settled = true;
       observer.disconnect();
-      mainEl.removeEventListener("scroll", correctDrift);
-      mainEl.removeEventListener("touchstart", stopCorrecting);
-      mainEl.removeEventListener("wheel", stopCorrecting);
+      for (const el of targets) {
+        el.removeEventListener("scroll", correctDrift);
+        el.removeEventListener("touchstart", stopCorrecting);
+        el.removeEventListener("wheel", stopCorrecting);
+      }
+      window.removeEventListener("scroll", correctDrift);
       clearTimeout(settleTimer);
     };
   }, [activeTab]);
