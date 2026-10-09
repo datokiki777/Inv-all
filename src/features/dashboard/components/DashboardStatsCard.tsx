@@ -111,12 +111,17 @@ export function DashboardStatsCard({ metrics, locale }: DashboardStatsCardProps)
               <AmountValue amounts={nonZero(metrics.totalInvoiced)} locale={locale} emptyLabel="—" />
             </StatRow>
           ) : null}
-          <StatRow label={t("dashboard.totalCount")}>{metrics.totalCount}</StatRow>
-          <StatRow label={t("dashboard.draftCountLabel")}>{metrics.draftCount}</StatRow>
+          {/* Same zero-hiding rule extended to the two count rows — a
+              freshly-created company with no invoices at all yet has
+              nothing meaningful to say with "Total invoices: 0" or
+              "Drafts: 0" either; once there's at least one invoice,
+              these become genuinely informative again. */}
+          {metrics.totalCount > 0 ? <StatRow label={t("dashboard.totalCount")}>{metrics.totalCount}</StatRow> : null}
+          {metrics.draftCount > 0 ? <StatRow label={t("dashboard.draftCountLabel")}>{metrics.draftCount}</StatRow> : null}
         </div>
       ) : null}
 
-      {expanded && metrics.paidVatByMonth.length > 0 ? (
+      {expanded && metrics.paidVatByMonth.some((entry) => nonZero(entry.amounts).length > 0) ? (
         <div className="border-t border-line px-4 py-3">
           <div className="mb-1 flex items-baseline justify-between gap-3">
             <p className="text-xs font-medium uppercase text-ink-faint">{t("dashboard.paidVatByMonth")}</p>
@@ -134,11 +139,16 @@ export function DashboardStatsCard({ metrics, locale }: DashboardStatsCardProps)
               more months there are. max-h-40 keeps this section itself
               compact, showing roughly 3 rows before it scrolls on its own. */}
           <div className="max-h-40 divide-y divide-line overflow-y-auto">
-            {metrics.paidVatByMonth.map((entry) => (
-              <StatRow key={entry.month} label={formatMonthLabel(entry.month, locale)}>
-                <AmountValue amounts={entry.amounts} locale={locale} emptyLabel="—" />
-              </StatRow>
-            ))}
+            {/* A month with nothing collected (€0.00) is dropped entirely
+                rather than shown as a zero row, same rule as everywhere
+                else in this card. */}
+            {metrics.paidVatByMonth
+              .filter((entry) => nonZero(entry.amounts).length > 0)
+              .map((entry) => (
+                <StatRow key={entry.month} label={formatMonthLabel(entry.month, locale)}>
+                  <AmountValue amounts={nonZero(entry.amounts)} locale={locale} emptyLabel="—" />
+                </StatRow>
+              ))}
           </div>
         </div>
       ) : null}
