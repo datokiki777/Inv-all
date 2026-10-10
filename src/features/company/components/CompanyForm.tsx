@@ -13,6 +13,15 @@ import { CURRENCIES } from "@/utils/currencies";
 
 const TEMPLATES = ["classic", "modern", "compact", "minimal", "new"] as const;
 
+// The two default invoiceNumberFormat templates, one per invoice language
+// — "INV" for English, "RE" (Rechnung) for German, matching each
+// language's own convention. Used below so switching defaultInvoiceLanguage
+// can also switch the suggested number format to match, but ONLY when the
+// field still holds one of these two defaults verbatim: if it's been
+// customized to anything else, that custom choice is left alone.
+const DEFAULT_FORMAT_EN = "INV-{YYYY}-{seq:4}";
+const DEFAULT_FORMAT_DE = "RE-{YYYY}-{seq:4}";
+
 interface CompanyFormProps {
   company?: Company;
   onSubmit: (values: CompanyFormValues) => Promise<void>;
@@ -40,7 +49,7 @@ function toDefaultValues(company: Company | undefined): CompanyFormValues {
       bic: company?.bankDetails?.bic ?? ""
     },
     defaultInvoiceLanguage: company?.defaultInvoiceLanguage ?? "en",
-    invoiceNumberFormat: company?.invoiceNumberFormat ?? "INV-{YYYY}-{seq:4}",
+    invoiceNumberFormat: company?.invoiceNumberFormat ?? (company?.defaultInvoiceLanguage === "de" ? DEFAULT_FORMAT_DE : DEFAULT_FORMAT_EN),
     nextInvoiceSequence: company?.nextInvoiceSequence ?? 1,
     defaultCurrency: company?.defaultCurrency ?? "EUR",
     defaultInvoiceTemplateId: company?.defaultInvoiceTemplateId ?? "modern"
@@ -56,6 +65,7 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors, isSubmitting }
   } = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
@@ -156,7 +166,19 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
       <FormField label={t("company.defaultInvoiceLanguage")} htmlFor="defaultInvoiceLanguage">
         <SegmentedControl
           value={invoiceLanguage}
-          onChange={(v) => setValue("defaultInvoiceLanguage", v, { shouldDirty: true })}
+          onChange={(v) => {
+            setValue("defaultInvoiceLanguage", v, { shouldDirty: true });
+            // Switch the suggested number format to match the new
+            // language's own convention too — but only while it's still
+            // exactly one of the two known defaults; a format the person
+            // has already customized to their own scheme is left
+            // untouched, since switching languages isn't a reason to
+            // discard that.
+            const currentFormat = getValues("invoiceNumberFormat");
+            if (currentFormat === DEFAULT_FORMAT_EN || currentFormat === DEFAULT_FORMAT_DE) {
+              setValue("invoiceNumberFormat", v === "de" ? DEFAULT_FORMAT_DE : DEFAULT_FORMAT_EN, { shouldDirty: true });
+            }
+          }}
           options={[
             { value: "de", label: t("languages.de") },
             { value: "en", label: t("languages.en") }
