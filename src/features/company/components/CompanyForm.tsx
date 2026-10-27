@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -8,10 +9,12 @@ import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { LogoUploader } from "./LogoUploader";
 import { CURRENCIES } from "@/utils/currencies";
 
 const TEMPLATES = ["classic", "modern", "compact", "minimal", "new"] as const;
+type TemplateId = (typeof TEMPLATES)[number];
 
 // The two default invoiceNumberFormat templates, one per invoice language
 // — "INV" for English, "RE" (Rechnung) for German, matching each
@@ -74,6 +77,19 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
 
   const logoDataUrl = watch("logoDataUrl");
   const invoiceLanguage = watch("defaultInvoiceLanguage");
+
+  // Changing the PDF design is protected by a confirmation step — but
+  // only when editing an EXISTING company (there's a prior, deliberate
+  // choice worth protecting against an accidental tap); picking one while
+  // first creating a company needs no confirmation, since nothing has
+  // been chosen yet. The key to Cancel genuinely working here: the new
+  // value is held in this separate, local piece of state and is NEVER
+  // written into the form (field.onChange is never called) until the
+  // person actually confirms. So "Cancel" has nothing to undo — it just
+  // discards this pending value, and the Select's displayed value (still
+  // reading straight from the form field) was never touched in the first
+  // place.
+  const [pendingTemplateId, setPendingTemplateId] = useState<TemplateId | null>(null);
 
   function fieldError(
     key:
@@ -194,12 +210,55 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
             <Select
               id="defaultInvoiceTemplateId"
               value={field.value}
-              onChange={field.onChange}
+              onChange={(v) => {
+                if (company) {
+                  // Editing an existing company — hold the pick as
+                  // "pending" and ask for confirmation instead of
+                  // applying it immediately.
+                  setPendingTemplateId(v as TemplateId);
+                } else {
+                  field.onChange(v);
+                }
+              }}
               options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
             />
           )}
         />
       </FormField>
+
+      <Controller
+        control={control}
+        name="defaultInvoiceTemplateId"
+        render={({ field }) => (
+          <Dialog open={pendingTemplateId !== null} onOpenChange={(open) => !open && setPendingTemplateId(null)}>
+            {pendingTemplateId ? (
+              <DialogContent title={t("company.confirmTemplateChangeTitle")}>
+                <p className="text-sm text-ink-muted">
+                  {t("company.confirmTemplateChangeBody", {
+                    from: t(`invoice:form.templates.${field.value}`),
+                    to: t(`invoice:form.templates.${pendingTemplateId}`)
+                  })}
+                </p>
+                <div className="mt-5 flex gap-3">
+                  <Button type="button" variant="secondary" className="flex-1" onClick={() => setPendingTemplateId(null)}>
+                    {t("actions.cancel")}
+                  </Button>
+                  <Button
+                    type="button"
+                    className="flex-1"
+                    onClick={() => {
+                      field.onChange(pendingTemplateId);
+                      setPendingTemplateId(null);
+                    }}
+                  >
+                    {t("actions.confirm")}
+                  </Button>
+                </div>
+              </DialogContent>
+            ) : null}
+          </Dialog>
+        )}
+      />
 
       <FormField label={t("company.defaultCurrency")} htmlFor="defaultCurrency" error={fieldError("defaultCurrency")}>
         <Controller

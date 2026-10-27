@@ -25,6 +25,7 @@
     "saving": "Wird gespeichert…",
     "cancel": "Abbrechen",
     "duplicate": "Duplizieren",
+    "confirm": "Bestätigen",
     "download": "PDF herunterladen",
     "share": "PDF teilen",
     "shareError": "PDF konnte nicht geteilt werden. Versuche es erneut oder nutze stattdessen Herunterladen.",
@@ -101,7 +102,9 @@
     "deleteError": "Firma konnte nicht gelöscht werden. Versuche es erneut.",
     "editTitle": "Firma bearbeiten",
     "addTitle": "Firma hinzufügen",
-    "cannotDeleteLast": "Du brauchst mindestens eine Firma — füge eine weitere hinzu, bevor du diese löschst."
+    "cannotDeleteLast": "Du brauchst mindestens eine Firma — füge eine weitere hinzu, bevor du diese löschst.",
+    "confirmTemplateChangeTitle": "PDF-Design ändern?",
+    "confirmTemplateChangeBody": "Das Standard-PDF-Design dieser Firma von „{{from}}“ auf „{{to}}“ ändern? Dies betrifft nur künftige Rechnungen — bereits erstellte Rechnungen behalten ihr eigenes Design."
   },
   "clients": {
     "type": "Kundentyp",

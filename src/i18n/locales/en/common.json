@@ -25,6 +25,7 @@
     "saving": "Saving…",
     "cancel": "Cancel",
     "duplicate": "Duplicate",
+    "confirm": "Confirm",
     "download": "Download PDF",
     "share": "Share PDF",
     "shareError": "Couldn't share this PDF. Try again, or use Download instead.",
@@ -101,7 +102,9 @@
     "deleteError": "Couldn't delete company. Try again.",
     "editTitle": "Edit company",
     "addTitle": "Add company",
-    "cannotDeleteLast": "You need at least one company — add another before deleting this one."
+    "cannotDeleteLast": "You need at least one company — add another before deleting this one.",
+    "confirmTemplateChangeTitle": "Change PDF design?",
+    "confirmTemplateChangeBody": "Switch this company's default PDF design from \"{{from}}\" to \"{{to}}\"? This only affects new invoices going forward — invoices already created keep their own design."
   },
   "clients": {
     "type": "Client type",
