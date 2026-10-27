@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Trash2, Share2, FileDown } from "lucide-react";
+import { Trash2, Share2, FileDown, X } from "lucide-react";
 import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
 import { DashboardStatsCard } from "@/features/dashboard/components/DashboardStatsCard";
 import { useAppSettings, localeForLanguage } from "@/features/settings/hooks/useAppSettings";
@@ -39,6 +39,13 @@ export function DashboardPage() {
 
   function refreshRecentExports() {
     recentExportService.listRecent().then(setRecentExports);
+  }
+
+  function handleRemoveRecentExport(invoiceId: string) {
+    // Only removes this shortcut-list entry — the invoice itself is
+    // completely untouched, same as dismissing a "recently viewed" item
+    // anywhere else.
+    recentExportService.removeForInvoice(invoiceId).then(refreshRecentExports);
   }
 
   useEffect(() => {
@@ -205,8 +212,24 @@ export function DashboardPage() {
                   <Link
                     key={invoice.id}
                     to={`/invoices/${invoice.id}/preview`}
-                    className="flex w-40 shrink-0 flex-col gap-1 rounded-lg border border-line bg-surface-raised px-3 py-2.5"
+                    className="relative flex w-40 shrink-0 flex-col gap-1 rounded-lg border border-line bg-surface-raised py-2.5 pl-3 pr-7"
                   >
+                    {/* Removes just this shortcut entry, not the invoice
+                        itself — stopPropagation/preventDefault so tapping
+                        it doesn't also trigger the card's own Link
+                        navigation underneath it. */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveRecentExport(invoice.id);
+                      }}
+                      className="absolute right-1 top-1 rounded p-1 text-ink-faint hover:text-danger"
+                      aria-label={t("actions.delete")}
+                    >
+                      <X size={13} />
+                    </button>
                     <div className="flex items-center gap-1.5 text-ink-faint">
                       <FileDown size={13} />
                       <span className="truncate text-xs">{new Date(exportedAt).toLocaleDateString(locale)}</span>
