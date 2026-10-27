@@ -26,6 +26,8 @@
     "cancel": "Abbrechen",
     "duplicate": "Duplizieren",
     "download": "PDF herunterladen",
+    "share": "PDF teilen",
+    "shareError": "PDF konnte nicht geteilt werden. Versuche es erneut oder nutze stattdessen Herunterladen.",
     "preview": "Vorschau"
   },
   "languages": {
@@ -54,7 +56,8 @@
     "totalInvoiced": "Gesamt fakturiert",
     "totalCount": "Rechnungen gesamt",
     "draftCountLabel": "Entwürfe",
-    "paidVatByMonth": "Erhaltene MwSt. pro Monat (bezahlte Rechnungen)"
+    "paidVatByMonth": "Erhaltene MwSt. pro Monat (bezahlte Rechnungen)",
+    "recentlyExported": "Zuletzt exportiert"
   },
   "company": {
     "logo": "Logo",

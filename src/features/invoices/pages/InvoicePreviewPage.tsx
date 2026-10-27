@@ -1,33 +1,38 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, Link } from "react-router-dom";
-import { pdf } from "@react-pdf/renderer";
-import { Download, Pencil } from "lucide-react";
+import { Download, Share2, Pencil } from "lucide-react";
 import { invoiceService } from "@/features/invoices/services/invoiceService";
-import { getTemplate } from "@/pdf/templateRegistry";
-import { getPdfLabels } from "@/pdf/labels";
+import { recentExportService } from "@/features/invoices/services/recentExportService";
+import { generateInvoicePdfBlob, invoicePdfFileName } from "@/pdf/generateInvoicePdf";
 import { PdfCanvasPreview } from "@/pdf/PdfCanvasPreview";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/toast";
 import { downloadBlob } from "@/utils/downloadFile";
+import { canShareFiles, shareFile } from "@/utils/shareFile";
 import type { Invoice } from "@/types";
 
 type Status = "loading" | "ready" | "error" | "notFound";
 
 /**
- * Preview and download both come from one generated PDF blob, built with
- * getTemplate(invoice.templateId).Component — the exact same template
- * component used everywhere else. There is no separate HTML preview markup
- * that could visually drift from the actual PDF file.
+ * Preview, download, and share all come from one generated PDF blob, built
+ * with getTemplate(invoice.templateId).Component via generateInvoicePdfBlob
+ * — the exact same template component used everywhere else. There is no
+ * separate HTML preview markup that could visually drift from the actual
+ * PDF file, and nothing shared/downloaded is ever a different file from
+ * what's on screen.
  */
 export function InvoicePreviewPage() {
   const { t } = useTranslation(["common", "invoice"]);
+  const toast = useToast();
   const { invoiceId } = useParams();
   const [status, setStatus] = useState<Status>("loading");
   const [invoice, setInvoice] = useState<Invoice | undefined>();
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [pdfBlobError, setPdfBlobError] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,19 +52,15 @@ export function InvoicePreviewPage() {
   }, [invoiceId]);
 
   // Generate the actual PDF bytes once the invoice is loaded (or changes) —
-  // both the on-screen preview and the download button read from this
-  // same blob, so they can never show different content.
+  // the on-screen preview, download, and share buttons all read from this
+  // same blob, so they can never show/send different content.
   useEffect(() => {
     if (!invoice) return;
     let cancelled = false;
     setPdfBlob(null);
     setPdfBlobError(false);
 
-    const { Component: Template } = getTemplate(invoice.templateId);
-    const labels = getPdfLabels(invoice.pdfLanguage);
-
-    pdf(<Template invoice={invoice} labels={labels} />)
-      .toBlob()
+    generateInvoicePdfBlob(invoice)
       .then((blob) => {
         if (!cancelled) setPdfBlob(blob);
       })
@@ -76,7 +77,29 @@ export function InvoicePreviewPage() {
   if (status === "error") return <EmptyState title={t("invoice:preview.loadError")} />;
   if (status === "notFound" || !invoice) return <EmptyState title={t("invoice:form.notFound")} />;
 
-  const fileName = `${invoice.invoiceNumber.replace(/[^a-zA-Z0-9-_]/g, "_")}.pdf`;
+  const fileName = invoicePdfFileName(invoice);
+
+  function handleDownload() {
+    if (!pdfBlob || !invoice) return;
+    downloadBlob(fileName, pdfBlob);
+    recentExportService.recordExport(invoice.id);
+  }
+
+  async function handleShare() {
+    if (!pdfBlob || !invoice) return;
+    setSharing(true);
+    try {
+      const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+      const shared = await shareFile(file, invoice.invoiceNumber);
+      if (shared) recentExportService.recordExport(invoice.id);
+    } catch {
+      toast.error(t("actions.shareError"));
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  const shareSupported = !!pdfBlob && canShareFiles(new File([pdfBlob], fileName, { type: "application/pdf" }));
 
   return (
     <div className="flex h-[calc(100vh-8.5rem)] flex-col gap-3">
@@ -88,7 +111,12 @@ export function InvoicePreviewPage() {
               <Pencil size={15} /> {t("actions.edit")}
             </Button>
           </Link>
-          <Button size="sm" disabled={!pdfBlob} onClick={() => pdfBlob && downloadBlob(fileName, pdfBlob)}>
+          {shareSupported ? (
+            <Button variant="secondary" size="sm" disabled={sharing} onClick={handleShare}>
+              <Share2 size={15} /> {t("actions.share")}
+            </Button>
+          ) : null}
+          <Button size="sm" disabled={!pdfBlob} onClick={handleDownload}>
             <Download size={15} /> {pdfBlob ? t("actions.download") : t("invoice:preview.preparing")}
           </Button>
         </div>

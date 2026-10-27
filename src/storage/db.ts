@@ -7,7 +7,7 @@ import type { Company, Client, Invoice, ProductOrService, AppSettings } from "@/
  * migration block below — existing data is never dropped on upgrade.
  */
 export const DB_NAME = "invoice-app-db";
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 
 export const STORE = {
   companies: "companies",
@@ -15,7 +15,8 @@ export const STORE = {
   invoices: "invoices",
   products: "products",
   settings: "settings",
-  invoiceDrafts: "invoiceDrafts"
+  invoiceDrafts: "invoiceDrafts",
+  recentExports: "recentExports"
 } as const;
 
 /** A saved-but-not-submitted Invoice form, keyed by "new" (create page) or the invoice id (edit page). */
@@ -24,6 +25,20 @@ export interface InvoiceDraftRecord {
   /** Serialized InvoiceFormValues — stored as unknown here to avoid a schemas -> storage dependency. */
   values: unknown;
   savedAt: string;
+}
+
+/**
+ * Tracks when an invoice's PDF was last downloaded or shared — for the
+ * Dashboard's "Recently exported" shortcut list. Keyed by invoiceId
+ * itself (not a generated id), so re-exporting the same invoice just
+ * bumps its existing record's timestamp rather than piling up duplicate
+ * entries. No PDF bytes are stored here at all — just this pointer +
+ * timestamp; the PDF itself is always regenerated fresh from the
+ * invoice's current data when opened, so it's never stale.
+ */
+export interface RecentExportRecord {
+  invoiceId: string;
+  exportedAt: string;
 }
 
 interface InvoiceAppDB extends DBSchema {
@@ -40,6 +55,7 @@ interface InvoiceAppDB extends DBSchema {
   products: { key: string; value: ProductOrService; indexes: { "by-name": string } };
   settings: { key: string; value: AppSettings };
   invoiceDrafts: { key: string; value: InvoiceDraftRecord };
+  recentExports: { key: string; value: RecentExportRecord; indexes: { "by-exportedAt": string } };
 }
 
 let dbPromise: Promise<IDBPDatabase<InvoiceAppDB>> | null = null;
@@ -70,8 +86,15 @@ export function getDb(): Promise<IDBPDatabase<InvoiceAppDB>> {
           db.createObjectStore(STORE.invoiceDrafts, { keyPath: "key" });
         }
 
+        if (oldVersion < 3) {
+          // See RecentExportRecord — keyed by invoiceId itself so an
+          // export just upserts in place.
+          const recentExports = db.createObjectStore(STORE.recentExports, { keyPath: "invoiceId" });
+          recentExports.createIndex("by-exportedAt", "exportedAt");
+        }
+
         // Next migration goes here, e.g.:
-        // if (oldVersion < 3) { ... add a new index / store without touching existing data ... }
+        // if (oldVersion < 4) { ... add a new index / store without touching existing data ... }
       }
     });
   }

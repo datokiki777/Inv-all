@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, Share2, FileDown } from "lucide-react";
 import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
 import { DashboardStatsCard } from "@/features/dashboard/components/DashboardStatsCard";
 import { useAppSettings, localeForLanguage } from "@/features/settings/hooks/useAppSettings";
@@ -14,7 +14,14 @@ import { DeleteInvoiceDialog } from "@/features/invoices/components/DeleteInvoic
 import { useToast } from "@/components/ui/toast";
 import { formatMoney } from "@/utils/money";
 import { getClientDisplayName } from "@/utils/clientDisplayName";
+import { recentExportService, type RecentExportEntry } from "@/features/invoices/services/recentExportService";
+import { canShareFiles, shareFile } from "@/utils/shareFile";
 import type { Invoice, InvoiceStatus } from "@/types";
+
+// Feature-detected once, generically — file-sharing support is a
+// browser/device capability, not something that varies per invoice, so
+// there's no need to re-check it for every card.
+const SHARE_SUPPORTED = canShareFiles(new File([], "test.pdf", { type: "application/pdf" }));
 
 export function DashboardPage() {
   const { t } = useTranslation(["common", "invoice"]);
@@ -24,6 +31,43 @@ export function DashboardPage() {
   const locale = localeForLanguage(settings?.interfaceLanguage);
   const [partialPaymentInvoice, setPartialPaymentInvoice] = useState<Invoice | null>(null);
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
+  const [recentExports, setRecentExports] = useState<RecentExportEntry[]>([]);
+  // Which invoice's PDF is currently being generated for a share tap —
+  // only one at a time in practice, but tracked by id so the loading
+  // state lands on the right card if several were somehow tapped in a row.
+  const [sharingInvoiceId, setSharingInvoiceId] = useState<string | null>(null);
+
+  function refreshRecentExports() {
+    recentExportService.listRecent().then(setRecentExports);
+  }
+
+  useEffect(() => {
+    refreshRecentExports();
+  }, []);
+
+  async function handleShare(invoice: Invoice) {
+    setSharingInvoiceId(invoice.id);
+    try {
+      // Dynamically imported rather than a static top-level import —
+      // generateInvoicePdfFile pulls in @react-pdf/renderer and every
+      // registered template, which is a large dependency. Dashboard is
+      // part of the main bundle (not route-split like the Preview page
+      // already is), so a static import here would force that whole PDF
+      // stack to load on every app start, not just when someone actually
+      // taps Share. This way it's only fetched the first time it's needed.
+      const { generateInvoicePdfFile } = await import("@/pdf/generateInvoicePdf");
+      const file = await generateInvoicePdfFile(invoice);
+      const shared = await shareFile(file, invoice.invoiceNumber);
+      if (shared) {
+        await recentExportService.recordExport(invoice.id);
+        refreshRecentExports();
+      }
+    } catch {
+      toast.error(t("actions.shareError"));
+    } finally {
+      setSharingInvoiceId(null);
+    }
+  }
 
   async function handleStatusChange(invoice: Invoice, newStatus: InvoiceStatus) {
     // "Partially paid" needs a payment amount we don't have yet — the
@@ -57,6 +101,7 @@ export function DashboardPage() {
     try {
       await remove(deletingInvoice.id);
       toast.success(t("invoice:list.deleteSuccess"));
+      refreshRecentExports();
     } catch {
       toast.error(t("invoice:list.deleteError"));
     } finally {
@@ -107,6 +152,17 @@ export function DashboardPage() {
                         ) : null}
                       </Link>
                       <StatusPicker status={invoice.status} onChange={(newStatus) => handleStatusChange(invoice, newStatus)} />
+                      {SHARE_SUPPORTED ? (
+                        <button
+                          type="button"
+                          onClick={() => handleShare(invoice)}
+                          disabled={sharingInvoiceId === invoice.id}
+                          className="shrink-0 rounded p-1.5 text-ink-faint hover:text-ink disabled:opacity-50"
+                          aria-label={t("actions.share")}
+                        >
+                          <Share2 size={16} />
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         onClick={() => setDeletingInvoice(invoice)}
@@ -132,6 +188,33 @@ export function DashboardPage() {
               </div>
             )}
           </div>
+
+          {recentExports.length > 0 ? (
+            <div>
+              <p className="mb-2 text-sm font-medium text-ink">{t("dashboard.recentlyExported")}</p>
+              {/* Compact horizontal shortcut row, not another full card
+                  list — this is secondary, "where did I just send that"
+                  convenience, not primary content. Tapping goes straight
+                  to Preview, which regenerates the PDF fresh every time,
+                  so it's never a stale copy of what was actually exported. */}
+              <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+                {recentExports.map(({ invoice, exportedAt }) => (
+                  <Link
+                    key={invoice.id}
+                    to={`/invoices/${invoice.id}/preview`}
+                    className="flex w-40 shrink-0 flex-col gap-1 rounded-lg border border-line bg-surface-raised px-3 py-2.5"
+                  >
+                    <div className="flex items-center gap-1.5 text-ink-faint">
+                      <FileDown size={13} />
+                      <span className="truncate text-xs">{new Date(exportedAt).toLocaleDateString(locale)}</span>
+                    </div>
+                    <p className="truncate text-sm font-medium text-ink">{invoice.invoiceNumber}</p>
+                    <p className="truncate text-xs text-ink-muted">{getClientDisplayName(invoice.client)}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </>
       ) : null}
 

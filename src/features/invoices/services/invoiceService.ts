@@ -1,4 +1,5 @@
 import { invoiceRepository, settingsRepository, companyRepository } from "@/storage/repositories";
+import { recentExportService } from "./recentExportService";
 import { generateId } from "@/utils/id";
 import { nowIso, todayDateOnly, addDays } from "@/utils/date";
 import { generateInvoiceNumber } from "@/utils/invoiceNumber";
@@ -83,6 +84,9 @@ export const invoiceService = {
 
   async remove(id: string): Promise<void> {
     await invoiceRepository.remove(id);
+    // So a deleted invoice doesn't linger as an orphaned entry in the
+    // Dashboard's "Recently exported" list.
+    await recentExportService.removeForInvoice(id);
   },
 
   /**

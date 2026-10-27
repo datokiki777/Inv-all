@@ -4,3 +4,4 @@ export * from "./productRepository";
 export * from "./invoiceRepository";
 export * from "./settingsRepository";
 export * from "./invoiceDraftRepository";
+export * from "./recentExportRepository";

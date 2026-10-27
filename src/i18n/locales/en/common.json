@@ -26,6 +26,8 @@
     "cancel": "Cancel",
     "duplicate": "Duplicate",
     "download": "Download PDF",
+    "share": "Share PDF",
+    "shareError": "Couldn't share this PDF. Try again, or use Download instead.",
     "preview": "Preview"
   },
   "languages": {
@@ -54,7 +56,8 @@
     "totalInvoiced": "Total invoiced",
     "totalCount": "Total invoices",
     "draftCountLabel": "Drafts",
-    "paidVatByMonth": "VAT collected by month (paid invoices)"
+    "paidVatByMonth": "VAT collected by month (paid invoices)",
+    "recentlyExported": "Recently exported"
   },
   "company": {
     "logo": "Logo",
