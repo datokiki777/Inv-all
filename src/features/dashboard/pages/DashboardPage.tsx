@@ -139,8 +139,11 @@ export function DashboardPage() {
               // Internally scrollable (not the whole page) now that this
               // shows every invoice for the current filter instead of
               // capping at 5 — a fixed max-height keeps the Dashboard
-              // itself compact regardless of how many there are.
-              <div className="max-h-[28rem] space-y-2 overflow-y-auto pr-0.5">
+              // itself compact regardless of how many there are. Sized to
+              // show roughly 3 cards before scrolling, so the "Recently
+              // exported" section below isn't pushed almost entirely
+              // off-screen by a tall, barely-constrained list.
+              <div className="max-h-[25rem] space-y-2 overflow-y-auto pr-0.5">
                 {metrics.recentInvoices.map((invoice) => (
                   <div key={invoice.id} className="rounded-lg border border-line bg-surface-raised px-4 py-3">
                     <div className="flex items-center justify-between gap-2">

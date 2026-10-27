@@ -103,20 +103,24 @@ export function InvoicePreviewPage() {
 
   return (
     <div className="flex h-[calc(100vh-8.5rem)] flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-xl text-ink">{invoice.invoiceNumber}</h1>
+      {/* Title on its own line, then an equal-width button row underneath
+          — squeezing the title and three buttons onto one shared row
+          left too little room for either, wrapping both the invoice
+          number AND the button labels onto multiple cramped lines. */}
+      <div className="flex flex-col gap-3">
+        <h1 className="truncate font-display text-xl text-ink">{invoice.invoiceNumber}</h1>
         <div className="flex gap-2">
-          <Link to={`/invoices/${invoice.id}/edit`}>
-            <Button variant="secondary" size="sm">
+          <Link to={`/invoices/${invoice.id}/edit`} className="flex-1">
+            <Button variant="secondary" size="sm" className="w-full">
               <Pencil size={15} /> {t("actions.edit")}
             </Button>
           </Link>
           {shareSupported ? (
-            <Button variant="secondary" size="sm" disabled={sharing} onClick={handleShare}>
+            <Button variant="secondary" size="sm" className="flex-1" disabled={sharing} onClick={handleShare}>
               <Share2 size={15} /> {t("actions.share")}
             </Button>
           ) : null}
-          <Button size="sm" disabled={!pdfBlob} onClick={handleDownload}>
+          <Button size="sm" className="flex-1" disabled={!pdfBlob} onClick={handleDownload}>
             <Download size={15} /> {pdfBlob ? t("actions.download") : t("invoice:preview.preparing")}
           </Button>
         </div>

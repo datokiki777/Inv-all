@@ -26,8 +26,8 @@
     "cancel": "Cancel",
     "duplicate": "Duplicate",
     "confirm": "Confirm",
-    "download": "Download PDF",
-    "share": "Share PDF",
+    "download": "Download",
+    "share": "Share",
     "shareError": "Couldn't share this PDF. Try again, or use Download instead.",
     "preview": "Preview"
   },

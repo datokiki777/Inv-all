@@ -26,8 +26,8 @@
     "cancel": "Abbrechen",
     "duplicate": "Duplizieren",
     "confirm": "Bestätigen",
-    "download": "PDF herunterladen",
-    "share": "PDF teilen",
+    "download": "Herunterladen",
+    "share": "Teilen",
     "shareError": "PDF konnte nicht geteilt werden. Versuche es erneut oder nutze stattdessen Herunterladen.",
     "preview": "Vorschau"
   },
