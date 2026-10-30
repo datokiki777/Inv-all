@@ -100,6 +100,8 @@
       "partialPayment": "ეს ინვოისი ასახავს ნაწილობრივ გადახდას. დარჩენილი თანხა მოგეწოდებათ ცალკე."
     },
     "template": "PDF დიზაინი",
+    "confirmTemplateChangeTitle": "PDF დიზაინის შეცვლა?",
+    "confirmTemplateChangeBody": "შევცვალო ამ ინვოისის PDF დიზაინი \"{{from}}\"-დან \"{{to}}\"-ზე?",
     "templates": {
       "classic": "კლასიკური",
       "modern": "თანამედროვე",

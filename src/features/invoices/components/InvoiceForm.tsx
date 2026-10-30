@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { todayDateOnly, formatDate } from "@/utils/date";
 import { blankInvoiceFormItem, invoiceToFormValues } from "@/utils/invoiceFormMapping";
@@ -116,6 +117,12 @@ export function InvoiceForm({
   // never opens it never pays for generating/rendering the PDF at all),
   // but once shown, it then stays mounted for the rest of the session.
   const [previewEverShown, setPreviewEverShown] = useState(false);
+  // A template pick made via the Select is held here as "pending" and only
+  // written into the form once confirmed — never before. Cancel therefore
+  // has nothing to revert: the form value (and so the Select's displayed
+  // value) was never touched in the first place. Same pattern as the
+  // company form's default-design guard.
+  const [pendingTemplateId, setPendingTemplateId] = useState<(typeof TEMPLATES)[number] | null>(null);
   useEffect(() => {
     if (activeTab === "preview") setPreviewEverShown(true);
   }, [activeTab]);
@@ -367,12 +374,50 @@ export function InvoiceForm({
               control={control}
               name="templateId"
               render={({ field }) => (
-                <Select
-                  id="templateId"
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
-                />
+                <>
+                  <Select
+                    id="templateId"
+                    value={field.value}
+                    onChange={(v) => {
+                      // Same value re-picked — nothing to confirm.
+                      if (v === field.value) return;
+                      setPendingTemplateId(v as (typeof TEMPLATES)[number]);
+                    }}
+                    options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
+                  />
+                  {/* Switching companies on a new invoice still re-applies
+                      that company's default design directly (see
+                      CompanyPicker) — that's a separate, deliberate action
+                      and doesn't go through this guard; only a direct pick
+                      from this Select does. */}
+                  <Dialog open={pendingTemplateId !== null} onOpenChange={(open) => !open && setPendingTemplateId(null)}>
+                    {pendingTemplateId ? (
+                      <DialogContent title={t("invoice:form.confirmTemplateChangeTitle")}>
+                        <p className="text-sm text-ink-muted">
+                          {t("invoice:form.confirmTemplateChangeBody", {
+                            from: t(`invoice:form.templates.${field.value}`),
+                            to: t(`invoice:form.templates.${pendingTemplateId}`)
+                          })}
+                        </p>
+                        <div className="mt-5 flex gap-3">
+                          <Button type="button" variant="secondary" className="flex-1" onClick={() => setPendingTemplateId(null)}>
+                            {t("actions.cancel")}
+                          </Button>
+                          <Button
+                            type="button"
+                            className="flex-1"
+                            onClick={() => {
+                              field.onChange(pendingTemplateId);
+                              setPendingTemplateId(null);
+                            }}
+                          >
+                            {t("actions.confirm")}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    ) : null}
+                  </Dialog>
+                </>
               )}
             />
           </FormField>

@@ -100,6 +100,8 @@
       "partialPayment": "This invoice reflects a partial payment. The remaining balance will follow separately."
     },
     "template": "PDF design",
+    "confirmTemplateChangeTitle": "Change PDF design?",
+    "confirmTemplateChangeBody": "Switch this invoice's PDF design from \"{{from}}\" to \"{{to}}\"?",
     "templates": {
       "classic": "Classic",
       "modern": "Modern",

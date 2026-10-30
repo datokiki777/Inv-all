@@ -100,6 +100,8 @@
       "partialPayment": "Diese Rechnung entspricht einer Teilzahlung. Der Restbetrag folgt separat."
     },
     "template": "PDF-Design",
+    "confirmTemplateChangeTitle": "PDF-Design ändern?",
+    "confirmTemplateChangeBody": "Das PDF-Design dieser Rechnung von \"{{from}}\" auf \"{{to}}\" ändern?",
     "templates": {
       "classic": "Classic",
       "modern": "Modern",
