@@ -4,6 +4,11 @@ import modern from "./modern.png";
 import compact from "./compact.png";
 import minimal from "./minimal.png";
 import newTemplate from "./new.png";
+import classicLarge from "./classic-large.png";
+import modernLarge from "./modern-large.png";
+import compactLarge from "./compact-large.png";
+import minimalLarge from "./minimal-large.png";
+import newLarge from "./new-large.png";
 
 /**
  * Static previews of each PDF design, rendered from the REAL template
@@ -22,4 +27,13 @@ export const TEMPLATE_THUMBNAILS: Record<InvoiceTemplateId, string> = {
   compact,
   minimal,
   new: newTemplate
+};
+
+/** Enlarged versions (~1100px wide) for the tap-to-enlarge view — sharp enough to judge the design on a high-density phone screen. */
+export const TEMPLATE_LARGE_PREVIEWS: Record<InvoiceTemplateId, string> = {
+  classic: classicLarge,
+  modern: modernLarge,
+  compact: compactLarge,
+  minimal: minimalLarge,
+  new: newLarge
 };

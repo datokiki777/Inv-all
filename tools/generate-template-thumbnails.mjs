@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Regenerates src/assets/template-thumbnails/*.png from the REAL PDF
+ * Regenerates src/assets/template-thumbnails/*.png (small + `-large` enlarged versions) from the REAL PDF
  * template components (rendered with a neutral sample invoice).
  *
  * RUN THIS whenever a template's look changes — the thumbnails are static
@@ -21,6 +21,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = path.join(root, "src/assets/template-thumbnails");
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "thumbs-"));
 const THUMB_WIDTH = 360; // px — crisp at ~100-180 CSS px on 2-3x phone screens
+const LARGE_WIDTH = 1100; // px — the enlarged view fills a ~400 CSS px dialog, i.e. ~1100 device px on a 2.75x phone
 
 // Vite resolves `foo.ttf?url` to a hashed URL; plain Node can't. In this
 // Node run the "URL" is just the absolute file path, which react-pdf's
@@ -55,10 +56,14 @@ const ids = await renderAllSamplePdfs(work);
 fs.mkdirSync(outDir, { recursive: true });
 for (const id of ids) {
   const base = path.join(work, id);
-  execFileSync("pdftoppm", ["-png", "-singlefile", "-f", "1", "-l", "1", "-scale-to-x", String(THUMB_WIDTH), "-scale-to-y", "-1", `${base}.pdf`, base]);
-  // Quantize: text-on-white compresses to a fraction of the size with no visible loss at thumbnail scale.
-  execFileSync("convert", [`${base}.png`, "-strip", "-dither", "None", "-colors", "256", `PNG8:${path.join(outDir, `${id}.png`)}`]);
-  console.log(`${id}.png  ${(fs.statSync(path.join(outDir, `${id}.png`)).size / 1024).toFixed(1)} KB`);
+  for (const [suffix, width] of [["", THUMB_WIDTH], ["-large", LARGE_WIDTH]]) {
+    const raster = `${base}${suffix}`;
+    execFileSync("pdftoppm", ["-png", "-singlefile", "-f", "1", "-l", "1", "-scale-to-x", String(width), "-scale-to-y", "-1", `${base}.pdf`, raster]);
+    // Quantize: text-on-white compresses to a fraction of the size with no visible loss at this scale.
+    const target = path.join(outDir, `${id}${suffix}.png`);
+    execFileSync("convert", [`${raster}.png`, "-strip", "-dither", "None", "-colors", "256", `PNG8:${target}`]);
+    console.log(`${id}${suffix}.png  ${(fs.statSync(target).size / 1024).toFixed(1)} KB`);
+  }
 }
 fs.rmSync(work, { recursive: true, force: true });
 console.log(`Done — ${ids.length} thumbnails in ${path.relative(root, outDir)}`);
