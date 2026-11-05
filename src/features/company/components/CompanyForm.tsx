@@ -10,6 +10,8 @@ import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { TemplatePicker, TemplateThumbnail } from "@/components/common/TemplatePicker";
+import { ArrowRight } from "lucide-react";
 import { LogoUploader } from "./LogoUploader";
 import { CURRENCIES } from "@/utils/currencies";
 
@@ -57,6 +59,17 @@ function toDefaultValues(company: Company | undefined): CompanyFormValues {
     defaultCurrency: company?.defaultCurrency ?? "EUR",
     defaultInvoiceTemplateId: company?.defaultInvoiceTemplateId ?? "modern"
   };
+}
+
+function DesignPreviewCard({ id, label, highlighted }: { id: TemplateId; label: string; highlighted?: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div className={`w-20 overflow-hidden rounded-md border-2 ${highlighted ? "border-accent" : "border-line"}`}>
+        <TemplateThumbnail id={id} />
+      </div>
+      <span className={`text-xs ${highlighted ? "font-medium text-accent" : "text-ink-muted"}`}>{label}</span>
+    </div>
+  );
 }
 
 /** Add/edit form for one company — rendered inside a Dialog by CompaniesPage, same pattern as ClientForm. */
@@ -207,20 +220,21 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
           control={control}
           name="defaultInvoiceTemplateId"
           render={({ field }) => (
-            <Select
+            <TemplatePicker
               id="defaultInvoiceTemplateId"
+              ariaLabel={t("company.defaultInvoiceTemplateId")}
               value={field.value}
               onChange={(v) => {
                 if (company) {
                   // Editing an existing company — hold the pick as
                   // "pending" and ask for confirmation instead of
-                  // applying it immediately.
-                  setPendingTemplateId(v as TemplateId);
+                  // applying it immediately. (Re-tapping the current
+                  // design is a no-op, nothing to confirm.)
+                  if (v !== field.value) setPendingTemplateId(v);
                 } else {
                   field.onChange(v);
                 }
               }}
-              options={TEMPLATES.map((template) => ({ value: template, label: t(`invoice:form.templates.${template}`) }))}
             />
           )}
         />
@@ -233,6 +247,13 @@ export function CompanyForm({ company, onSubmit, onCancel }: CompanyFormProps) {
           <Dialog open={pendingTemplateId !== null} onOpenChange={(open) => !open && setPendingTemplateId(null)}>
             {pendingTemplateId ? (
               <DialogContent title={t("company.confirmTemplateChangeTitle")}>
+                {/* Current design -> the one being picked, side by side,
+                    so the change can be judged by sight, not by names. */}
+                <div className="mb-4 flex items-center justify-center gap-4">
+                  <DesignPreviewCard id={field.value} label={t(`invoice:form.templates.${field.value}`)} />
+                  <ArrowRight size={18} className="shrink-0 text-ink-faint" />
+                  <DesignPreviewCard id={pendingTemplateId} label={t(`invoice:form.templates.${pendingTemplateId}`)} highlighted />
+                </div>
                 <p className="text-sm text-ink-muted">
                   {t("company.confirmTemplateChangeBody", {
                     from: t(`invoice:form.templates.${field.value}`),
